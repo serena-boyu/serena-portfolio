@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Serena Ng — Portfolio</title>
+<meta name="ext-resource-dependency" content="assets/searchneu.png" data-resource-id="searchneu" />
+<link rel="preload" as="image" href="assets/about/headshot-w.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: rgb(0,0,0);
+    --paper: rgb(255,255,255);
+    --hair: rgb(215,215,215);
+    --hair-soft: rgba(160,160,160,0.35);
+    --muted: rgb(160,160,160);
+    --gray-50: rgb(244,244,244);
+    --gray-100: rgb(226,226,226);
+    --accent: rgb(87,94,219);
+    --accent-shadow: rgba(87,94,219,0.28);
+    --shadow-soft: rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01", "cv11";
+    overscroll-behavior: none;
+  }
+
+  body { min-height: 100vh; }
+
+  #root { min-height: 100vh; }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* Reusable */
+  .accent-rule {
+    height: 1px;
+    background: var(--accent);
+    width: 100%;
+  }
+
+  /* Hide scrollbar but keep scroll */
+  .clean-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+  .clean-scroll::-webkit-scrollbar-track { background: transparent; }
+  .clean-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 999px; }
+
+  /* Fully hidden scrollbar (still scrollable) — used by the mobile sub-nav. */
+  .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .no-scrollbar::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+  /* Subtle striped placeholder */
+  .placeholder-stripe {
+    background-image:
+      repeating-linear-gradient(135deg,
+        rgba(0,0,0,0.04) 0px,
+        rgba(0,0,0,0.04) 1px,
+        transparent 1px,
+        transparent 14px),
+      linear-gradient(180deg, #fafafa, #f0f0f0);
+    color: rgba(0,0,0,0.45);
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px;
+  }
+
+  /* Nice focus ring */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Shared top-nav link (consistent across Home + subpages) */
+  .nav-link {
+    background: none;
+    border: none;
+    padding: 6px 0;
+    margin: 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13.5px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    opacity: 0.9;
+    transition: color .25s ease, opacity .25s ease;
+    display: inline-flex;
+    align-items: center;
+  }
+  .nav-link:hover { color: var(--accent); opacity: 1; }
+  .nav-link.is-current { color: var(--accent); opacity: 1; }
+  .nav-wordmark {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    transition: color .2s ease;
+  }
+  .nav-wordmark:hover { color: var(--accent); }
+
+  /* Pill button (archive links, CTAs) with a distinct hover state */
+  .pill-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 9px 16px;
+    font-family: inherit;
+    font-size: 13px;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    transition: background .25s ease, box-shadow .25s ease, transform .2s cubic-bezier(.22,.61,.36,1);
+  }
+  .pill-btn:hover {
+    background: color-mix(in oklch, var(--accent) 84%, #000);
+    box-shadow: 0 8px 20px var(--accent-shadow);
+    transform: translateY(-1px);
+  }
+  .pill-btn:active { transform: translateY(0); }
+  /* `is-hot` mirrors :hover so a parent (e.g. a whole playground section) can
+     drive the button's hover state when the pointer is anywhere inside it. */
+  .pill-btn.is-hot {
+    background: color-mix(in oklch, var(--accent) 84%, #000);
+    box-shadow: 0 8px 20px var(--accent-shadow);
+    transform: translateY(-1px);
+  }
+  .pill-btn.is-hot .arr { transform: translateX(4px); }
+  .pill-btn .arr { display: inline-block; transition: transform .25s cubic-bezier(.22,.61,.36,1); }
+  .pill-btn:hover .arr { transform: translateX(4px); }
+
+  /* Ghost (outline) variant — same hover energy, lighter default */
+  .pill-btn.ghost {
+    background: transparent;
+    color: var(--accent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 40%, transparent);
+  }
+  .pill-btn.ghost:hover {
+    background: color-mix(in oklch, var(--accent) 8%, transparent);
+    box-shadow: inset 0 0 0 1px var(--accent), 0 8px 20px var(--accent-shadow);
+  }
+  /* Thicker outline variant (secondary buttons that need more presence) */
+  .pill-btn.ghost.thick {
+    box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--accent) 55%, transparent);
+  }
+  .pill-btn.ghost.thick:hover {
+    box-shadow: inset 0 0 0 2px var(--accent), 0 8px 20px var(--accent-shadow);
+  }
+
+  /* Contact form fields */
+  .field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgba(0,0,0,0.65);
+    margin-bottom: 7px;
+  }
+  .field-input {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid rgb(176,176,176);
+    border-radius: 12px;
+    padding: 12px 14px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .field-input::placeholder { color: rgba(0,0,0,0.35); }
+  .field-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-shadow);
+  }
+  textarea.field-input { resize: vertical; min-height: 130px; line-height: 1.5; }
+  @media (max-width: 640px) {
+    .contact-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
+  }
+
+  /* About hero + Journey cards: stack vertically on narrow screens. */
+  @media (max-width: 720px) {
+    .about-hero { grid-template-columns: 1fr !important; gap: 24px !important; }
+    .about-hero .about-portrait { order: -1; justify-self: start !important; width: 200px !important; }
+    /* The stacked layout puts the portrait first (order:-1) and left-aligned,
+       so there's nowhere to place the bubble that doesn't collide with either
+       the sticky nav above or the heading below. The reveal is hover-driven
+       anyway, which touch devices don't have — so hide it here. */
+    .about-fact-bubble { display: none !important; }
+    .journey-card { grid-template-columns: 1fr !important; gap: 16px !important; }
+    .about-two-col { grid-template-columns: 1fr !important; gap: 32px !important; }
+  }
+
+  /* Playground: keep content inside the viewport and reflow on mobile. */
+  .pg-container { width: 100%; box-sizing: border-box; }
+  /* Playground folder-shaped hover indicator — one clipped silhouette that
+     tips up in 3D, so there are no seams between separate pieces. */
+  .folder-shape {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 100%;
+    will-change: transform;
+  }
+  @keyframes folderLift {
+    0%   { transform: perspective(1100px) rotateX(-11deg) translateY(7px) scale(0.985); }
+    100% { transform: perspective(1100px) rotateX(0deg) translateY(0) scale(1); }
+  }
+  .folder-open .folder-shape { animation: folderLift .48s cubic-bezier(.22,.75,.3,1) both; }
+  @media (prefers-reduced-motion: reduce) {
+    .folder-open .folder-shape { animation: none; }
+  }
+
+/* Company / client links — purple, darkening slightly on hover. */
+  .org-link { color: var(--accent); text-decoration: none; transition: color .18s ease; }
+  .org-link:hover, .org-link:focus-visible { color: color-mix(in oklch, var(--accent) 68%, black); }
+
+  /* Archive pages: static caption hidden on desktop (hover card covers it). */
+  .archive-static-caption { display: none; }
+  /* "Up next" / "Next project": the inline button is mobile-only. */
+  .upnext-btn-inline { display: none; }
+  /* About heading: "I'm Serena!" drops to its own line on mobile only. */
+  .howdy-break { display: none; }
+  /* Book flipper: arrows flank the book on desktop; on mobile they're dropped
+     entirely (swipe replaces them) and the controls stack. */
+  @media (max-width: 720px) {
+    .howdy-break { display: block; }
+    /* Drop the side arrows so the stage can use the full content width. */
+    .book-row { gap: 0 !important; }
+    .book-arrow-side { display: none !important; }
+    /* Scrubber spans the full content width. */
+    .book-scrub { padding: 0 !important; }
+    /* Auto-play on top, Back to start beneath it. */
+    .book-tools { flex-direction: column; align-items: center; gap: 100px; }
+    .book-tool-restart { order: 2; }
+    /* Tall books (portrait spreads) get narrower side padding in fullscreen
+       here, since a phone has far less width to spare than a desktop. */
+    .book-wrap.is-tall:fullscreen,
+    .book-wrap.is-tall:-webkit-full-screen,
+    .book-wrap.is-tall.is-expanded { padding: 6vh 3vw; }
+    /* Swiping the book shouldn't also pan the page. */
+    [data-book-stage] { touch-action: pan-y; }
+  }
+  @media (max-width: 720px) {
+    /* Thumbnail stays on the left; copy + button stack to its right, both
+       vertically centered against each other. */
+    .upnext-row { align-items: center !important; }
+    .upnext-btn-side { display: none; }
+    .upnext-btn-inline { display: inline-flex; margin-top: 12px; }
+  }
+  /* Book flipper arrows */
+  @keyframes leafTurnNext { from { transform: rotateY(0deg); } to { transform: rotateY(-180deg); } }
+  @keyframes leafTurnPrev { from { transform: rotateY(0deg); } to { transform: rotateY(180deg); } }
+  .book-arrow { flex-shrink: 0; width: 52px; height: 52px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-family: inherit; font-size: 22px; font-weight: 500; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: 0 3px 12px var(--accent-shadow); transition: background .2s ease, color .2s ease, border-color .2s ease, opacity .2s ease, transform .2s ease, box-shadow .2s ease; }
+  .book-arrow:hover:not(:disabled) { background: color-mix(in oklch, var(--accent) 86%, black); border-color: color-mix(in oklch, var(--accent) 86%, black); color: #fff; transform: scale(1.08); box-shadow: 0 6px 20px var(--accent-shadow); }
+  .book-arrow:active:not(:disabled) { transform: scale(0.96); }
+  .book-arrow:disabled { background: var(--paper); border-color: var(--hair); color: rgba(0,0,0,0.28); box-shadow: none; cursor: default; }
+  /* Book: fullscreen shell, progress slider, small tool button */
+  .book-wrap:fullscreen { background: var(--paper); padding: 5vh 5vw; display: flex; flex-direction: column; justify-content: center; }
+  .book-wrap:-webkit-full-screen { background: var(--paper); padding: 5vh 5vw; display: flex; flex-direction: column; justify-content: center; }
+  .book-wrap.is-expanded { position: fixed; inset: 0; z-index: 1000; margin: 0 !important; background: var(--paper); padding: 5vh 5vw; display: flex; flex-direction: column; justify-content: center; overflow: auto; }
+  /* Taller books (portrait spreads) need more room around them so the page
+     edges don't crowd the viewport. */
+  .book-wrap.is-tall:fullscreen { padding: 8vh 11vw; }
+  .book-wrap.is-tall:-webkit-full-screen { padding: 8vh 11vw; }
+  .book-wrap.is-tall.is-expanded { padding: 8vh 11vw; }
+  .book-progress { -webkit-appearance: none; appearance: none; position: absolute; inset: 0; width: 100%; height: 22px; margin: 0; background: transparent; opacity: 0; cursor: grab; display: block; }
+  .book-progress:active { cursor: grabbing; }
+  .book-progress::-webkit-slider-runnable-track { height: 22px; background: transparent; }
+  .book-progress::-moz-range-track { height: 22px; background: transparent; }
+  .book-progress::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 999px; background: #000; border: 0; }
+  .book-progress::-moz-range-thumb { width: 22px; height: 22px; border: 0; border-radius: 999px; background: #000; }
+  .book-progress:focus-visible { opacity: 1; outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 999px; }
+  .book-tool { border: 1px solid var(--accent); background: var(--accent); color: #fff; font-family: inherit; font-size: 12.5px; letter-spacing: -0.01em; border-radius: 999px; padding: 6px 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease; }
+  .book-tool:hover { background: color-mix(in oklch, var(--accent) 86%, black); border-color: color-mix(in oklch, var(--accent) 86%, black); color: #fff; box-shadow: 0 4px 14px var(--accent-shadow); }
+  @media (max-width: 720px) {
+    .book-arrow { width: 42px; height: 42px; font-size: 18px; }
+  }
+  /* Browser-framed video figures: cap the width on short viewports so the whole
+     window stays visible without scrolling. The recordings are ~1.38:1, so the
+     width is derived from the available height. */
+  .browser-figure { width: 100%; }
+  @media (max-height: 900px) {
+    .browser-figure { max-width: 96vh; }
+  }
+  @media (max-height: 760px) {
+    .browser-figure { max-width: 88vh; }
+  }
+
+  @media (max-width: 720px) {
+    .quote-wall { column-count: 1 !important; }
+    .notes-grid { grid-template-columns: 1fr !important; }
+    .half-media { grid-template-columns: 1fr !important; gap: 18px !important; }
+    .half-media > * { order: 0 !important; }
+    .media-row { grid-template-columns: 1fr !important; gap: 18px !important; }
+  }
+
+  /* Soft pop when a My Journey dot becomes active (turns purple) on scroll. */
+  @keyframes journeyDotPop {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.35); }
+    100% { transform: scale(1); }
+  }
+  .journey-dot.is-active { animation: journeyDotPop .5s cubic-bezier(.34,1.56,.64,1); }
+  @media (prefers-reduced-motion: reduce) {
+    .journey-dot.is-active { animation: none; }
+  }
+
+  /* My Journey timeline geometry — smaller nodes; tighter + further left on
+     mobile so the cards can be wider. Dynamic bits (fill scaleY, head top,
+     dot colors) stay inline in JS; static geometry lives here. */
+  .journey-track, .journey-fill {
+    position: absolute; left: 10px; top: 18px; bottom: 18px;
+    width: 2px; border-radius: 2px;
+  }
+  .journey-track { background: var(--hair); }
+  .journey-fill {
+    background: var(--accent); box-shadow: 0 0 8px var(--accent-shadow);
+    transform-origin: top;
+  }
+  .journey-head {
+    position: absolute; left: 6px; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-shadow);
+  }
+  .journey-dot {
+    position: absolute; left: 3px; top: 8px;
+    width: 16px; height: 16px; border-radius: 50%;
+  }
+  .journey-item { position: relative; padding-left: 40px; }
+  @media (max-width: 720px) {
+    .journey-track, .journey-fill { left: 6px; }
+    .journey-head { left: 3px; width: 8px; height: 8px; }
+    .journey-dot { left: 0; top: 7px; width: 14px; height: 14px; }
+    .journey-item { padding-left: 24px; }
+  }
+
+  /* Waving-hand custom cursor on the About portrait. */
+  @keyframes handWave {
+    0%, 100% { transform: rotate(-12deg); }
+    50%      { transform: rotate(14deg); }
+  }
+
+  /* "Howdy" — a cowboy hat tips onto the word on hover. */
+  .howdy-word {
+    position: relative;
+    display: inline-block;
+    cursor: default;
+  }
+  .howdy-word::after {
+    content: "🤠";
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    font-size: 1em;
+    line-height: 1;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 6px) rotate(-18deg) scale(0.7);
+    transition: opacity .2s ease, transform .34s cubic-bezier(.34,1.56,.64,1);
+  }
+  .howdy-word:hover::after {
+    opacity: 1;
+    transform: translate(-50%, -1px) rotate(-12deg) scale(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .howdy-word::after { transition: opacity .2s ease; }
+    .howdy-word:hover::after { transform: translate(-50%, -1px) rotate(-12deg) scale(1); }
+  }
+
+  /* "Howdy, I'm Serena!" hand — a brief wave once every 8s, then rests at 8°. */
+  @keyframes howdyWave {
+    0%      { transform: rotate(8deg); }
+    3%      { transform: rotate(-12deg); }
+    6%      { transform: rotate(14deg); }
+    9%      { transform: rotate(-8deg); }
+    12%     { transform: rotate(12deg); }
+    15%     { transform: rotate(8deg); }
+    100%    { transform: rotate(8deg); }
+  }
+  .howdy-wave {
+    transform-origin: 70% 90%;
+    animation: howdyWave 8s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .howdy-wave { animation: none; transform: rotate(8deg); }
+  }
+  @media (max-width: 720px) {
+    .pg-container { padding-left: 22px !important; padding-right: 22px !important; }
+    /* Hero: emoji cloud drops below the text block. */
+    .pg-hero { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+    .pg-hero .pg-emoji-cloud { width: 100% !important; align-self: stretch; margin-top: 20px; }
+    /* Section header: description on top, archive button left-aligned below. */
+    .pg-section-head { flex-direction: column !important; align-items: flex-start !important; gap: 14px !important; }
+    /* Image grid: 2 columns (× 3 rows for 6 items). */
+    .pg-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    /* Archive pages: single column of large images. */
+    .archive-grid { grid-template-columns: 1fr !important; }
+    /* "What I've been up to": 2 cols × 3 rows, taller cards so the
+       hover caption box never gets clipped inside the image. */
+    .recent-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .recent-grid > div { aspect-ratio: 1 / 1 !important; }
+    /* Smaller archive page title on mobile. */
+    .archive-title { font-size: 30px !important; }
+    /* No hover on mobile → show a static caption beneath each image. */
+    .archive-static-caption { display: block; margin-top: 10px; }
+  }
+
+  /* ── Shared site top-nav (consistent across every page) ───────────── */
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: block;
+    padding: 15px 0;
+    background: transparent;
+    transition: padding .25s ease, background .25s ease, box-shadow .25s ease, transform .3s cubic-bezier(.4,0,.2,1);
+  }
+  /* Case study pages: slide the nav out of view on scroll-down. */
+  .site-nav.is-hidden { transform: translateY(-104%); }
+  @media (prefers-reduced-motion: reduce) {
+    .site-nav { transition: padding .25s ease, background .25s ease, box-shadow .25s ease; }
+    .site-nav.is-hidden { transform: none; }
+  }
+  /* Inner row constrained to the page's content width so the "Serena Ng"
+     wordmark left edge always lines up with the page content below it. */
+  .site-nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 40px;
+    box-sizing: border-box;
+  }
+  /* On Home (fixed, non-scrolling split layout) the bar overlays the top. */
+  .site-nav.overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+  }
+  /* Compact sticky state once the page is scrolled. */
+  .site-nav.is-compact {
+    padding: 9px 0;
+    background: rgba(255,255,255,0.82);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    backdrop-filter: saturate(180%) blur(14px);
+    box-shadow: 0 1px 0 var(--hair), 0 6px 22px rgba(0,0,0,0.05);
+  }
+  .site-nav .site-nav-links { display: flex; gap: 44px; align-items: center; }
+  .site-nav .nav-wordmark { transition: font-size .25s ease, color .2s ease; }
+  .site-nav.is-compact .nav-wordmark { font-size: 13.5px; }
+  @media (max-width: 560px) {
+    .site-nav { padding: 12px 0; }
+    .site-nav.is-compact { padding: 8px 0; }
+    .site-nav-inner { padding: 0 20px; }
+    .site-nav .site-nav-links { gap: 20px; }
+  }
+
+  /* ── Nav dropdown menus (Work / Playground) ───────────────────────── */
+  .nav-item { position: relative; display: inline-flex; }
+  /* Caret indicator — rotates up and reveals when the menu is open. */
+  .nav-link .nav-caret {
+    display: inline-block;
+    width: 9px; height: 9px;
+    margin-left: 5px;
+    opacity: 0;
+    transform: rotate(0deg);
+    transition: opacity .18s ease, transform .18s ease;
+    vertical-align: middle;
+  }
+  .nav-item:hover .nav-link .nav-caret,
+  .nav-item:focus-within .nav-link .nav-caret {
+    opacity: 1;
+    transform: rotate(180deg);
+  }
+  .nav-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    width: max-content;
+    padding: 7px;
+    background: #ffffff;
+    border: 1px solid var(--hair);
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.05);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity .18s ease, transform .18s ease, visibility .18s;
+    z-index: 60;
+  }
+  /* A hover bridge so the menu doesn't close in the gap below the link. */
+  .nav-menu::before {
+    content: "";
+    position: absolute;
+    top: -10px; left: 0; right: 0;
+    height: 10px;
+  }
+  .nav-item:hover .nav-menu,
+  .nav-item:focus-within .nav-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  /* Guarantee only ONE dropdown open at a time: while hovering anywhere in
+     the nav, suppress any other menu kept open by lingering focus-within. */
+  .site-nav-links:hover .nav-item:not(:hover) .nav-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+  }
+  /* Touch / no-hover devices: disable the dropdowns entirely so tapping
+     "Work" or "Playground" navigates to the page (which lists the sub-items)
+     instead of just opening a menu. Also hide the caret indicator. */
+  @media (hover: none) {
+    .nav-menu { display: none !important; }
+    .nav-link .nav-caret { display: none !important; }
+  }
+  .nav-menu-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    white-space: nowrap;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13.5px;
+    letter-spacing: -0.01em;
+    color: rgba(0,0,0,0.72);
+    padding: 9px 12px;
+    border-radius: 9px;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .nav-menu-item:hover { background: color-mix(in oklch, var(--accent) 9%, transparent); color: var(--accent); }
+  /* Current page within a dropdown — highlighted purple. */
+  .nav-menu-item.is-active { color: var(--accent); font-weight: 600; }
+  .nav-menu-item.is-active:hover { background: color-mix(in oklch, var(--accent) 12%, transparent); }
+
+  /* ── Shared site footer (consistent across every page) ────────────── */
+  .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 28px;
+    padding: 22px 40px;
+    font-size: 12px;
+    letter-spacing: -0.01em;
+    color: rgba(0,0,0,0.45);
+  }
+  .site-footer .site-footer-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+  .site-footer.bare { padding-left: 0; padding-right: 0; padding-bottom: 0; }
+  .footer-link {
+    color: rgba(0,0,0,0.6);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklch, var(--ink) 16%, transparent);
+    padding-bottom: 1px;
+    cursor: pointer;
+    transition: color .2s ease, border-color .2s ease, background-color .2s ease;
+  }
+  .footer-link:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: color-mix(in oklch, var(--accent) 8%, transparent);
+  }
+  @media (max-width: 560px) {
+    .site-footer { padding: 18px 20px; }
+  }
+
+  /* Soft page-load entrance that FAILS VISIBLE. The base is always opacity:1,
+     so the page can never be stuck blank. The fade only runs while the
+     `.is-entering` class is present, which JS adds on mount and removes when
+     the animation ends (with a timeout + tab-focus failsafe in App.jsx) — so a
+     throttled/frozen animation clock can't hide the page. Opacity-only, to not
+     disturb the fixed/sticky nav. */
+  @keyframes pageFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .page-enter { opacity: 1; }
+  .page-enter.is-entering { animation: pageFade .42s ease-out; }
+  @media (prefers-reduced-motion: reduce) {
+    .page-enter.is-entering { animation: none; }
+  }
+</style>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#ffffff">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#ffffff"/>
+    <rect x="0" y="0" width="640" height="800" fill="#ececec"/>
+    <circle cx="320" cy="360" r="120" fill="#d7d7d7"/>
+    <text x="820" y="330" font-family="Inter, sans-serif" font-size="120" font-weight="700" fill="#575EDB" text-anchor="middle">SN</text>
+    <rect x="700" y="430" width="240" height="14" rx="7" fill="#575EDB"/>
+    <rect x="700" y="470" width="180" height="14" rx="7" fill="#d7d7d7"/>
+  </svg>
+</template>
+<div id="root"></div>
+
+<!-- React + Babel -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="src/data.jsx"></script>
+<script type="text/babel" src="src/Home.jsx"></script>
+<script type="text/babel" src="src/ProjectPage.jsx"></script>
+<script type="text/babel" src="src/About.jsx"></script>
+<script type="text/babel" src="src/PlaygroundSimple.jsx"></script>
+<script type="text/babel" src="src/App.jsx"></script>
+</body>
+</html>
