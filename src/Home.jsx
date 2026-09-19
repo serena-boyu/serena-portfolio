@@ -183,9 +183,9 @@ function ProjectThumb({ project, active }) {
 }
 
 function CompanyLink({ href, children }) {
-  // Uses text-decoration (not a border) so the underline follows the text when
-  // a name wraps to the next line, and nowrap so a two-word company name never
-  // splits across lines.
+  // No resting underline — the purple carries the affordance. The underline
+  // only appears on hover/focus, and uses text-decoration (not a border) so it
+  // follows the text if a name wraps. nowrap keeps two-word names intact.
   return (
     <a
       href={href}
@@ -195,7 +195,7 @@ function CompanyLink({ href, children }) {
         color: "var(--accent)",
         whiteSpace: "nowrap",
         textDecoration: "underline",
-        textDecorationColor: "color-mix(in oklch, var(--accent) 28%, transparent)",
+        textDecorationColor: "transparent",
         textDecorationThickness: "1px",
         textUnderlineOffset: "3px",
         transition: "text-decoration-color .2s ease, color .2s ease"
@@ -204,13 +204,19 @@ function CompanyLink({ href, children }) {
         e.currentTarget.style.textDecorationColor = "var(--accent)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.textDecorationColor = "color-mix(in oklch, var(--accent) 28%, transparent)";
+        e.currentTarget.style.textDecorationColor = "transparent";
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.textDecorationColor = "var(--accent)";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.textDecorationColor = "transparent";
       }}>
       {children}
     </a>);
 }
 
-function EmojiCloud({ visible, hoveredId, onHover }) {
+function EmojiCloud({ visible, hoveredId, onHover, onOpenMisc }) {
   // Warm the browser cache for every hover photo once, on mount — so the first
   // hover paints instantly instead of waiting on a network fetch.
   useEffect(() => {
@@ -272,7 +278,8 @@ function EmojiCloud({ visible, hoveredId, onHover }) {
               onMouseLeave={() => onHover(null)}
               onFocus={() => onHover(i)}
               onBlur={() => onHover(null)}
-              aria-label={e.title}
+              onClick={onOpenMisc}
+              aria-label={e.title + " — open the Archive"}
               style={{
                 position: "absolute",
                 left: p.left,
@@ -446,6 +453,17 @@ function EmojiCard({ emoji, anchor }) {
         fontWeight: 300
       }}>
         {emoji.body}
+      </div>
+      {/* Signals that the emoji itself is clickable. */}
+      <div style={{
+        marginTop: 8,
+        fontSize: 11,
+        letterSpacing: "0.02em",
+        color: "var(--accent)",
+        textAlign: "center",
+        fontWeight: 500
+      }}>
+        Click to see more →
       </div>
       <style>{`
         @keyframes cardIn {
@@ -809,7 +827,7 @@ function HomeDesktop({ onOpen, onNavigate }) {
         )}
 
         {/* Emojis (idle) */}
-        <EmojiCloud visible={showEmojis && !showThumb} hoveredId={hoveredEmoji} onHover={setHoveredEmoji} />
+        <EmojiCloud visible={showEmojis && !showThumb} hoveredId={hoveredEmoji} onHover={setHoveredEmoji} onOpenMisc={() => onNavigate("playground")} />
 
         {/* Emoji caption card is rendered inside <EmojiCloud /> above */}
 
@@ -864,13 +882,13 @@ function HomeDesktop({ onOpen, onNavigate }) {
           <div style={{
                 marginTop: "clamp(12px, 2.2vh, 22px)",
                 fontWeight: 300,
-                fontSize: 18,
-                lineHeight: "28px",
+                fontSize: 16.5,
+                lineHeight: "26px",
                 letterSpacing: "-0.02em",
                 color: "rgba(0,0,0,0.78)"
               }}>
             <div>Patient experience + AI workflows @ <CompanyLink href="https://www.epic.com">Epic Health Systems</CompanyLink></div>
-            <div>Previously designed for <CompanyLink href="https://www.ronikdesign.com/">Ronik</CompanyLink>, <CompanyLink href="https://snyk.io">Snyk</CompanyLink>, <CompanyLink href="https://www.jfkairport.com/">JFK Airport</CompanyLink>, <CompanyLink href="https://plus.reuters.com/p/1">Reuters</CompanyLink>, etc.</div>
+            <div>Previously designed for <CompanyLink href="https://www.ronikdesign.com/">Ronik</CompanyLink>, <CompanyLink href="https://snyk.io">Snyk</CompanyLink>, <CompanyLink href="https://www.jfkairport.com/">JFK Airport</CompanyLink>, <CompanyLink href="https://plus.reuters.com/p/1">Reuters</CompanyLink>, and more.</div>
           </div>
 
           <div className="accent-rule" style={{ marginTop: "clamp(18px, 3.5vh, 36px)", margin: "34px 0px 0px" }} />
@@ -932,7 +950,7 @@ function HomeMobile({ onOpen, onNavigate }) {
             color: "rgba(0,0,0,0.78)"
           }}>
           <div>Patient experience + AI workflows @ <CompanyLink href="https://www.epic.com">Epic Health Systems</CompanyLink></div>
-          <div>Previously designed for <CompanyLink href="https://www.ronikdesign.com/">Ronik</CompanyLink>, <CompanyLink href="https://snyk.io">Snyk</CompanyLink>, <CompanyLink href="https://www.jfkairport.com/">JFK Airport</CompanyLink>, <CompanyLink href="https://plus.reuters.com/p/1">Reuters</CompanyLink>, etc.</div>
+          <div>Previously designed for <CompanyLink href="https://www.ronikdesign.com/">Ronik</CompanyLink>, <CompanyLink href="https://snyk.io">Snyk</CompanyLink>, <CompanyLink href="https://www.jfkairport.com/">JFK Airport</CompanyLink>, <CompanyLink href="https://plus.reuters.com/p/1">Reuters</CompanyLink>, and more.</div>
         </div>
         <div className="accent-rule" style={{ marginTop: 22 }} />
       </div>

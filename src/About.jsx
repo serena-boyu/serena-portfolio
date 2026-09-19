@@ -177,6 +177,21 @@ function ImageCaption({ title, caption, src, videoSrc, gradient, aspect = "16 / 
 
 }
 
+// Client logos for the marquee in the About page's Client Work section.
+// Order intentionally matches the sentence above it. Each asset is grayscale,
+// whitespace-trimmed, and rendered at exactly 2x its display height (so the
+// CSS never upscales it). Heights are balanced by optical AREA rather than
+// being equal, so very wide wordmarks don't dominate the row.
+const CLIENT_LOGOS = [
+{ src: "assets/logos/reuters.png", h: 32, name: "Reuters Plus", href: "https://plus.reuters.com/p/1" },
+{ src: "assets/logos/jfk-t4.png", h: 31, name: "JFK Airport", href: "https://www.jfkairport.com/explore-jfk/terminals/terminal-4" },
+{ src: "assets/logos/nbcuniversal.png", h: 21, name: "NBCUniversal", href: "https://together.nbcuni.com/home/" },
+{ src: "assets/logos/ogilvy.png", h: 32, name: "Ogilvy", href: "https://www.ogilvy.com/" },
+{ src: "assets/logos/ecolab.png", h: 29, name: "Ecolab", href: "https://www.ecolab.com/en-us" },
+{ src: "assets/logos/pgim.png", h: 32, name: "PGIM", href: "https://www.pgim.com/us/en/institutional" },
+{ src: "assets/logos/leading-edge.png", h: 32, name: "Leading Edge", href: "https://www.leadingedge.org/" },
+{ src: "assets/logos/flo-marketing.png", h: 32, name: "Flo. Marketing", href: "https://www.flomktg.com/" }];
+
 // Fun facts shown in the bubble when the portrait is clicked — edit freely.
 const FUN_FACTS = [
 "I have a 1200+ day streak on Duolingo!",
@@ -560,17 +575,84 @@ window.SiteNav = SiteNav;
 
 // Shared site footer used on EVERY page. Small text pinned to the bottom.
 // `marginTop: auto` lets it sink to the bottom when its parent is a flex column.
-function SiteFooter({ bare, big, noResume }) {
+function SiteFooter({ bare, big, noResume, contentMaxWidth = 1080 }) {
   const style = bare ? { marginTop: "clamp(20px, 4vh, 48px)" } : { marginTop: "auto" };
   if (big) style.fontSize = 13.5;
+
+  // Matches the easing used by the case-study "Back to top" link.
+  const toTop = () => {
+    const read = () =>
+    window.scrollY || document.documentElement.scrollTop ||
+    document.scrollingElement && document.scrollingElement.scrollTop || 0;
+    const start = read();
+    if (start < 4) return;
+    if (typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    const dur = Math.min(1500, Math.max(700, start * 0.55));
+    const clock = () => window.performance && performance.now ? performance.now() : Date.now();
+    const t0 = clock();
+    const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const step = () => {
+      const p = Math.min(1, (clock() - t0) / dur);
+      window.scrollTo(0, Math.round(start * (1 - ease(p))));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  // Plain hash links rather than an onNavigate prop, so the footer works on
+  // every page without each call site having to thread the router through.
   return (
     <footer
       className={"site-footer" + (bare ? " bare" : "")}
       style={style}>
-      <span>© 2026 Serena Ng</span>
-      <span>Designed by Serena + crafted with <a className="footer-link" href="https://www.anthropic.com/claude" target="_blank" rel="noreferrer noopener">Claude</a></span>
-      <div className="site-footer-links">
-        <a className="footer-link" href="mailto:serena.ng.contact@gmail.com">serena.ng.contact@gmail.com</a>
+      {/* Matches the page's own content cap so the footer lines up with
+          everything above it on wide screens. */}
+      <div className="footer-inner" style={{ maxWidth: contentMaxWidth }}>
+      <div className="footer-top">
+        <div className="footer-left">
+          <div className="footer-meta">
+            <div className="footer-signoff-title">Thanks for stopping by! ❤︎</div>
+            <span style={{ color: "rgba(0,0,0,0.62)", fontSize: 13 }}>
+              Designed by Serena + crafted with{" "}
+              <a className="footer-link" href="https://www.anthropic.com/claude" target="_blank" rel="noreferrer noopener">Claude</a>
+            </span>
+            {/* Pushed to the bottom of the column so it baselines with the
+                last nav link on the right. */}
+            <a className="footer-link footer-email" href="mailto:serena.ng.contact@gmail.com">serena.ng.contact@gmail.com</a>
+          </div>
+        </div>
+
+        <div className="footer-cols">
+          <div className="footer-col">
+            <div className="footer-col-title">Pages</div>
+            <a className="footer-link" href="#/">Featured Work</a>
+            <a className="footer-link" href="#/playground">Archive</a>
+            <a className="footer-link" href="#/about">About</a>
+          </div>
+          <div className="footer-col">
+            <div className="footer-col-title">Featured Work</div>
+            <a className="footer-link" href="#/project/searchneu">SearchNEU</a>
+            <a className="footer-link" href="#/project/jfk">JFK Airport</a>
+            <a className="footer-link" href="#/project/ecolab">Reuters x Ecolab</a>
+            <a className="footer-link" href="#/project/pomodoro">The Pomodoro Timer</a>
+          </div>
+          <div className="footer-col">
+            <div className="footer-col-title">Archive</div>
+            <a className="footer-link" href="#/archive/branding">Design</a>
+            <a className="footer-link" href="#/archive/photography">Photography</a>
+            <a className="footer-link" href="#/archive/misc">Miscellaneous</a>
+          </div>
+          <div className="footer-col">
+            <button className="footer-top-btn" onClick={toTop}>
+              <span aria-hidden="true">↑</span> Back to top
+            </button>
+          </div>
+        </div>
+      </div>
       </div>
     </footer>);
 
@@ -941,10 +1023,10 @@ function About({ onNavigate }) {
               <span className="howdy-word">Howdy</span>,<span className="howdy-break" />{" "}I'm Serena! <span className="howdy-wave" style={{ display: "inline-block" }}>👋</span>
             </h1>
             <p style={{ margin: "14px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.78)", maxWidth: 540, textWrap: "pretty" }}>
-              I'm a designer who's worn a lot of hats, including product research, UX/UI, visual design, and marketing. <strong style={{ fontWeight: 600, color: "rgba(0,0,0,0.92)" }}>I've learned that the best solutions rarely stay inside one discipline.</strong>
+              I'm a designer who's worn a lot of hats, including product research, UX/UI, visual design, development, and marketing. <strong style={{ fontWeight: 600, color: "rgba(0,0,0,0.92)" }}>I've learned that the best solutions rarely stay inside one discipline.</strong>
             </p>
             <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.78)", maxWidth: 540, textWrap: "pretty" }}>
-              I've worked shoulder-to-shoulder with engineers, marketers, and clients across startups and agencies. I care less about which hat I'm wearing than about <strong style={{ fontWeight: 600, color: "rgba(0,0,0,0.92)" }}>solving the right problem: the one with the most impact, and the one that holds up as the product grows.</strong>
+              I've worked shoulder-to-shoulder with engineers, marketers, and clients across startups and agencies. I care less about which hat I'm wearing and more about <strong style={{ fontWeight: 600, color: "rgba(0,0,0,0.92)" }}>solving the right problem: the one with the most impact, and the one that holds up as the product grows.</strong>
             </p>
             <div style={{ marginTop: 20 }}>
               <button className="pill-btn" onClick={scrollToContact}>
@@ -955,15 +1037,16 @@ function About({ onNavigate }) {
           <WavingPortrait />
         </div>
 
-        {/* Two columns: Experience + Client work */}
-        <div className="about-two-col" style={{ marginTop: 56, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }}>
+        {/* Two columns: Experience + Client work. minmax(0,1fr) stops the
+            logo marquee's max-content track from inflating its column and
+            squeezing Experience. */}
+        <div className="about-two-col" style={{ marginTop: 56, display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 48 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Experience</div>
             <MetaItem role="UX Quality Manager (Software R&D)" org="Epic Systems" href="https://www.epic.com/" />
             <MetaItem role="UX & Visual Designer" org="Ronik Design Agency" href="https://www.ronikdesign.com/" />
             <MetaItem role="Product Designer & Researcher" org="Snyk Cybersecurity" href="https://snyk.io/" />
             <MetaItem role="UX Designer" org="SearchNEU" href="https://searchneu.com/" />
-            <MetaItem role="UX Designer" org="Cooper" href="https://coopernu.vercel.app/" />
             <MetaItem role="UX Designer" org="Sandbox Software Consultancy" href="https://www.sandboxnu.com/" />
             <MetaItem role="Game UX/UI Design Intern" org="Tanbii" href="https://www.tanbii.com/" />
             <MetaItem role="Graphic & UI Design Intern" org="Waquoit Bay National Research" href="https://waquoitbayreserve.org/" />
@@ -972,7 +1055,7 @@ function About({ onNavigate }) {
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Client Work</div>
             <p style={{ margin: 0, fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
-              My client work has spanned research, UX/UI, and visual design for organizations like{" "}
+              My client work has spanned UX/UI, research, and visual design for organizations like{" "}
               <a href="https://plus.reuters.com/p/1" className="org-link" target="_blank" rel="noreferrer noopener">Reuters Plus</a>,{" "}
               <a href="https://www.jfkairport.com/explore-jfk/terminals/terminal-4" className="org-link" target="_blank" rel="noreferrer noopener">JFK Airport</a>,{" "}
               <a href="https://together.nbcuni.com/home/" className="org-link" target="_blank" rel="noreferrer noopener">NBCUniversal</a>,{" "}
@@ -983,40 +1066,57 @@ function About({ onNavigate }) {
               <a href="https://www.flomktg.com/" className="org-link" target="_blank" rel="noreferrer noopener">Flo. Marketing</a>,
               and more.
             </p>
-            <p style={{ margin: "12px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
-              These projects range from large-scale enterprise platforms to fast-moving agency campaigns.
+            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
+              These projects range from large-scale B2B SaaS enterprise platforms to fast-moving agency campaigns.
             </p>
-            <div style={{ marginTop: 20, display: "flex", flexWrap: "wrap", gap: 10 }}>
-              {["B2B SaaS", "Healthcare", "Cybersecurity", "Enterprise", "UX Design", "UX Research", "Design Systems", "Brand Identity"].
-              map((t) =>
-              <span key={t} style={{
-                fontSize: 12.5,
-                fontWeight: 400,
-                letterSpacing: "-0.01em",
-                color: "rgba(0,0,0,0.7)",
-                background: "var(--gray-50)",
-                border: "1px solid var(--hair)",
-                borderRadius: 999,
-                padding: "5px 12px",
-                whiteSpace: "nowrap"
-              }}>{t}</span>
-              )}
-            </div>
-            <p style={{ margin: "22px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)", fontStyle: "italic" }}>
-              {/* Secret link — reads as plain text until hovered, then scrolls to Contact. */}
+            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)", fontStyle: "italic" }}>
+              Got an opportunity for me?{" "}
+              {/* Only this phrase is the link — purple, scrolls to Contact. */}
               <span
                 role="link"
                 tabIndex={0}
                 onClick={scrollToContact}
                 onKeyDown={(e) => {if (e.key === "Enter" || e.key === " ") {e.preventDefault();scrollToContact();}}}
-                onMouseEnter={(e) => {e.currentTarget.style.color = "var(--accent)";}}
-                onMouseLeave={(e) => {e.currentTarget.style.color = "inherit";}}
-                onFocus={(e) => {e.currentTarget.style.color = "var(--accent)";}}
-                onBlur={(e) => {e.currentTarget.style.color = "inherit";}}
-                style={{ cursor: "pointer", color: "inherit", transition: "color .2s ease" }}>
-                Got an opportunity for me? Let's chat!
+                onMouseEnter={(e) => {e.currentTarget.style.textDecorationColor = "currentColor";}}
+                onMouseLeave={(e) => {e.currentTarget.style.textDecorationColor = "transparent";}}
+                onFocus={(e) => {e.currentTarget.style.textDecorationColor = "currentColor";}}
+                onBlur={(e) => {e.currentTarget.style.textDecorationColor = "transparent";}}
+                style={{
+                  cursor: "pointer",
+                  color: "var(--accent)",
+                  textDecoration: "underline",
+                  textDecorationColor: "transparent",
+                  textUnderlineOffset: 3,
+                  transition: "text-decoration-color .2s ease"
+                }}>
+                Let's chat!
               </span>
             </p>
+            {/* Auto-scrolling logo marquee. Order matches the sentence in this section.
+                Two copies of the list make the loop seamless. */}
+            <div className="logo-marquee">
+              <div className="logo-track">
+                {/* Not lazy-loaded: the duplicate copy sits off-screen to the
+                    right, and deferring it would leave gaps mid-loop. The
+                    second copy is hidden from assistive tech and taken out of
+                    the tab order so each client is announced only once. */}
+                {[].concat(CLIENT_LOGOS, CLIENT_LOGOS).map((l, i) => {
+                  const dup = i >= CLIENT_LOGOS.length;
+                  return (
+                    <a
+                      key={i}
+                      href={l.href}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      aria-hidden={dup ? "true" : undefined}
+                      tabIndex={dup ? -1 : undefined}
+                      aria-label={dup ? undefined : l.name}>
+                      <img src={l.src} alt={dup ? "" : l.name} decoding="async" style={{ height: l.h }} />
+                    </a>);
+
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1060,7 +1160,7 @@ const PLAYGROUND_CATEGORIES = {
     title: "Photography",
     tabLabel: "Photo Archive",
     archiveTitle: "Photography Archive",
-    archiveIntro: "Mostly shot on a Canon EOS R50. Catch me exploring new places and occasionally taking graduation pictures.",
+    archiveIntro: "Mostly shot on a Canon EOS R50 — catch me exploring new places and occasionally taking graduation pictures",
     body: "",
     archiveLabel: "Photo Archive",
     items: [
@@ -1081,7 +1181,7 @@ const PLAYGROUND_CATEGORIES = {
     title: "Design",
     tabLabel: "Design Archive",
     archiveTitle: "Design Archive",
-    archiveIntro: "Graphic design, branding systems, and UX/UI work — spanning client projects, student org merch, and self-initiated experiments.",
+    archiveIntro: "Graphic design, branding systems, and UX/UI work — spanning client projects, student org merch, and self-initiated experiments",
     body: "",
     archiveLabel: "Design Archive",
     // This archive is filterable and each item has its own detail page.
@@ -1098,7 +1198,7 @@ const PLAYGROUND_CATEGORIES = {
       body: [
         "Flo. Marketing is a B2B strategy and marketing firm partnering with high-growth startups and Fortune 500 companies alike, offering go-to-market programs, fractional CMO services, and brand development. After 7+ years of success, Flo. was ready for an outward presence that matched their strategic focus and ambition.",
         "I helped redesign the brand identity around the new logo's signature \u201cdot\u201d as a graphical motif, plus a library of custom icons representing common ideas in Flo.'s marketing language. I animated those icons, built out brand touchpoints, and assisted on 3D graphics that extend the iconography into visual backdrops.",
-        "After pitching several directions and collaborating with the client through review rounds, we delivered the brand identity the agency uses today. Created with Figma, Illustrator, After Effects, and Cinema 4D."
+        "After pitching several directions and collaborating with the client through review rounds, we delivered the brand identity the agency uses today. Created using Figma, Illustrator, After Effects, and Cinema 4D."
       ],
       images: [
       { src: "assets/playground/design/flo/logo.webp", flat: true, caption: "The Flo. Marketing logo, with its signature dot." },
@@ -1139,7 +1239,7 @@ const PLAYGROUND_CATEGORIES = {
       year: "10 x 8 inches\nBook",
       role: "Sole Designer\nBook Design & Layout",
       body: [
-        "A 50+ page book covering everything about boba — the history of tea, how boba is made, its cultural impact, matcha, and a set of recipes.",
+        "This book covers everything about boba — the history of tea, how boba is made, its cultural impact, matcha, and a set of recipes.",
         "The book was designed in Adobe InDesign, using master pages, paragraph and character styles, and a baseline grid so the 50+ pages stayed consistent. Illustrator handled the cover artwork and the vector elements throughout."
       ],
       book: {
@@ -1410,7 +1510,7 @@ const PLAYGROUND_CATEGORIES = {
     emoji: "🐉",
     title: "Miscellaneous",
     archiveTitle: "Miscellaneous Archive",
-    archiveIntro: "A collection of other things that interest me.",
+    archiveIntro: "A collection of other things that interest me",
     body: "",
     archiveLabel: "View Archive",
     items: [
@@ -1636,7 +1736,7 @@ function Playground({ onNavigate }) {
             <h1 style={{ margin: 0, fontWeight: 700, fontSize: 44, lineHeight: 1.08, letterSpacing: "-0.04em" }}>
               Welcome to<br />my Archive! <span>📁</span>
             </h1>
-            <p style={{ margin: "12px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
+            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
               A space to showcase the other things outside my case studies...
             </p>
           </div>
@@ -1711,7 +1811,7 @@ function Archive({ slug, onNavigate }) {
           <h1 className="archive-title" style={{ margin: 0, fontWeight: 700, fontSize: 44, lineHeight: 1.05, letterSpacing: "-0.04em" }}>
             {category.title} <span style={{ fontWeight: 400 }}>{category.emoji}</span>
           </h1>
-          <p style={{ margin: "18px 0 0", fontWeight: 300, fontSize: 17, lineHeight: "27px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)", textWrap: "pretty" }}>
+          <p style={{ margin: "18px 0 0", maxWidth: 540, fontWeight: 300, fontSize: 17, lineHeight: "27px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)", textWrap: "pretty" }}>
             {category.archiveIntro}
           </p>
           <div style={{ marginTop: 18, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase", color: "rgba(0,0,0,0.4)" }}>

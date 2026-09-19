@@ -270,21 +270,42 @@ function CaseFigure({ src, videoSrc, caption, label, aspect = "16 / 10", priorit
 
 }
 
-function CompactSidebar({ sections, activeId, onJump, onTop }) {
+function CompactSidebar({ sections, activeId, onJump, onTop, onHome }) {
   // Flat list of sections, each optionally followed by its subsection links.
   return (
-    <nav
-      aria-label="Case study sections"
-      className="no-scrollbar"
+    // Sticky column that does NOT scroll. Holds the Back to Home button plus
+    // the section nav, so the button stays pinned while a long section list
+    // scrolls internally beneath it.
+    <div
       style={{
         position: "sticky",
-        top: 84,
+        // The nav is 58px tall, so this clears it by 8px. NOTE: this sticky
+        // offset — not marginTop — controls the button's position while the
+        // page is scrolled, which is when the sidebar is actually being used.
+        top: 66,
         alignSelf: "flex-start",
         width: 168,
         flexShrink: 0,
-        // Cap to the pinned viewport so long section lists stay reachable;
-        // the nav scrolls internally instead of overflowing below the fold.
-        maxHeight: "calc(100vh - 108px)",
+        display: "flex",
+        flexDirection: "column",
+        // Raises the unscrolled (top of page) position to roughly match.
+        marginTop: -52
+      }}>
+      {/* The top nav auto-hides while reading, so this is the persistent
+          way back to the work index. */}
+      <button
+        className="pill-btn ghost"
+        onClick={onHome}
+        style={{ alignSelf: "flex-start", marginBottom: 20, flexShrink: 0 }}>
+        <span style={{ display: "inline-block" }}>←</span> Back to Home
+      </button>
+      <nav
+      aria-label="Case study sections"
+      className="no-scrollbar"
+      style={{
+        // Cap to the pinned viewport MINUS the button above, so long section
+        // lists stay reachable without pushing the button off-screen.
+        maxHeight: "calc(100vh - 90px - 52px)",
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
@@ -390,7 +411,8 @@ function CompactSidebar({ sections, activeId, onJump, onTop }) {
         }}>
         ↑ Back to top
       </button>
-    </nav>);
+      </nav>
+    </div>);
 
 }
 
@@ -1105,7 +1127,7 @@ function PasswordGate({ project, onUnlock, onNavigate }) {
           </div>
         </div>
       </div>
-      <window.SiteFooter />
+      <window.SiteFooter contentMaxWidth={1180} />
     </div>);
 
 }
@@ -1148,7 +1170,7 @@ function UnderConstruction({ data, projectId, onNavigate }) {
           </div>
         </div>
       </div>
-      <window.SiteFooter />
+      <window.SiteFooter contentMaxWidth={1180} />
     </div>);
 
 }
@@ -1264,7 +1286,7 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
         margin: "0 auto",
         padding: isMobile ? "16px 20px 60px" : "84px 40px 80px"
       }}>
-        {!isMobile && <CompactSidebar sections={data.sections} activeId={activeId} onJump={jump} onTop={toTop} />}
+        {!isMobile && <CompactSidebar sections={data.sections} activeId={activeId} onJump={jump} onTop={toTop} onHome={() => onNavigate("home")} />}
 
         <main style={{ flex: 1, minWidth: 0 }}>
           {/* Hero */}
@@ -1426,7 +1448,7 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
           </div>
         </main>
       </div>
-      <window.SiteFooter />
+      <window.SiteFooter contentMaxWidth={1180} />
       {zoomed && window.Lightbox && <window.Lightbox item={zoomed} onClose={() => setZoomed(null)} />}
     </div>
     </ZoomCtx.Provider>);

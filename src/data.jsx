@@ -20,7 +20,7 @@ const PROJECTS = [
   {
     id: "searchneu",
     title: "SearchNEU",
-    blurb: "Mobile redesign for a course search engine",
+    blurb: "Redesigning a course search engine for mobile",
     role: "Lead Designer",
     year: "2024",
     duration: "12 weeks",
@@ -37,7 +37,7 @@ const PROJECTS = [
   {
     id: "jfk",
     title: "JFK Airport",
-    blurb: "Streamlining visitor security escort requests",
+    blurb: "Streamlining security escort requests",
     role: "Product Designer, Reuters Studio",
     year: "2023",
     duration: "8 weeks",
@@ -49,7 +49,7 @@ const PROJECTS = [
     // Same recording as the case study's first figure, in browser chrome.
     video: "assets/jfk/full-demo.mp4",
     videoStart: 4,
-    videoFrame: "jfkt4.nyc/escort-portal",
+    videoFrame: "vetting.jfkt4.nyc",
   },
   {
     id: "ecolab",
@@ -70,7 +70,7 @@ const PROJECTS = [
   {
     id: "pomodoro",
     title: "The Pomodoro Timer",
-    blurb: "A non-distracting yet satisfying way to stay focused",
+    blurb: "A non-distracting yet satisfying productivity tool",
     role: "Sole Designer",
     year: "2023",
     duration: "",
@@ -101,7 +101,7 @@ const EMOJIS = [
   {
     char: "📷",
     title: "Capturing the world",
-    body: "I mostly use a Canon EOS R50, which is a small but mighty camera.",
+    body: "I mostly use a Canon EOS R50, a small but mighty camera.",
     img: "assets/funPics/emojiHovers/camera-sm.png",
   },
   {
@@ -120,7 +120,7 @@ const EMOJIS = [
   {
     char: "🧋",
     title: "Boba lover",
-    body: "My go-to drink is earl grey milk tea with grass jelly (less sugar & less ice).",
+    body: "My go-to drink is earl grey milk tea with grass jelly (less sugar).",
     img: "assets/funPics/emojiHovers/boba-sm.png",
   },
   {
@@ -500,7 +500,7 @@ const PROJECT_PAGE = {
           { value: "7,000+", label: "escort requests handled a month" },
         ],
         figures: [
-          { videoSrc: "assets/jfk/full-demo.mp4", frame: "jfkt4.nyc/escort-portal", caption: "Walkthrough of the dashboard in use." },
+          { videoSrc: "assets/jfk/full-demo.mp4", frame: "vetting.jfkt4.nyc", caption: "Walkthrough of the dashboard in use." },
         ],
       },
       {
@@ -608,7 +608,7 @@ const PROJECT_PAGE = {
               "Expanding a row shows the full submission without navigating away — useful for confirming visitor details, checking whether a request was already sent, and reading the rejection reason.",
             ],
             figures: [
-              { videoSrc: "assets/jfk/expandable-rows-demo.mp4", frame: "jfkt4.nyc/escort-portal", caption: "Expanding a request to reveal full visitor and escort details." },
+              { videoSrc: "assets/jfk/expandable-rows-demo.mp4", frame: "vetting.jfkt4.nyc", caption: "Expanding a request to reveal full visitor and escort details." },
               { src: "assets/jfk/web/mobile-accordion.jpg", spaceAbove: 34, caption: "Expanded request details on mobile." },
             ],
             beats: [
@@ -633,7 +633,7 @@ const PROJECT_PAGE = {
               "Applied filters appear as dismissible chips above the queue, so it's always clear what's narrowing the list.",
             ],
             figures: [
-              { videoSrc: "assets/jfk/filter-demo-raw.mp4", frame: "jfkt4.nyc/escort-portal", caption: "Filtering and searching through requests." },
+              { videoSrc: "assets/jfk/filter-demo-raw.mp4", frame: "vetting.jfkt4.nyc", caption: "Filtering and searching through requests." },
               { src: "assets/jfk/web/filter-options-5.jpg", caption: "The three filter panels: status, visit date, and submission date." },
               { src: "assets/jfk/web/mobile-filters-2.jpg", spaceAbove: 34, caption: "The filter modal and applied-filter chips on mobile." },
             ],
@@ -646,7 +646,7 @@ const PROJECT_PAGE = {
               "Portal admins can post a non-dismissable announcement to the top of the dashboard — the first thing employees see when they log in.",
             ],
             figures: [
-              { videoSrc: "assets/jfk/announcement-demo-raw.mp4", frame: "jfkt4.nyc/escort-portal", caption: "An announcement pinned to the top of the dashboard." },
+              { videoSrc: "assets/jfk/announcement-demo-raw.mp4", frame: "vetting.jfkt4.nyc", caption: "An announcement pinned to the top of the dashboard." },
               { src: "assets/jfk/web/mobile-announcement.jpg", spaceAbove: 34, caption: "The announcement on mobile." },
             ],
           },
@@ -659,7 +659,7 @@ const PROJECT_PAGE = {
               "Giving this content a real home also made the portal scalable. We used the new space to add an FAQ section — a long-requested feature that previously had nowhere to go.",
             ],
             figures: [
-              { videoSrc: "assets/jfk/info-demo-raw.mp4", frame: "jfkt4.nyc/escort-portal", caption: "The Information page, with a side navigation for jumping between sections." },
+              { videoSrc: "assets/jfk/info-demo-raw.mp4", frame: "vetting.jfkt4.nyc", caption: "The Information page, with a side navigation for jumping between sections." },
               { src: "assets/jfk/web/mobile-info-2.jpg", spaceAbove: 34, caption: "The Information page on mobile, including the new FAQ section." },
             ],
           },
@@ -683,13 +683,13 @@ const PROJECT_PAGE = {
         title: "Final Design Gallery",
         body: [],
         figures: [
-          { videoSrc: "assets/jfk/full-demo.mp4", frame: "jfkt4.nyc/escort-portal", caption: "The dashboard end to end." },
+          { videoSrc: "assets/jfk/full-demo.mp4", frame: "vetting.jfkt4.nyc", caption: "The dashboard end to end." },
           { src: "assets/jfk/web/hero-dashboard-v3.jpg", caption: "The Escort Authorization Portal across desktop and mobile." },
-          { videoSrc: "assets/jfk/announcement-demo-raw.mp4", frame: "jfkt4.nyc/escort-portal", caption: "Announcements on desktop." },
+          { videoSrc: "assets/jfk/announcement-demo-raw.mp4", frame: "vetting.jfkt4.nyc", caption: "Announcements on desktop." },
           { src: "assets/jfk/web/expanded-both.jpg", caption: "An expanded request with its rejection reason, on desktop and mobile." },
-          { videoSrc: "assets/jfk/filter-demo-raw.mp4", frame: "jfkt4.nyc/escort-portal", caption: "Filtering and searching on desktop." },
+          { videoSrc: "assets/jfk/filter-demo-raw.mp4", frame: "vetting.jfkt4.nyc", caption: "Filtering and searching on desktop." },
           { src: "assets/jfk/web/mobile-filters.jpg", caption: "Filtering on mobile." },
-          { videoSrc: "assets/jfk/info-demo-raw.mp4", frame: "jfkt4.nyc/escort-portal", caption: "The Information page on desktop." },
+          { videoSrc: "assets/jfk/info-demo-raw.mp4", frame: "vetting.jfkt4.nyc", caption: "The Information page on desktop." },
           { src: "assets/jfk/web/mobile-info-2.jpg", caption: "The Information page on mobile." },
           { src: "assets/jfk/web/account-both.jpg", caption: "The Account page on desktop and mobile." },
           { src: "assets/jfk/web/loading-empty.jpg", caption: "Loading and empty states." },
