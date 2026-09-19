@@ -3,7 +3,27 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Serena Ng — Portfolio</title>
+<title>Serena Ng — Product Designer</title>
+<meta name="description" content="Serena Ng is a product-obsessed designer working on patient experience and AI workflows at Epic Health Systems. Previously Ronik, Snyk, JFK Airport, and Reuters." />
+
+<!-- Favicon. Replace these files to change the tab icon. -->
+<link rel="icon" href="assets/favicon.png" sizes="any" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+
+<!-- Link preview (iMessage, Slack, LinkedIn, X, Facebook).
+     og:image MUST be an absolute URL — relative paths are ignored. -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://serenang.com/" />
+<meta property="og:title" content="Serena Ng — Product Designer" />
+<meta property="og:description" content="Product designer working on patient experience and AI workflows at Epic Health Systems. Previously Ronik, Snyk, JFK Airport, and Reuters." />
+<meta property="og:image" content="https://serenang.com/assets/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Serena Ng — Product Designer" />
+<meta name="twitter:description" content="Product designer working on patient experience and AI workflows at Epic Health Systems." />
+<meta name="twitter:image" content="https://serenang.com/assets/og-image.png" />
+
 <meta name="ext-resource-dependency" content="assets/searchneu.png" data-resource-id="searchneu" />
 <link rel="preload" as="image" href="assets/about/headshot-w.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -215,7 +235,7 @@
        anyway, which touch devices don't have — so hide it here. */
     .about-fact-bubble { display: none !important; }
     .journey-card { grid-template-columns: 1fr !important; gap: 16px !important; }
-    .about-two-col { grid-template-columns: 1fr !important; gap: 32px !important; }
+    .about-two-col { grid-template-columns: minmax(0, 1fr) !important; gap: 32px !important; }
   }
 
   /* Playground: keep content inside the viewport and reflow on mobile. */
@@ -243,6 +263,49 @@
 
   /* Archive pages: static caption hidden on desktop (hover card covers it). */
   .archive-static-caption { display: none; }
+
+  /* Client logo marquee — auto-scrolls, fades out at both edges. */
+  .logo-marquee {
+    margin-top: 26px;
+    overflow: hidden;
+    /* Never let the max-content track widen the surrounding layout. */
+    max-width: 100%;
+    min-width: 0;
+    /* Feather the edges so logos slide in and out rather than clipping. */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  }
+  .logo-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    /* Spacing lives on the items, NOT as `gap`. With `gap`, 16 items have only
+       15 gaps, so -50% lands half a gap short and the loop visibly jumps. */
+    animation: logoMarquee 34s linear infinite;
+  }
+  .logo-marquee:hover .logo-track { animation-play-state: paused; }
+  /* Spacing and the hover fade live on the <a>, since that's now the flex
+     child — the seam math depends on the margin being on the outermost item. */
+  .logo-track a {
+    display: block;
+    flex-shrink: 0;
+    margin-right: 44px;
+    opacity: 1;
+    transition: opacity .25s ease;
+  }
+  .logo-track a:hover,
+  .logo-track a:focus-visible { opacity: 0.6; }
+  .logo-track img {
+    width: auto;
+    display: block;
+  }
+  @keyframes logoMarquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logo-track { animation: none; }
+  }
   /* "Up next" / "Next project": the inline button is mobile-only. */
   .upnext-btn-inline { display: none; }
   /* About heading: "I'm Serena!" drops to its own line on mobile only. */
@@ -490,7 +553,9 @@
     display: inline-block;
     width: 9px; height: 9px;
     margin-left: 5px;
-    opacity: 0;
+    /* Always visible so it's clear these items open a menu; it just dims
+       until hovered, then brightens and flips. */
+    opacity: 0.4;
     transform: rotate(0deg);
     transition: opacity .18s ease, transform .18s ease;
     vertical-align: middle;
@@ -567,18 +632,70 @@
 
   /* ── Shared site footer (consistent across every page) ────────────── */
   .site-footer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px 28px;
-    padding: 22px 40px;
+    border-top: 1px solid var(--hair);
+    padding: 34px 0 40px;
     font-size: 12px;
     letter-spacing: -0.01em;
     color: rgba(0,0,0,0.45);
   }
-  .site-footer .site-footer-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
-  .site-footer.bare { padding-left: 0; padding-right: 0; padding-bottom: 0; }
+  .site-footer.bare { padding-bottom: 0; }
+  .footer-inner { margin: 0 auto; padding: 0 40px; }
+  .site-footer.bare .footer-inner { padding-left: 0; padding-right: 0; }
+  /* One top-aligned row: meta, credit, nav columns, back-to-top. */
+  .footer-top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 28px 34px;
+  }
+  .footer-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+  /* Auto top margin pins the email to the bottom of the column. No padding-top
+     here — it would inflate the box and make the hover highlight too tall. */
+  .footer-email { margin-top: auto; position: relative; bottom: 6px; }
+  .footer-signoff-title {
+    margin-top: -4px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1px;
+  }
+  .footer-credit { white-space: nowrap; line-height: 19px; padding-top: 2px; }
+  .footer-cols { display: flex; flex-wrap: wrap; gap: 28px 56px; margin-left: auto; }
+  /* Keeps the sign-off and credit together so the nav columns wrap as a unit. */
+  .footer-left { display: flex; flex-wrap: wrap; align-items: stretch; gap: 20px 44px; }
+  .footer-col { display: flex; flex-direction: column; gap: 9px; }
+  .footer-col-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,0.45);
+  }
+  /* Bottom band: legal + credit, divided from the links above. */
+  /* Back-to-top, grouped with the nav columns at the end of the row. */
+  .footer-top-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--hair);
+    background: var(--paper);
+    border-radius: 999px;
+    padding: 5px 14px 7px;
+    margin-top: -3px;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: -0.01em;
+    color: rgba(0,0,0,0.6);
+    cursor: pointer;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .footer-top-btn:hover {
+    color: var(--accent);
+    border-color: color-mix(in oklch, var(--accent) 45%, transparent);
+    background: color-mix(in oklch, var(--accent) 7%, transparent);
+  }
   .footer-link {
     color: rgba(0,0,0,0.6);
     text-decoration: none;
@@ -592,8 +709,19 @@
     border-bottom-color: var(--accent);
     background: color-mix(in oklch, var(--accent) 8%, transparent);
   }
+  /* Page links sit in a column, so they shouldn't carry a resting underline. */
+  .footer-col .footer-link {
+    border-bottom-color: transparent;
+    background: none;
+    align-self: flex-start;
+  }
+  .footer-col .footer-link:hover { border-bottom-color: var(--accent); }
   @media (max-width: 560px) {
-    .site-footer { padding: 18px 20px; }
+    .site-footer { padding: 28px 0 32px; }
+    .footer-inner { padding: 0 20px; }
+    .footer-top { gap: 24px; }
+    .footer-cols { gap: 24px 40px; }
+    .footer-credit { white-space: normal; }
   }
 
   /* Soft page-load entrance that FAILS VISIBLE. The base is always opacity:1,
