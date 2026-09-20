@@ -492,7 +492,8 @@ function ProjectRow({ project, hovered, onHover, onOpen, isMobile }) {
           color: "inherit",
           display: "flex",
           flexDirection: "column",
-          gap: 12
+          gap: 12,
+          boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05)"
         }}>
         
         <div>
@@ -503,15 +504,41 @@ function ProjectRow({ project, hovered, onHover, onOpen, isMobile }) {
             {project.blurb}
           </div>
         </div>
-        {project.video ?
-        <video src={project.video} autoPlay muted loop playsInline aria-label={project.title} style={{ width: "100%", height: "auto", maxHeight: 260, objectFit: "contain", display: "block" }} /> :
-        project.img ?
-        <img src={project.img} alt="" onError={(e) => {e.currentTarget.style.display = "none";}} style={{ width: "100%", height: "auto", maxHeight: 260, objectFit: "contain" }} /> :
+        {project.video || project.img ?
+        // Uniform framed box: every thumbnail is the same size, with the media
+        // filling it and cropping from the bottom so sources of differing
+        // aspect ratios can't read narrower than each other.
+        <div style={{
+          width: "100%",
+          height: 260,
+          borderRadius: 12,
+          border: "1px solid var(--hair)",
+          overflow: "hidden",
+          background: "var(--gray-50)"
+        }}>
+            {project.video ?
+          <video
+            src={project.video}
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-label={project.title}
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} /> :
+
+          <img
+            src={project.img}
+            alt=""
+            onError={(e) => {e.currentTarget.style.display = "none";}}
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} />
+          }
+          </div> :
 
         <div className="placeholder-stripe" style={{
           width: "100%",
-          aspectRatio: "16 / 10",
-          borderRadius: 12
+          height: 260,
+          borderRadius: 12,
+          border: "1px solid var(--hair)"
         }}>
             [ {project.title} thumbnail ]
           </div>
@@ -827,7 +854,7 @@ function HomeDesktop({ onOpen, onNavigate }) {
         )}
 
         {/* Emojis (idle) */}
-        <EmojiCloud visible={showEmojis && !showThumb} hoveredId={hoveredEmoji} onHover={setHoveredEmoji} onOpenMisc={() => onNavigate("playground")} />
+        <EmojiCloud visible={showEmojis && !showThumb} hoveredId={hoveredEmoji} onHover={setHoveredEmoji} onOpenMisc={() => onNavigate("archive")} />
 
         {/* Emoji caption card is rendered inside <EmojiCloud /> above */}
 
@@ -923,7 +950,6 @@ function HomeMobile({ onOpen, onNavigate }) {
   return (
     <div style={{
       minHeight: "100vh",
-      paddingBottom: 60,
       display: "flex",
       flexDirection: "column",
       gap: 28
@@ -949,8 +975,8 @@ function HomeMobile({ onOpen, onNavigate }) {
             letterSpacing: "-0.02em",
             color: "rgba(0,0,0,0.78)"
           }}>
-          <div>Patient experience + AI workflows @ <CompanyLink href="https://www.epic.com">Epic Health Systems</CompanyLink></div>
-          <div>Previously designed for <CompanyLink href="https://www.ronikdesign.com/">Ronik</CompanyLink>, <CompanyLink href="https://snyk.io">Snyk</CompanyLink>, <CompanyLink href="https://www.jfkairport.com/">JFK Airport</CompanyLink>, <CompanyLink href="https://plus.reuters.com/p/1">Reuters</CompanyLink>, and more.</div>
+          <div>Patient experience + AI workflows @ <CompanyLink href="https://www.epic.com">Epic</CompanyLink></div>
+          <div>Previously designed for <CompanyLink href="https://www.ronikdesign.com/">Ronik</CompanyLink>, <CompanyLink href="https://snyk.io">Snyk</CompanyLink>, <CompanyLink href="https://www.jfkairport.com/">JFK Airport</CompanyLink>, etc.</div>
         </div>
         <div className="accent-rule" style={{ marginTop: 22 }} />
       </div>
@@ -963,7 +989,7 @@ function HomeMobile({ onOpen, onNavigate }) {
       </div>
 
       {/* About me — quick bits (replaces emoji hover on mobile) */}
-      <div>
+      <div style={{ paddingTop: 16, paddingBottom: 24 }}>
         <div style={{ fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase", color: "rgba(0,0,0,0.5)", marginBottom: 12 }}>
           Outside of work
         </div>
@@ -987,6 +1013,7 @@ function HomeMobile({ onOpen, onNavigate }) {
         </div>
       </div>
       </div>
+      <window.SiteFooter />
     </div>);
 
 }

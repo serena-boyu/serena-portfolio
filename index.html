@@ -225,15 +225,41 @@
     .contact-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
   }
 
+  /* Experience rows: swap in shorter labels on phones. */
+  .meta-short { display: none; }
+  @media (max-width: 720px) {
+    .meta-long { display: none; }
+    .meta-short { display: inline; }
+  }
+
   /* About hero + Journey cards: stack vertically on narrow screens. */
   @media (max-width: 720px) {
     .about-hero { grid-template-columns: 1fr !important; gap: 24px !important; }
     .about-hero .about-portrait { order: -1; justify-self: start !important; width: 200px !important; }
-    /* The stacked layout puts the portrait first (order:-1) and left-aligned,
-       so there's nowhere to place the bubble that doesn't collide with either
-       the sticky nav above or the heading below. The reveal is hover-driven
-       anyway, which touch devices don't have — so hide it here. */
-    .about-fact-bubble { display: none !important; }
+    /* Tapping the portrait opens the bubble here, so it must stay visible.
+       It sits to the RIGHT of the (200px, left-aligned) portrait, overlapping
+       its edge slightly, and runs to the viewport's right margin. */
+    .about-fact-bubble {
+      left: calc(100% - 34px) !important;
+      margin-left: 0 !important;
+      right: auto !important;
+      bottom: auto !important;
+      top: 0 !important;
+      /* Explicit width — `width:auto` shrink-wraps, so max-width alone never
+         widened it. Bubble starts 186px from the viewport's left edge
+         (20px page padding + 200px portrait − 34px overlap). */
+      width: calc(100vw - 246px) !important;
+      max-width: none !important;
+      transform-origin: top left !important;
+    }
+    /* Trail circles move to the bubble's left edge, pointing at the portrait. */
+    .about-fact-tail {
+      left: -10px !important; bottom: auto !important; top: 26px !important;
+      width: 22px !important; height: 22px !important;
+    }
+    .about-fact-tail2 {
+      left: -19px !important; bottom: auto !important; top: 46px !important;
+    }
     .journey-card { grid-template-columns: 1fr !important; gap: 16px !important; }
     .about-two-col { grid-template-columns: minmax(0, 1fr) !important; gap: 32px !important; }
   }
@@ -722,6 +748,13 @@
     .footer-top { gap: 24px; }
     .footer-cols { gap: 24px 40px; }
     .footer-credit { white-space: normal; }
+    /* The column doesn't stretch here, so `margin-top:auto` can't separate the
+       email — give it explicit breathing room instead. */
+    .footer-email { margin-top: 12px; bottom: 0; }
+    /* Extra room between the email and the nav columns beneath it. */
+    .footer-left { margin-bottom: 8px; }
+    /* Back-to-top drops to its own full-width row, centered at the very end. */
+    .footer-cols > .footer-col:last-child { flex-basis: 100%; align-items: center; margin-top: 16px; }
   }
 
   /* Soft page-load entrance that FAILS VISIBLE. The base is always opacity:1,

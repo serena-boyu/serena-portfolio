@@ -417,6 +417,25 @@ function CompactSidebar({ sections, activeId, onJump, onTop, onHome }) {
 }
 
 function MobileTimeline({ sections, activeId, onJump }) {
+  // The pill row scrolls horizontally and can be many pills wide, so the
+  // active one drifts out of view as the reader moves down the page. Nudge the
+  // row so the current section is always visible.
+  const barRef = useRefP(null);
+  useEffectP(() => {
+    const bar = barRef.current;
+    if (!bar) return;
+    const pill = bar.querySelector("[data-active-pill='1']");
+    if (!pill) return;
+    const barBox = bar.getBoundingClientRect();
+    const pillBox = pill.getBoundingClientRect();
+    const pad = 16;
+    let delta = 0;
+    if (pillBox.left < barBox.left + pad) delta = pillBox.left - barBox.left - pad;else
+    if (pillBox.right > barBox.right - pad) delta = pillBox.right - barBox.right + pad;
+    if (!delta) return;
+    // scrollBy avoids scrollIntoView, which would also scroll the page.
+    bar.scrollBy({ left: delta, behavior: "smooth" });
+  }, [activeId]);
   // The main site-nav compacts on scroll (its height changes) and, on case
   // study pages, slides out of view entirely. Track its VISUAL bottom edge —
   // getBoundingClientRect() accounts for the transform, so the sub-nav follows
@@ -472,12 +491,16 @@ function MobileTimeline({ sections, activeId, onJump }) {
       display: "flex",
       gap: 8,
       overflowX: "auto"
-    }} className="no-scrollbar">
+    }} className="no-scrollbar" ref={barRef}>
       {sections.map((s) => {
-        const isActive = s.id === activeId;
+        // The scroll spy reports subsection ids too (e.g. "improvements-2"),
+        // which match no pill here — so nothing highlighted once you scrolled
+        // into one. Resolve those back to their parent section.
+        const isActive = s.id === activeId || String(activeId || "").startsWith(s.id + "-");
         return (
           <button
             key={s.id}
+            data-active-pill={isActive ? "1" : undefined}
             onClick={() => onJump(s.id)}
             style={{
               border: "1px solid var(--hair)",
@@ -1289,6 +1312,15 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
         {!isMobile && <CompactSidebar sections={data.sections} activeId={activeId} onJump={jump} onTop={toTop} onHome={() => onNavigate("home")} />}
 
         <main style={{ flex: 1, minWidth: 0 }}>
+          {/* Mobile has no sidebar, so the way back lives above the hero. */}
+          {isMobile &&
+          <button
+            className="pill-btn ghost"
+            onClick={() => onNavigate("home")}
+            style={{ alignSelf: "flex-start", marginTop: 10, marginBottom: 32 }}>
+              <span style={{ display: "inline-block" }}>←</span> Back to Home
+            </button>
+          }
           {/* Hero */}
           <div style={{ paddingBottom: 32, borderBottom: "1px solid var(--hair-soft)" }}>
             <div style={{

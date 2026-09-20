@@ -89,7 +89,8 @@ function App() {
     view = <window.DesignProject slug={slug} onNavigate={navigate} />;
   } else if (route === "about") {
     view = <window.About onNavigate={navigate} />;
-  } else if (route === "playground") {
+  } else if (route === "archive" || route === "playground") {
+    // "playground" kept as an alias so any old/shared links still resolve.
     view = <window.Playground onNavigate={navigate} />;
   } else {
     view = <window.Home onOpen={open} onNavigate={navigate} isMobile={isMobile} />;

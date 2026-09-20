@@ -209,6 +209,18 @@ function WavingPortrait() {
   // Hover shows the bubble; clicking while hovered cycles to the next fact.
   const [factIdx, setFactIdx] = useStateAb(0);
   const ref = useRefAb(null);
+  // Touch devices have no hover, so tapping toggles the bubble instead of
+  // showing the waving-hand cursor (which can't follow a finger anyway).
+  const [isTouch, setIsTouch] = useStateAb(false);
+  useEffectAb(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia("(hover: none)");
+    const sync = () => setIsTouch(mq.matches);
+    sync();
+    if (mq.addEventListener) {mq.addEventListener("change", sync);return () => mq.removeEventListener("change", sync);}
+    mq.addListener(sync);
+    return () => mq.removeListener(sync);
+  }, []);
 
   const onMove = (e) => {
     const r = ref.current && ref.current.getBoundingClientRect();
@@ -286,10 +298,18 @@ function WavingPortrait() {
         role="button"
         tabIndex={0}
         aria-label="Show a fun fact"
-        onClick={() => setFactIdx((i) => i + 1)}
-        onKeyDown={(e) => {if (e.key === "Enter" || e.key === " ") {e.preventDefault();setFactIdx((i) => i + 1);}}}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
+        onClick={() => {
+          if (isTouch) {
+            // First tap opens it; each tap after advances to the next fact.
+            if (hover) setFactIdx((i) => i + 1);else
+            setHover(true);
+            return;
+          }
+          setFactIdx((i) => i + 1);
+        }}
+        onKeyDown={(e) => {if (e.key === "Enter" || e.key === " ") {e.preventDefault();if (isTouch && !hover) setHover(true);else setFactIdx((i) => i + 1);}}}
+        onMouseEnter={() => {if (!isTouch) setHover(true);}}
+        onMouseLeave={() => {if (!isTouch) setHover(false);}}
         onMouseMove={onMove}
         style={{
           width: "100%", height: "100%", borderRadius: "50%",
@@ -299,7 +319,7 @@ function WavingPortrait() {
           border: "1px solid var(--hair)",
           position: "relative",
           overflow: "hidden",
-          cursor: hover ? "none" : "pointer"
+          cursor: hover && !isTouch ? "none" : "pointer"
         }}>
       {/* Swap the path below to set your portrait (or leave blank for placeholder). */}
       {window.PORTRAIT_SRC ?
@@ -337,7 +357,7 @@ function WavingPortrait() {
           lineHeight: 1,
           color: "#000",
           pointerEvents: "none",
-          visibility: hover ? "visible" : "hidden",
+          visibility: hover && !isTouch ? "visible" : "hidden",
           opacity: 1,
           scale: hover ? "1" : "0.4",
           translate: "-30% -20%",
@@ -551,7 +571,7 @@ function SiteNav({ onNavigate, current, overlay, activeProjectId, activeArchiveS
           </div>
         </div>
         <div className="nav-item">
-          <button className={"nav-link" + (current === "playground" ? " is-current" : "")} onClick={(e) => {e.currentTarget.blur();onNavigate("playground");}}>
+          <button className={"nav-link" + (current === "playground" ? " is-current" : "")} onClick={(e) => {e.currentTarget.blur();onNavigate("archive");}}>
             Archive
             <svg className="nav-caret" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -630,7 +650,7 @@ function SiteFooter({ bare, big, noResume, contentMaxWidth = 1080 }) {
           <div className="footer-col">
             <div className="footer-col-title">Pages</div>
             <a className="footer-link" href="#/">Featured Work</a>
-            <a className="footer-link" href="#/playground">Archive</a>
+            <a className="footer-link" href="#/archive">Archive</a>
             <a className="footer-link" href="#/about">About</a>
           </div>
           <div className="footer-col">
@@ -662,7 +682,7 @@ window.SiteFooter = SiteFooter;
 // Back-compat alias — older call sites used <SubpageNav/>.
 function SubpageNav(props) {return <SiteNav {...props} />;}
 
-function MetaItem({ label, value, link, role, org, href }) {
+function MetaItem({ label, value, link, role, org, href, roleShort, orgShort }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 12 }}>
       {label &&
@@ -671,8 +691,23 @@ function MetaItem({ label, value, link, role, org, href }) {
       <div style={{ fontSize: 15, fontWeight: 300, lineHeight: "22px", letterSpacing: "-0.02em", color: link ? "var(--accent)" : "rgba(0,0,0,0.7)" }}>
         {org ?
         <>
-            {role} <span style={{ color: "rgba(0,0,0,0.4)" }}>@</span>{" "}
-            <a className="org-link" href={href} target="_blank" rel="noreferrer noopener">{org}</a>
+            {/* Long / short variants swap by CSS so the row fits on a phone. */}
+            {roleShort ?
+          <>
+                <span className="meta-long">{role}</span>
+                <span className="meta-short">{roleShort}</span>
+              </> :
+          role
+          } <span style={{ color: "rgba(0,0,0,0.4)" }}>@</span>{" "}
+            <a className="org-link" href={href} target="_blank" rel="noreferrer noopener">
+              {orgShort ?
+            <>
+                  <span className="meta-long">{org}</span>
+                  <span className="meta-short">{orgShort}</span>
+                </> :
+            org
+            }
+            </a>
           </> :
         value
         }
@@ -1045,11 +1080,11 @@ function About({ onNavigate }) {
             <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Experience</div>
             <MetaItem role="UX Quality Manager (Software R&D)" org="Epic Systems" href="https://www.epic.com/" />
             <MetaItem role="UX & Visual Designer" org="Ronik Design Agency" href="https://www.ronikdesign.com/" />
-            <MetaItem role="Product Designer & Researcher" org="Snyk Cybersecurity" href="https://snyk.io/" />
+            <MetaItem role="Product Designer & Researcher" roleShort="Product Designer & Research" org="Snyk Cybersecurity" orgShort="Snyk" href="https://snyk.io/" />
             <MetaItem role="UX Designer" org="SearchNEU" href="https://searchneu.com/" />
             <MetaItem role="UX Designer" org="Sandbox Software Consultancy" href="https://www.sandboxnu.com/" />
             <MetaItem role="Game UX/UI Design Intern" org="Tanbii" href="https://www.tanbii.com/" />
-            <MetaItem role="Graphic & UI Design Intern" org="Waquoit Bay National Research" href="https://waquoitbayreserve.org/" />
+            <MetaItem role="Graphic & UI Design Intern" roleShort="Design Intern" org="Waquoit Bay National Research" href="https://waquoitbayreserve.org/" />
             <MetaItem role="BFA in UX Design" org="Northeastern University" href="https://www.northeastern.edu/" />
           </div>
           <div>
@@ -1799,7 +1834,7 @@ function Archive({ slug, onNavigate }) {
         <button
           className="pill-btn ghost"
           style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 28 }}
-          onClick={() => onNavigate("playground")}>
+          onClick={() => onNavigate("archive")}>
           <span style={{ display: "inline-block" }}>←</span> Back to Archive
         </button>
 
