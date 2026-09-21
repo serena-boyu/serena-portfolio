@@ -1106,10 +1106,10 @@ function About({ onNavigate }) {
             <h1 style={{ margin: 0, fontWeight: 700, fontSize: 32, letterSpacing: "-0.035em" }}>
               <span className="howdy-word">Howdy</span>,<span className="howdy-break" />{" "}I'm Serena! <span className="howdy-wave" style={{ display: "inline-block" }}>👋</span>
             </h1>
-            <p style={{ margin: "14px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.78)", maxWidth: 540, textWrap: "pretty" }}>
+            <p style={{ margin: "14px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.78)", textWrap: "pretty" }} className="about-intro-p">
               I'm a designer who's worn a lot of hats, including product research, UX/UI, visual design, development, and marketing. <strong style={{ fontWeight: 600, color: "rgba(0,0,0,0.92)" }}>I've learned that the best solutions rarely stay inside one discipline.</strong>
             </p>
-            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.78)", maxWidth: 540, textWrap: "pretty" }}>
+            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.78)", textWrap: "pretty" }} className="about-intro-p">
               I've worked shoulder-to-shoulder with engineers, marketers, and clients across startups and agencies. I care less about which hat I'm wearing and more about <strong style={{ fontWeight: 600, color: "rgba(0,0,0,0.92)" }}>solving the right problem: the one with the most impact, and the one that holds up as the product grows.</strong>
             </p>
             <div style={{ marginTop: 20 }}>
@@ -1130,7 +1130,7 @@ function About({ onNavigate }) {
             <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Experience</div>
             <MetaItem role="UX Quality Manager (Software R&D)" org="Epic Systems" orgShort="Epic" href="https://www.epic.com/" />
             <MetaItem role="UX & Visual Designer" org="Ronik Design Agency" href="https://www.ronikdesign.com/" />
-            <MetaItem role="Product Designer & Researcher" roleShort="Product Designer & Research" org="Snyk Cybersecurity" orgShort="Snyk" href="https://snyk.io/" />
+            <MetaItem role="Product Designer & Researcher" org="Snyk Cybersecurity" orgShort="Snyk" href="https://snyk.io/" />
             <MetaItem role="UX Designer" org="SearchNEU" href="https://searchneu.com/" />
             <MetaItem role="UX Designer" org="Sandbox Software Consultancy" href="https://www.sandboxnu.com/" />
             <MetaItem role="Game UX/UI Design Intern" org="Tanbii" href="https://www.tanbii.com/" />

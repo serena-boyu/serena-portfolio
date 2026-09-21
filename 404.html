@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Page not found — Serena Ng</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="/assets/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: rgb(0,0,0);
+    --paper: rgb(255,255,255);
+    --hair: rgb(215,215,215);
+    --muted: rgb(160,160,160);
+    --gray-50: rgb(244,244,244);
+    --accent: rgb(87,94,219);
+    --accent-shadow: rgba(87,94,219,0.28);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01", "cv11";
+  }
+  a { color: inherit; text-decoration: none; }
+  .page { min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* Nav — mirrors the site's compact bar */
+  /* Matches .site-nav: transparent at rest, frosted only once scrolled. */
+  .nav {
+    position: sticky; top: 0; z-index: 30;
+    background: transparent;
+    transition: background .25s ease, box-shadow .25s ease;
+  }
+  .nav.is-compact {
+    background: rgba(255,255,255,0.82);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    backdrop-filter: saturate(180%) blur(14px);
+    box-shadow: 0 1px 0 var(--hair), 0 6px 22px rgba(0,0,0,0.05);
+  }
+  .nav-inner {
+    max-width: 1080px; margin: 0 auto;
+    padding: 13px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .wordmark { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; transition: color .2s ease; }
+  .wordmark:hover { color: var(--accent); }
+  .nav-links { display: flex; gap: 44px; }
+  .nav-links a { font-size: 13.5px; letter-spacing: -0.01em; color: rgba(0,0,0,0.82); transition: color .2s ease; }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* Body */
+  .main {
+    flex: 1;
+    display: flex; flex-direction: column; justify-content: center;
+    max-width: 1080px; width: 100%; margin: 0 auto;
+    padding: 80px 40px 100px;
+  }
+  .eyebrow {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+  }
+  h1 {
+    margin: 0;
+    font-weight: 700; font-size: 44px; line-height: 1.06; letter-spacing: -0.04em;
+    max-width: 620px;
+  }
+  .sub {
+    margin: 18px 0 0;
+    font-weight: 300; font-size: 17px; line-height: 27px; letter-spacing: -0.02em;
+    color: rgba(0,0,0,0.7); max-width: 520px; text-wrap: pretty;
+  }
+  .emoji {
+    font-size: 46px; line-height: 1; margin-bottom: 22px;
+    /* Flex children are blockified, so this MUST shrink-wrap or the rotation
+       below pivots a full-width box across the eyebrow underneath it. */
+    align-self: flex-start; width: max-content;
+    animation: drift 5s ease-in-out infinite;
+  }
+  @keyframes drift {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50%      { transform: translateY(-9px) rotate(5deg); }
+  }
+  @media (prefers-reduced-motion: reduce) { .emoji { animation: none; } }
+
+  .actions { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px; }
+  /* Mirrors .pill-btn in index.html — keep these in sync. */
+  .pill {
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 999px;
+    padding: 9px 16px; font-family: inherit; font-size: 13px;
+    letter-spacing: -0.01em; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+    box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    transition: background .25s ease, box-shadow .25s ease, transform .2s cubic-bezier(.22,.61,.36,1);
+  }
+  .pill:hover {
+    background: color-mix(in oklch, var(--accent) 84%, #000);
+    box-shadow: 0 8px 20px var(--accent-shadow);
+    transform: translateY(-1px);
+  }
+  .pill:active { transform: translateY(0); }
+  .pill .arr { display: inline-block; transition: transform .25s cubic-bezier(.22,.61,.36,1); }
+  .pill:hover .arr { transform: translateX(4px); }
+  .pill.ghost {
+    background: transparent; color: var(--accent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 40%, transparent);
+  }
+  .pill.ghost:hover {
+    background: color-mix(in oklch, var(--accent) 8%, transparent);
+    box-shadow: inset 0 0 0 1px var(--accent), 0 8px 20px var(--accent-shadow);
+  }
+
+  /* Footer */
+  .foot {
+    border-top: 1px solid var(--hair);
+    max-width: 1080px; width: 100%; margin: 0 auto;
+    padding: 22px 40px 30px;
+    font-size: 12.5px; letter-spacing: -0.01em; color: rgba(0,0,0,0.45);
+    display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between;
+  }
+  .foot a { color: rgba(0,0,0,0.62); transition: color .2s ease; }
+  .foot a:hover { color: var(--accent); }
+
+  @media (max-width: 720px) {
+    .nav-inner { padding: 13px 22px; }
+    .nav-links { gap: 26px; }
+    .main { padding: 56px 22px 80px; }
+    h1 { font-size: 32px; }
+    .sub { font-size: 15px; line-height: 24px; }
+    .foot { padding: 20px 22px 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="wordmark" href="/">Serena Ng</a>
+      <nav class="nav-links">
+        <a href="/#/">Featured Work</a>
+        <a href="/#/playground">Archive</a>
+        <a href="/#/about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <span class="emoji">📁</span>
+    <div class="eyebrow">Error 404</div>
+    <h1>This page seems to have wandered off.</h1>
+    <p class="sub">The link might be outdated, or I may have moved something while tidying up. Either way, there's plenty left to look at.</p>
+    <div class="actions">
+      <a class="pill" href="/#/">Featured Work <span class="arr">→</span></a>
+      <a class="pill ghost" href="/#/playground">Browse the Archive</a>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span>Designed by Serena + crafted with <a href="https://www.anthropic.com/claude" target="_blank" rel="noreferrer noopener">Claude</a></span>
+    <a href="mailto:serena.ng.contact@gmail.com">serena.ng.contact@gmail.com</a>
+  </footer>
+</div>
+<script>
+  var nav = document.querySelector(".nav");
+  var sync = function () { nav.classList.toggle("is-compact", window.scrollY > 4); };
+  sync();
+  window.addEventListener("scroll", sync, { passive: true });
+</script>
+</body>
+</html>

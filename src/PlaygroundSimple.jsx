@@ -22,7 +22,7 @@ const PS_TITLES_MOBILE = {
 };
 const PS_BLURBS_MOBILE = {
   branding: "Graphic, branding, and UX/UI design explorations.",
-  photography: "Mostly shot on a Canon EOS R50 when I'm exploring."
+  photography: "Mostly shot on a Canon EOS R50"
 };
 
 function PlaygroundSectionSimple({ slug, category, onNavigate }) {

@@ -287,6 +287,11 @@
   .org-link { color: var(--accent); text-decoration: none; transition: color .18s ease; }
   .org-link:hover, .org-link:focus-visible { color: color-mix(in oklch, var(--accent) 68%, black); }
 
+  /* About intro: capped on desktop, full content width on mobile. */
+  .about-intro-p { max-width: 540px; }
+  @media (max-width: 720px) {
+    .about-intro-p { max-width: none; }
+  }
   /* Archive index: desktop/mobile copy variants for the section headers. */
   .pg-only-mobile { display: none; }
   /* Mobile case studies: floating escape hatch back to the work index.
@@ -306,9 +311,11 @@
     box-shadow: 0 10px 30px var(--accent-shadow), 0 4px 12px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.1);
     animation: pageFade .5s ease-out both;
   }
-  /* Pages with no bottom nav bar: the pill sits at the bottom of the screen. */
+  /* Pages with no bottom nav bar: the pill sits lower, with a tighter shadow
+     since it's floating over content rather than above a bar. */
   .floating-home.is-low {
-    bottom: calc(18px + env(safe-area-inset-bottom));
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    box-shadow: 0 4px 12px var(--accent-shadow), 0 2px 5px rgba(0,0,0,0.14) !important;
   }
   /* Design archive: filter pills sit inline under the header. */
   .archive-filters {
@@ -500,10 +507,11 @@
   }
   .journey-item { position: relative; padding-left: 40px; }
   @media (max-width: 720px) {
-    .journey-track, .journey-fill { left: 6px; }
-    .journey-head { left: 3px; width: 8px; height: 8px; }
-    .journey-dot { left: 0; top: 7px; width: 14px; height: 14px; }
-    .journey-item { padding-left: 24px; }
+    /* Rail sits outside the content edge so the cards gain the full gutter. */
+    .journey-track, .journey-fill { left: -8px; }
+    .journey-head { left: -11px; width: 8px; height: 8px; }
+    .journey-dot { left: -14px; top: 7px; width: 14px; height: 14px; }
+    .journey-item { padding-left: 16px; }
   }
 
   /* Waving-hand custom cursor on the About portrait. */
@@ -602,10 +610,14 @@
     .archive-filters {
       position: sticky !important;
       top: calc(var(--nav-h, 47px) - 1px);
-      left: 0;
-      right: 0;
       z-index: 20;
-      margin: 0 -22px 20px !important;
+      /* Break out to the full viewport width regardless of the wrapper's
+         horizontal padding (which differs between breakpoints). */
+      width: 100vw;
+      margin-left: calc(50% - 50vw) !important;
+      margin-right: calc(50% - 50vw) !important;
+      margin-top: 0 !important;
+      margin-bottom: 20px !important;
       padding: 0 !important;
       background: transparent;
       border-bottom: 1px solid transparent;
@@ -621,7 +633,7 @@
     }
     /* Inner row is the horizontal scroller; the shell above must not clip. */
     .archive-filters-row {
-      padding: 9px 22px !important;
+      padding: 9px 40px !important;
       gap: 7px !important;
       flex-wrap: nowrap !important;
       overflow-x: auto;
@@ -921,12 +933,12 @@
 
 <!-- ?v= cache-buster: BUMP THIS NUMBER on every deploy so browsers re-fetch
      the JSX instead of serving a stale cached copy. -->
-<script type="text/babel" src="tweaks-panel.jsx?v=2"></script>
-<script type="text/babel" src="src/data.jsx?v=2"></script>
-<script type="text/babel" src="src/Home.jsx?v=2"></script>
-<script type="text/babel" src="src/ProjectPage.jsx?v=2"></script>
-<script type="text/babel" src="src/About.jsx?v=2"></script>
-<script type="text/babel" src="src/PlaygroundSimple.jsx?v=2"></script>
-<script type="text/babel" src="src/App.jsx?v=2"></script>
+<script type="text/babel" src="tweaks-panel.jsx?v=3"></script>
+<script type="text/babel" src="src/data.jsx?v=3"></script>
+<script type="text/babel" src="src/Home.jsx?v=3"></script>
+<script type="text/babel" src="src/ProjectPage.jsx?v=3"></script>
+<script type="text/babel" src="src/About.jsx?v=3"></script>
+<script type="text/babel" src="src/PlaygroundSimple.jsx?v=3"></script>
+<script type="text/babel" src="src/App.jsx?v=3"></script>
 </body>
 </html>
