@@ -436,22 +436,39 @@ function MobileTimeline({ sections, activeId, onJump }) {
     // scrollBy avoids scrollIntoView, which would also scroll the page.
     bar.scrollBy({ left: delta, behavior: "smooth" });
   }, [activeId]);
-  // Scroll progress (0-1) drives the purple fill on the bar's top border.
-  const [progress, setProgress] = useStateP(0);
+  // Scroll progress drives the purple fill on the bar's top border. Driven by
+  // a requestAnimationFrame loop writing straight to the DOM: touch scrolling
+  // fires scroll events sparsely, so a per-event setState (plus a CSS width
+  // transition) visibly steps rather than glides.
+  const progressRef = useRefP(null);
   useEffectP(() => {
-    const read = () => {
+    const target = () => {
       const doc = document.documentElement;
       const max = (doc.scrollHeight || 0) - window.innerHeight;
       const y = window.scrollY || doc.scrollTop || 0;
-      setProgress(max > 0 ? Math.min(1, Math.max(0, y / max)) : 0);
+      return max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
     };
-    read();
-    window.addEventListener("scroll", read, { passive: true });
-    window.addEventListener("resize", read);
-    return () => {
-      window.removeEventListener("scroll", read);
-      window.removeEventListener("resize", read);
+    let shown = target();
+    let raf = 0;
+    const EASE = 0.18;
+    const paint = (v) => {
+      if (progressRef.current) progressRef.current.style.width = (v * 100).toFixed(3) + "%";
     };
+    paint(shown);
+    const tick = () => {
+      const t = target();
+      const diff = t - shown;
+      if (Math.abs(diff) > 0.0004) {
+        shown += diff * EASE;
+        paint(shown);
+      } else if (shown !== t) {
+        shown = t;
+        paint(t);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, []);
   // The main site-nav compacts on scroll (its height changes) and, on case
   // study pages, slides out of view entirely. Track its VISUAL bottom edge —
@@ -517,15 +534,15 @@ function MobileTimeline({ sections, activeId, onJump }) {
     }}>
       {/* Purple fill laid over the gray top border — how far down the page. */}
       <div
+        ref={progressRef}
         aria-hidden="true"
         style={{
           position: "absolute",
           left: 0,
           top: -1,
           height: 2,
-          width: `${(progress * 100).toFixed(2)}%`,
+          width: 0,
           background: "var(--accent)",
-          transition: "width .12s linear",
           pointerEvents: "none",
           zIndex: 1
         }} />
