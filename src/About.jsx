@@ -618,9 +618,221 @@ function SiteNav({ onNavigate, current, overlay, activeProjectId, activeArchiveS
 }
 window.SiteNav = SiteNav;
 
+// ─────────────────────────────────────────────────────────────────
+// Easter egg (desktop only): footer "Secret" link → confirm → a draggable,
+// looping, muted picture-in-picture video floating above the page.
+// ─────────────────────────────────────────────────────────────────
+function SecretPrompt({ onYes, onNo }) {
+  useEffectAb(() => {
+    const onKey = (e) => {if (e.key === "Escape") onNo();};
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onNo]);
+  return (
+    <div
+      onClick={onNo}
+      style={{
+        position: "fixed", inset: 0, zIndex: 2000,
+        background: "rgba(20,20,22,0.5)",
+        backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)",
+        display: "grid", placeItems: "center", padding: 24,
+        animation: "pageFade .2s ease-out both"
+      }}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "var(--paper)",
+          borderRadius: 20,
+          padding: "28px 30px",
+          width: "100%", maxWidth: 420,
+          boxShadow: "0 24px 60px rgba(0,0,0,0.22)",
+          textAlign: "center"
+        }}>
+        <div style={{ fontWeight: 700, fontSize: 20, letterSpacing: "-0.03em", color: "var(--ink)" }}>
+          Activate attention enhancer tool?
+        </div>
+        <div style={{ marginTop: 8, fontSize: 13, fontWeight: 300, letterSpacing: "-0.01em", color: "rgba(0,0,0,0.5)" }}>
+          (Btw this was my brother's idea)
+        </div>
+        <div style={{ marginTop: 22, display: "flex", gap: 9, justifyContent: "center", flexWrap: "wrap" }}>
+          <button className="pill-btn ghost" onClick={onNo} style={{ justifyContent: "center" }}>
+            Oh god no...
+          </button>
+          <button className="pill-btn" onClick={onYes} style={{ justifyContent: "center" }}>
+            YESSSSS!!!
+          </button>
+        </div>
+      </div>
+    </div>);
+
+}
+
+function BrainrotPlayer({ onClose }) {
+  const RATIO = 398 / 224; // 9:16-ish; height is derived so it never distorts
+  const MIN_W = 120,MAX_W = 520;
+  const boxRef = useRefAb(null);
+  const drag = useRefAb(null);
+  const resize = useRefAb(null);
+  const [w, setW] = useStateAb(224);
+  const h = Math.round(w * RATIO);
+  // Bottom-right by default, inset from the edges.
+  const [pos, setPos] = useStateAb(() => ({
+    x: Math.max(12, window.innerWidth - 224 - 22),
+    y: Math.max(12, window.innerHeight - 398 - 22)
+  }));
+
+  const clamp = (x, y, bw, bh) => ({
+    x: Math.min(Math.max(8, x), Math.max(8, window.innerWidth - bw - 8)),
+    y: Math.min(Math.max(8, y), Math.max(8, window.innerHeight - bh - 8))
+  });
+
+  useEffectAb(() => {
+    const onMove = (e) => {
+      if (resize.current) {
+        e.preventDefault();
+        const r = resize.current;
+        // Size FIRST, bounded only by the viewport itself — not by the box's
+        // current top-left. Capping against a pinned corner meant the default
+        // bottom-right placement could only grow a few pixels.
+        // Corners anchored on the right pull inward, so invert the delta.
+        const dx = (e.clientX - r.x) * (r.left ? -1 : 1);
+        const next = Math.round(Math.min(
+          Math.max(MIN_W, r.w + dx),
+          MAX_W,
+          window.innerWidth - 16,
+          (window.innerHeight - 16) / RATIO
+        ));
+        const nextH = Math.round(next * RATIO);
+        setW(next);
+        // Keep the corner OPPOSITE the handle pinned, so the box grows toward
+        // the direction being dragged rather than always down-right.
+        const nx = r.left ? r.x0 + (r.w - next) : r.x0;
+        const ny = r.top ? r.y0 + (r.h - nextH) : r.y0;
+        setPos(clamp(nx, ny, next, nextH));
+        return;
+      }
+      if (!drag.current) return;
+      e.preventDefault();
+      const d0 = drag.current;
+      setPos(clamp(e.clientX - d0.dx, e.clientY - d0.dy, d0.w, d0.h));
+    };
+    const onUp = () => {drag.current = null;resize.current = null;};
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+  }, []);
+
+  // Keep it on screen when the viewport or the box size changes.
+  useEffectAb(() => {
+    const fit = () => setPos((p) => clamp(p.x, p.y, w, h));
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [w, h]);
+
+  const startDrag = (e) => {
+    const r = boxRef.current.getBoundingClientRect();
+    drag.current = { dx: e.clientX - r.left, dy: e.clientY - r.top, w: r.width, h: r.height };
+  };
+  // corner: "nw" | "ne" | "sw" | "se" — `left`/`top` flag which edges move.
+  const startResize = (e, corner) => {
+    e.stopPropagation();
+    const r = boxRef.current.getBoundingClientRect();
+    resize.current = {
+      x: e.clientX,
+      w: r.width, h: r.height,
+      x0: r.left, y0: r.top,
+      left: corner === "nw" || corner === "sw",
+      top: corner === "nw" || corner === "ne"
+    };
+  };
+
+  return (
+    <div
+      ref={boxRef}
+      onPointerDown={startDrag}
+      style={{
+        position: "fixed",
+        left: pos.x, top: pos.y,
+        width: w, height: h,
+        zIndex: 1500,
+        borderRadius: 16,
+        overflow: "hidden",
+        background: "#000",
+        boxShadow: "0 18px 50px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2)",
+        cursor: "grab",
+        touchAction: "none"
+      }}>
+      <video
+        src="assets/secret/brainrot.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        disablePictureInPicture
+        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", pointerEvents: "none" }} />
+      <button
+        onClick={(e) => {e.stopPropagation();onClose();}}
+        onPointerDown={(e) => e.stopPropagation()}
+        aria-label="Close"
+        style={{
+          position: "absolute", top: 8, right: 8,
+          width: 26, height: 26, borderRadius: "50%",
+          border: "none", background: "rgba(0,0,0,0.4)", color: "#fff",
+          // Blur the video behind the button so the ✕ stays legible over
+          // whatever frame happens to be playing.
+          backdropFilter: "blur(6px) saturate(140%)",
+          WebkitBackdropFilter: "blur(6px) saturate(140%)",
+          cursor: "pointer", display: "grid", placeItems: "center",
+          fontFamily: "inherit", fontSize: 13, lineHeight: 1
+        }}>
+        ✕
+      </button>
+      {/* Aspect-locked resize handles. Top-right is omitted — the close
+          button occupies that corner. */}
+      {[
+      { c: "nw", css: { left: 0, top: 0, cursor: "nwse-resize" }, rot: 180 },
+      { c: "sw", css: { left: 0, bottom: 0, cursor: "nesw-resize" }, rot: 90 },
+      { c: "se", css: { right: 0, bottom: 0, cursor: "nwse-resize" }, rot: 0 }].
+      map((hd) =>
+      <div
+        key={hd.c}
+        onPointerDown={(ev) => startResize(ev, hd.c)}
+        title="Drag to resize"
+        style={Object.assign({
+          position: "absolute",
+          width: 26, height: 26,
+          display: "grid", placeItems: "center",
+          touchAction: "none"
+        }, hd.css)}>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"
+          style={{ transform: `rotate(${hd.rot}deg)` }}>
+            <path d="M11 4v7H4" stroke="rgba(255,255,255,0.85)" strokeWidth="1.6" strokeLinecap="round" />
+            <path d="M11 8.5H8.5V11" stroke="rgba(255,255,255,0.85)" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+        </div>
+      )}
+    </div>);
+
+}
+
 // Shared site footer used on EVERY page. Small text pinned to the bottom.
 // `marginTop: auto` lets it sink to the bottom when its parent is a flex column.
 function SiteFooter({ bare, big, noResume, contentMaxWidth = 1080 }) {
+  // Easter egg: the footer's "Secret" link asks first; App owns the player
+  // itself so it survives navigation (this component remounts per route).
+  const [secretAsk, setSecretAsk] = useStateAb(false);
+  // Hide the trigger while the player is already up (App owns that state).
+  const [brainrotOn, setBrainrotOn] = useStateAb(() => !!window.__brainrotOn);
+  useEffectAb(() => {
+    const sync = () => setBrainrotOn(!!window.__brainrotOn);
+    sync();
+    window.addEventListener("brainrotchange", sync);
+    return () => window.removeEventListener("brainrotchange", sync);
+  }, []);
   const style = bare ? { marginTop: "clamp(20px, 4vh, 48px)" } : { marginTop: "auto" };
   if (big) style.fontSize = 13.5;
 
@@ -690,6 +902,14 @@ function SiteFooter({ bare, big, noResume, contentMaxWidth = 1080 }) {
             <a className="footer-link" href="#/archive/branding">Design</a>
             <a className="footer-link" href="#/archive/photography">Photography</a>
             <a className="footer-link" href="#/archive/misc">Miscellaneous</a>
+            {/* Easter egg — desktop only. Fades out while it's running. */}
+            <button
+              className={"footer-link footer-secret" + (brainrotOn ? " is-hidden" : "")}
+              aria-hidden={brainrotOn ? "true" : undefined}
+              tabIndex={brainrotOn ? -1 : undefined}
+              onClick={() => setSecretAsk(true)}>
+              Secret~
+            </button>
           </div>
           <div className="footer-col">
             <button className="footer-top-btn" onClick={toTop}>
@@ -698,6 +918,14 @@ function SiteFooter({ bare, big, noResume, contentMaxWidth = 1080 }) {
           </div>
         </div>
       </div>
+      {secretAsk &&
+      <SecretPrompt
+        onNo={() => setSecretAsk(false)}
+        onYes={() => {
+          setSecretAsk(false);
+          if (window.__activateBrainrot) window.__activateBrainrot();
+        }} />
+      }
       </div>
     </footer>);
 
@@ -1805,6 +2033,14 @@ function PlaygroundSection({ slug, category, onNavigate }) {
           )}
         </div>
       </div>
+      {secretAsk &&
+      <SecretPrompt
+        onNo={() => setSecretAsk(false)}
+        onYes={() => {
+          setSecretAsk(false);
+          if (window.__activateBrainrot) window.__activateBrainrot();
+        }} />
+      }
       </div>
     </section>);
 
@@ -2691,6 +2927,7 @@ function DesignProject({ slug, onNavigate }) {
 
 }
 
+window.BrainrotPlayer = BrainrotPlayer;
 window.About = About;
 window.Playground = Playground;
 window.Archive = Archive;

@@ -71,6 +71,27 @@ function App() {
 
   useEffectA(() => { window.scrollTo(0, 0); }, [route]);
 
+  // Easter egg: the footer's "Secret" link activates a floating video player.
+  // Held here (above the router) and mirrored to sessionStorage so it also
+  // survives a reload.
+  const [brainrot, setBrainrot] = useStateA(() => {
+    try {return sessionStorage.getItem("brainrot") === "1";} catch (e) {return false;}
+  });
+  useEffectA(() => {
+    window.__activateBrainrot = () => {
+      try {sessionStorage.setItem("brainrot", "1");} catch (e) {}
+      setBrainrot(true);
+      window.dispatchEvent(new Event("brainrotchange"));
+    };
+    return () => {delete window.__activateBrainrot;};
+  }, []);
+  // Mirrored to a window flag + event so SiteFooter (which lives below the
+  // router) can hide the "Secret~" link while the player is open.
+  useEffectA(() => {
+    window.__brainrotOn = brainrot;
+    window.dispatchEvent(new Event("brainrotchange"));
+  }, [brainrot]);
+
   const navigate = (to) => {
     window.location.hash = "#/" + (to === "home" ? "" : to);
   };
@@ -106,6 +127,15 @@ function App() {
   return (
     <>
       <PageEnter routeKey={route}>{view}</PageEnter>
+      {/* Lives OUTSIDE PageEnter (which is keyed by route and re-created on
+          every navigation) so the floating player keeps playing as you browse. */}
+      {brainrot && window.BrainrotPlayer &&
+      <window.BrainrotPlayer onClose={() => {
+        setBrainrot(false);
+        try {sessionStorage.removeItem("brainrot");} catch (e) {}
+        window.dispatchEvent(new Event("brainrotchange"));
+      }} />
+      }
       {TweaksPanel && (
         <TweaksPanel title="Tweaks">
           <TweakSection title="Accent">

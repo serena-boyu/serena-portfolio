@@ -287,6 +287,35 @@
   .org-link { color: var(--accent); text-decoration: none; transition: color .18s ease; }
   .org-link:hover, .org-link:focus-visible { color: color-mix(in oklch, var(--accent) 68%, black); }
 
+  /* Easter-egg footer link — desktop only. */
+  .footer-secret {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    opacity: 1;
+    max-height: 2em;
+    overflow: hidden;
+  }
+  /* Compound selector so this beats `.footer-link`'s own `transition`, which
+     is declared later and would otherwise drop opacity/max-height from the
+     list (making the fade instant). Keeps the hover color transition too. */
+  .footer-link.footer-secret {
+    transition: opacity .35s ease, max-height .35s ease, margin .35s ease, color .2s ease;
+  }
+  /* Hidden while the player is running — fades out and collapses so the
+     column doesn't keep an empty gap. */
+  .footer-secret.is-hidden {
+    opacity: 0;
+    max-height: 0;
+    margin-top: -2px;
+    pointer-events: none;
+  }
+  @media (max-width: 720px) {
+    .footer-secret { display: none !important; }
+  }
   /* About intro: capped on desktop, full content width on mobile. */
   .about-intro-p { max-width: 540px; }
   @media (max-width: 720px) {
@@ -933,12 +962,12 @@
 
 <!-- ?v= cache-buster: BUMP THIS NUMBER on every deploy so browsers re-fetch
      the JSX instead of serving a stale cached copy. -->
-<script type="text/babel" src="tweaks-panel.jsx?v=3"></script>
-<script type="text/babel" src="src/data.jsx?v=3"></script>
-<script type="text/babel" src="src/Home.jsx?v=3"></script>
-<script type="text/babel" src="src/ProjectPage.jsx?v=3"></script>
-<script type="text/babel" src="src/About.jsx?v=3"></script>
-<script type="text/babel" src="src/PlaygroundSimple.jsx?v=3"></script>
-<script type="text/babel" src="src/App.jsx?v=3"></script>
+<script type="text/babel" src="tweaks-panel.jsx?v=5"></script>
+<script type="text/babel" src="src/data.jsx?v=5"></script>
+<script type="text/babel" src="src/Home.jsx?v=5"></script>
+<script type="text/babel" src="src/ProjectPage.jsx?v=5"></script>
+<script type="text/babel" src="src/About.jsx?v=5"></script>
+<script type="text/babel" src="src/PlaygroundSimple.jsx?v=5"></script>
+<script type="text/babel" src="src/App.jsx?v=5"></script>
 </body>
 </html>
