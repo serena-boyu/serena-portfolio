@@ -750,6 +750,10 @@ function Journey({ items }) {
   const containerRef = useRefAb(null);
   const [zoomed, setZoomed] = useStateAb(null);
   const itemRefs = useRefAb([]);
+  const fillRef = useRefAb(null);
+  const headRef = useRefAb(null);
+  const trackRef = useRefAb(0);
+  const activeRef = useRefAb(-1);
   const targetRef = useRefAb(0);   // scroll-driven target fill (0..1), no re-render
   const idxRef = useRefAb(-1);     // scroll-driven target active index
   const [progress, setProgress] = useStateAb(0); // smoothed 0..1 fill actually rendered
@@ -769,6 +773,7 @@ function Journey({ items }) {
       const rect = c.getBoundingClientRect();
       const triggerY = window.innerHeight * 0.55; // line head sits ~55% down the viewport
       const track = Math.max(1, rect.height - TOP_INSET - BOTTOM_INSET);
+      trackRef.current = track;
       setTrackPx((prev) => Math.abs(prev - track) > 1 ? track : prev);
       const travelled = triggerY - (rect.top + TOP_INSET);
       targetRef.current = Math.max(0, Math.min(1, travelled / track));
@@ -786,23 +791,41 @@ function Journey({ items }) {
     window.addEventListener("resize", sample);
     sample();
 
-    // Smoothing ticker: ease the displayed fill toward the target each frame.
+    // Smoothing loop. Uses requestAnimationFrame (NOT setInterval) so it runs
+    // in step with the compositor — a 16ms timer drifts against the refresh
+    // rate and gets throttled during touch-scroll, which is what made this
+    // judder on mobile. The fill/head styles are written straight to the DOM
+    // so a React re-render isn't needed every frame; only activeIdx (which
+    // changes rarely) goes through state.
     let displayed = 0;
+    let raf = 0;
     const EASE = 0.13; // lower = floatier/smoother
+    const paint = (v) => {
+      if (fillRef.current) fillRef.current.style.transform = `scaleY(${v})`;
+      if (headRef.current) {
+        headRef.current.style.top = (14 + v * trackRef.current) + "px";
+        headRef.current.style.opacity =
+        v > 0.01 && idxRef.current < items.length - 1 ? "1" : "0";
+      }
+    };
     const tick = () => {
       sample(); // continuously re-track (covers sparse touch-scroll events)
       const t = targetRef.current;
       const diff = t - displayed;
       if (Math.abs(diff) > 0.0006) {
         displayed += diff * EASE;
-        setProgress(displayed);
+        paint(displayed);
       } else if (displayed !== t) {
         displayed = t;
-        setProgress(t);
+        paint(t);
       }
-      setActiveIdx((prev) => prev !== idxRef.current ? idxRef.current : prev);
+      if (idxRef.current !== activeRef.current) {
+        activeRef.current = idxRef.current;
+        setActiveIdx(idxRef.current);
+      }
+      raf = requestAnimationFrame(tick);
     };
-    const intervalId = setInterval(tick, 16);
+    raf = requestAnimationFrame(tick);
 
     // Re-measure shortly after mount in case fonts/images shift the layout.
     const t1 = setTimeout(sample, 100);
@@ -811,7 +834,7 @@ function Journey({ items }) {
       window.removeEventListener("scroll", sample);
       document.removeEventListener("scroll", sample, { capture: true });
       window.removeEventListener("resize", sample);
-      clearInterval(intervalId);
+      cancelAnimationFrame(raf);
       clearTimeout(t1);clearTimeout(t2);
     };
   }, [items.length]);
@@ -820,10 +843,11 @@ function Journey({ items }) {
     <div ref={containerRef} className="journey" style={{ position: "relative" }}>
       {/* Gray track */}
       <div className="journey-track" />
-      {/* Purple fill — scaleY avoids the height-transition rendering quirk */}
-      <div className="journey-fill" style={{ transform: `scaleY(${progress})` }} />
+      {/* Purple fill — scaleY avoids the height-transition rendering quirk.
+          transform/top/opacity are written by the rAF loop, not React. */}
+      <div ref={fillRef} className="journey-fill" style={{ transform: `scaleY(${progress})` }} />
       {/* Glowing head of the line */}
-      <div className="journey-head" style={{
+      <div ref={headRef} className="journey-head" style={{
         top: 14 + progress * trackPx,
         opacity: progress > 0.01 && activeIdx < items.length - 1 ? 1 : 0
       }} />
@@ -1852,20 +1876,33 @@ function Archive({ slug, onNavigate }) {
   const activeSlug = slug in PLAYGROUND_CATEGORIES ? slug : "photography";
   const [zoomed, setZoomed] = useStateAb(null);
   const [filter, setFilter] = useStateAb("All");
-  // Scroll progress (0-1) drives the purple fill on the mobile filter bar.
-  const [progress, setProgress] = useStateAb(0);
+  // The top nav compacts as you scroll, so its height changes. Track its live
+  // bottom edge and pin the filter bar flush to it (no gap), and only show the
+  // bar's glass background once the page has actually scrolled.
+  const [navH, setNavH] = useStateAb(47);
+  const [stuck, setStuck] = useStateAb(false);
   useEffectAb(() => {
     const read = () => {
-      const doc = document.documentElement;
-      const max = (doc.scrollHeight || 0) - window.innerHeight;
-      const y = window.scrollY || doc.scrollTop || 0;
-      setProgress(max > 0 ? Math.min(1, Math.max(0, y / max)) : 0);
+      const nav = document.querySelector(".site-nav");
+      if (nav) setNavH(Math.max(0, Math.round(nav.getBoundingClientRect().bottom)));
+      setStuck((window.scrollY || document.documentElement.scrollTop || 0) > 4);
     };
     read();
-    window.addEventListener("scroll", read, { passive: true });
+    // Follow the nav's 0.25s compact transition, not just its end state.
+    let raf = 0;
+    const track = () => {read();raf = requestAnimationFrame(track);};
+    let stop = 0;
+    const kick = () => {
+      if (!raf) track();
+      clearTimeout(stop);
+      stop = setTimeout(() => {cancelAnimationFrame(raf);raf = 0;read();}, 420);
+    };
+    window.addEventListener("scroll", kick, { passive: true });
     window.addEventListener("resize", read);
     return () => {
-      window.removeEventListener("scroll", read);
+      cancelAnimationFrame(raf);
+      clearTimeout(stop);
+      window.removeEventListener("scroll", kick);
       window.removeEventListener("resize", read);
     };
   }, []);
@@ -1909,20 +1946,24 @@ function Archive({ slug, onNavigate }) {
 
         {/* Category filters (project-driven archives only) */}
         {isProjectArchive &&
-        <div className="archive-filters">
-            {/* Purple fill over the gray top border (mobile bottom bar only).
-                Lives in the non-scrolling shell so it can't slide away. */}
-            <div
-            aria-hidden="true"
-            className="archive-filters-progress"
-            style={{ width: `${(progress * 100).toFixed(2)}%` }} />
+        <div
+          className={"archive-filters" + (stuck ? " is-stuck" : "")}
+          style={{ "--nav-h": navH + "px" }}>
             <div className="archive-filters-row" style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
             {category.filters.map((f) => {
             const on = f === filter;
             return (
               <button
                 key={f}
-                onClick={() => setFilter(f)}
+                onClick={() => {
+                  setFilter(f);
+                  // The bar is sticky at the top on mobile, so after filtering
+                  // you'd otherwise stay mid-page looking at a new, shorter
+                  // grid. Return to the top so the results start from the top.
+                  if (window.matchMedia("(max-width: 720px)").matches) {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }}
                 aria-pressed={on}
                 style={{
                   cursor: "pointer",
@@ -2013,14 +2054,14 @@ function Archive({ slug, onNavigate }) {
       {/* Mobile: the filter row pins to the bottom, so float the way back
           above it — same pattern as the case studies. */}
       <button
-        className={"pill-btn floating-home archive-floating-back" + (isProjectArchive ? "" : " is-low")}
+        className="pill-btn floating-home archive-floating-back is-low"
         onClick={() => onNavigate("archive")}>
         <span style={{ display: "inline-block" }}>←</span> Back to Archive
       </button>
       <window.SiteFooter />
       {/* AFTER the footer: the fixed filter bar reserves no space, so this is
           what lets the footer scroll clear of it. */}
-      <div className={"archive-bottom-spacer" + (isProjectArchive ? "" : " is-short")} aria-hidden="true" />
+      <div className="archive-bottom-spacer is-short" aria-hidden="true" />
       {zoomed && <Lightbox item={zoomed} onClose={() => setZoomed(null)} />}
     </div>);
 

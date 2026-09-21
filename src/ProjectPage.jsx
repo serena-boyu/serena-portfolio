@@ -531,9 +531,9 @@ function MobileTimeline({ sections, activeId, onJump }) {
         }} />
       {/* Inner scroller holds the pills. */}
       <div style={{
-        padding: "14px 16px",
+        padding: "9px 14px",
         display: "flex",
-        gap: 8,
+        gap: 7,
         overflowX: "auto"
       }} className="no-scrollbar" ref={barRef}>
       {sections.map((s) => {
@@ -551,8 +551,8 @@ function MobileTimeline({ sections, activeId, onJump }) {
               background: isActive ? "var(--accent)" : "var(--paper)",
               color: isActive ? "white" : "rgba(0,0,0,0.7)",
               borderRadius: 999,
-              padding: "10px 16px",
-              fontSize: 13.5,
+              padding: "7px 13px",
+              fontSize: 12.5,
               letterSpacing: "-0.01em",
               fontFamily: "inherit",
               whiteSpace: "nowrap",
@@ -1526,7 +1526,7 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
       <window.SiteFooter contentMaxWidth={1180} />
       {/* The mobile section bar is position:fixed, so it no longer reserves
           space — pad the page out or it permanently covers the footer. */}
-      {isMobile && <div aria-hidden="true" style={{ height: "calc(150px + env(safe-area-inset-bottom))", flexShrink: 0 }} />}
+      {isMobile && <div aria-hidden="true" style={{ height: "calc(132px + env(safe-area-inset-bottom))", flexShrink: 0 }} />}
       {zoomed && window.Lightbox && <window.Lightbox item={zoomed} onClose={() => setZoomed(null)} />}
     </div>
     </ZoomCtx.Provider>);

@@ -295,10 +295,10 @@
     position: fixed;
     right: 18px;
     /* Sits above the bottom-pinned section bar (~67px + safe area). */
-    bottom: calc(80px + env(safe-area-inset-bottom));
+    bottom: calc(64px + env(safe-area-inset-bottom));
     z-index: 60;
-    padding: 15px 20px !important;
-    font-size: 14.5px !important;
+    padding: 11px 17px !important;
+    font-size: 13px !important;
     /* Solid accent pill so it reads as the primary escape hatch. */
     background: var(--accent) !important;
     border: 1px solid var(--accent) !important;
@@ -381,6 +381,10 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .logo-track { animation: none; }
+  }
+  @media (max-width: 720px) {
+    /* Fewer logos fit on screen, so the same px/sec reads as sluggish. */
+    .logo-track { animation-duration: 20s; }
   }
   /* "Up next" / "Next project": the inline button is mobile-only. */
   .upnext-btn-inline { display: none; }
@@ -592,48 +596,45 @@
     .archive-header { margin-bottom: 30px !important; }
     /* Filter pills pin to the bottom as a liquid-glass bar, matching the
        case-study section nav. */
+    /* Filter pills pin flush below the top nav (whose height changes as it
+       compacts, hence the measured --nav-h). The glass background only appears
+       once the page is scrolled, so it's invisible at rest. */
     .archive-filters {
-      position: fixed !important;
+      position: sticky !important;
+      top: calc(var(--nav-h, 47px) - 1px);
       left: 0;
       right: 0;
-      bottom: 0;
       z-index: 20;
-      margin: 0 !important;
+      margin: 0 -22px 20px !important;
       padding: 0 !important;
-      padding-bottom: env(safe-area-inset-bottom) !important;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+      box-shadow: none;
+      transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+    }
+    .archive-filters.is-stuck {
       background: rgba(245,245,247,0.62);
       -webkit-backdrop-filter: saturate(180%) blur(22px);
       backdrop-filter: saturate(180%) blur(22px);
-      border-top: 1px solid var(--hair);
-      box-shadow: 0 -8px 26px rgba(0,0,0,0.06);
+      border-bottom-color: var(--hair);
+      box-shadow: 0 8px 26px rgba(0,0,0,0.06);
     }
     /* Inner row is the horizontal scroller; the shell above must not clip. */
     .archive-filters-row {
-      padding: 14px 16px !important;
+      padding: 9px 22px !important;
+      gap: 7px !important;
       flex-wrap: nowrap !important;
       overflow-x: auto;
       scrollbar-width: none;
     }
-    /* Purple scroll-progress fill over the bar's gray top border. */
-    .archive-filters-progress {
-      display: block;
-      position: absolute;
-      left: 0;
-      top: -1px;
-      height: 2px;
-      background: var(--accent);
-      transition: width .12s linear;
-      pointer-events: none;
-      z-index: 1;
-    }
     .archive-filters-row::-webkit-scrollbar { display: none; }
-    .archive-filters-row > button { flex-shrink: 0; padding: 10px 16px !important; }
+    .archive-filters-row > button { flex-shrink: 0; padding: 7px 13px !important; font-size: 12.5px !important; }
     /* The floating pill replaces the inline one at the top. */
     .archive-top-back { display: none !important; }
     .archive-floating-back { display: inline-flex !important; }
     /* Must clear the floating back button (fixed at bottom:80px, ~49px tall)
        plus the footer's back-to-top row — same on every archive page. */
-    .archive-bottom-spacer { display: block; height: calc(150px + env(safe-area-inset-bottom)); }
+    .archive-bottom-spacer { display: block; height: calc(132px + env(safe-area-inset-bottom)); }
     /* No bottom bar on these pages, so the pill needs less clearance. */
     .archive-bottom-spacer.is-short { height: calc(92px + env(safe-area-inset-bottom)); }
     /* "What I've been up to": 2 cols × 3 rows, taller cards so the
@@ -920,12 +921,12 @@
 
 <!-- ?v= cache-buster: BUMP THIS NUMBER on every deploy so browsers re-fetch
      the JSX instead of serving a stale cached copy. -->
-<script type="text/babel" src="tweaks-panel.jsx?v=1"></script>
-<script type="text/babel" src="src/data.jsx?v=1"></script>
-<script type="text/babel" src="src/Home.jsx?v=1"></script>
-<script type="text/babel" src="src/ProjectPage.jsx?v=1"></script>
-<script type="text/babel" src="src/About.jsx?v=1"></script>
-<script type="text/babel" src="src/PlaygroundSimple.jsx?v=1"></script>
-<script type="text/babel" src="src/App.jsx?v=1"></script>
+<script type="text/babel" src="tweaks-panel.jsx?v=2"></script>
+<script type="text/babel" src="src/data.jsx?v=2"></script>
+<script type="text/babel" src="src/Home.jsx?v=2"></script>
+<script type="text/babel" src="src/ProjectPage.jsx?v=2"></script>
+<script type="text/babel" src="src/About.jsx?v=2"></script>
+<script type="text/babel" src="src/PlaygroundSimple.jsx?v=2"></script>
+<script type="text/babel" src="src/App.jsx?v=2"></script>
 </body>
 </html>

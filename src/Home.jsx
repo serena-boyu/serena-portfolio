@@ -259,7 +259,10 @@ function EmojiCloud({ visible, hoveredId, onHover, onNavigate }) {
         top: 84,
         left: "6%",
         right: "6%",
-        bottom: "5%",
+        // Reserve the idle hint's strip (it sits at bottom:30 and is ~16px
+        // tall) so the cluster's lowest emoji can never collide with it on
+        // short viewports.
+        bottom: 62,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
