@@ -100,6 +100,7 @@ const EMOJIS = [
   },
   {
     char: "📷",
+    to: "archive/photography",
     title: "Capturing the world",
     body: "I mostly use a Canon EOS R50, a small but mighty camera.",
     img: "assets/funPics/emojiHovers/camera-sm.png",
@@ -113,6 +114,7 @@ const EMOJIS = [
   },
   {
     char: "💻",
+    to: "archive",
     title: "Always tinkering",
     body: "Currently dabbling in using AI to develop my designs fast!",
     img: "assets/funPics/emojiHovers/tinkering-sm2.png",

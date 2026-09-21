@@ -216,7 +216,7 @@ function CompanyLink({ href, children }) {
     </a>);
 }
 
-function EmojiCloud({ visible, hoveredId, onHover, onOpenMisc }) {
+function EmojiCloud({ visible, hoveredId, onHover, onNavigate }) {
   // Warm the browser cache for every hover photo once, on mount — so the first
   // hover paints instantly instead of waiting on a network fetch.
   useEffect(() => {
@@ -243,7 +243,10 @@ function EmojiCloud({ visible, hoveredId, onHover, onOpenMisc }) {
   { left: "78%", top: "78%", size: 60, rot: 8 }, // lower-right
   // Anchored by `bottom` (not `top`) so its box can never spill past the
   // cluster and collide with the hint text below it.
-  { left: "6%", bottom: "2%", size: 74, rot: -6 }]; // bottom-left
+  // Anchored by `bottom`, so a SMALLER value sits lower. Keep this a plain
+  // percentage — EmojiCard parseFloat()s it to place the hover bubble, and a
+  // calc() would silently drop the offset and mis-position the card.
+  { left: "6%", bottom: "-0.3%", size: 74, rot: -6 }]; // bottom-left
 
   const hoveredEmoji = hoveredId !== null ? window.EMOJIS[hoveredId] : null;
   const hoveredPos = hoveredId !== null ? positions[hoveredId] : null;
@@ -278,7 +281,7 @@ function EmojiCloud({ visible, hoveredId, onHover, onOpenMisc }) {
               onMouseLeave={() => onHover(null)}
               onFocus={() => onHover(i)}
               onBlur={() => onHover(null)}
-              onClick={onOpenMisc}
+              onClick={() => onNavigate(e.to || "archive/misc")}
               aria-label={e.title + " — open the Archive"}
               style={{
                 position: "absolute",
@@ -854,7 +857,7 @@ function HomeDesktop({ onOpen, onNavigate }) {
         )}
 
         {/* Emojis (idle) */}
-        <EmojiCloud visible={showEmojis && !showThumb} hoveredId={hoveredEmoji} onHover={setHoveredEmoji} onOpenMisc={() => onNavigate("archive")} />
+        <EmojiCloud visible={showEmojis && !showThumb} hoveredId={hoveredEmoji} onHover={setHoveredEmoji} onNavigate={onNavigate} />
 
         {/* Emoji caption card is rendered inside <EmojiCloud /> above */}
 

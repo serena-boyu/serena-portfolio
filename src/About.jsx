@@ -197,9 +197,13 @@ const FUN_FACTS = [
 "I have a 1200+ day streak on Duolingo!",
 "I dual wield a mouse (right hand) and trackpad (left hand)",
 "Scallions are my favorite garnish",
-"My favorite game is Word Bites on GamePigeon",
+"I love playing Word Bites on GamePigeon",
 "My last name \u4f0d means five in Chinese",
-"I love snacking on dried mangos from Trader Joe's"];
+"I love snacking on dried mangos from Trader Joe's",
+"Enough about me, go check out my work! 😗"];
+
+// Entries at/after this index render without the purple "Fun fact:" label.
+const FUN_FACTS_UNLABELED_FROM = 6;
 
 // Portrait with a soft custom waving-hand cursor that fades in and waves.
 function WavingPortrait() {
@@ -222,6 +226,18 @@ function WavingPortrait() {
     return () => mq.removeListener(sync);
   }, []);
 
+  // Touch: a tap outside the portrait or bubble dismisses the bubble.
+  const wrapRef = useRefAb(null);
+  useEffectAb(() => {
+    if (!isTouch || !hover) return;
+    const onDocDown = (ev) => {
+      const wrap = wrapRef.current;
+      if (wrap && !wrap.contains(ev.target)) setHover(false);
+    };
+    document.addEventListener("pointerdown", onDocDown);
+    return () => document.removeEventListener("pointerdown", onDocDown);
+  }, [isTouch, hover]);
+
   const onMove = (e) => {
     const r = ref.current && ref.current.getBoundingClientRect();
     if (!r) return;
@@ -231,6 +247,7 @@ function WavingPortrait() {
   return (
     <div
       className="about-portrait"
+      ref={wrapRef}
       style={{
         width: "100%", maxWidth: 280, aspectRatio: "1 / 1",
         justifySelf: "end",
@@ -242,14 +259,16 @@ function WavingPortrait() {
       <div
         aria-live="polite"
         className="about-fact-bubble"
+        onClick={(e) => {if (isTouch && hover) {e.stopPropagation();setFactIdx((i) => i + 1);}}}
         style={{
           position: "absolute",
           left: "50%",
           bottom: "86%",
-          marginLeft: -96,
-          width: 196,
+          marginLeft: -110,
+          width: 224,
           zIndex: 3,
-          pointerEvents: "none",
+          pointerEvents: isTouch && hover ? "auto" : "none",
+          cursor: isTouch && hover ? "pointer" : "default",
           transformOrigin: "bottom left",
           opacity: hover ? 1 : 0,
           transform: hover ? "scale(1) translate(0, 0)" : "scale(0.9) translate(6px, 6px)",
@@ -288,7 +307,9 @@ function WavingPortrait() {
           letterSpacing: "-0.01em",
           color: "rgba(0,0,0,0.72)"
         }}>
-          <span style={{ fontWeight: 600, color: "var(--accent)" }}>Fun fact:</span>{" "}
+          {factIdx % FUN_FACTS.length < FUN_FACTS_UNLABELED_FROM &&
+          <><span style={{ fontWeight: 600, color: "var(--accent)" }}>Fun fact:</span>{" "}</>
+          }
           {FUN_FACTS[factIdx % FUN_FACTS.length]}
         </div>
       </div>
@@ -356,7 +377,8 @@ function WavingPortrait() {
           fontSize: 30,
           lineHeight: 1,
           color: "#000",
-          pointerEvents: "none",
+          pointerEvents: isTouch && hover ? "auto" : "none",
+          cursor: isTouch && hover ? "pointer" : "default",
           visibility: hover && !isTouch ? "visible" : "hidden",
           opacity: 1,
           scale: hover ? "1" : "0.4",
@@ -385,11 +407,23 @@ function Lightbox({ item, onClose }) {
   useEffectAb(() => {
     const onKey = (e) => {if (e.key === "Escape") onClose();};
     document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
+    // Lock BOTH html and body. Locking body alone leaves the root's scrollbar
+    // track rendered beside the overlay (which spans clientWidth only), showing
+    // as a pale bar down the right edge. Pad by the track's width so the page
+    // underneath doesn't shift as it disappears.
+    const de = document.documentElement;
+    const gutter = window.innerWidth - de.clientWidth;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevRootOverflow = de.style.overflow;
+    const prevBodyPad = document.body.style.paddingRight;
     document.body.style.overflow = "hidden";
+    de.style.overflow = "hidden";
+    if (gutter > 0) document.body.style.paddingRight = gutter + "px";
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+      de.style.overflow = prevRootOverflow;
+      document.body.style.paddingRight = prevBodyPad;
     };
   }, []);
   if (!item) return null;
@@ -397,33 +431,24 @@ function Lightbox({ item, onClose }) {
   return (
     <div
       onClick={onClose}
+      className="no-scrollbar"
       style={{
-        position: "fixed", inset: 0, zIndex: 1000,
+        position: "fixed", inset: 0, width: "100vw", zIndex: 1000,
         background: "rgba(20,20,22,0.82)",
         backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)",
         display: "flex", alignItems: portrait ? "flex-start" : "center", justifyContent: "center",
         padding: portrait ? "3vh 3vw" : "5vh 5vw",
+        // Scrollable for tall portrait images, but the gutter is hidden — on
+        // mobile an always-visible scrollbar reads as a pale bar down the
+        // right edge of the dark overlay.
         overflow: "auto",
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+        overscrollBehavior: "contain",
         cursor: "zoom-out",
         animation: "pageFade .25s ease-out both"
       }}>
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        aria-label="Close"
-        style={{
-          position: "fixed", top: 22, right: 26,
-          width: 42, height: 42, borderRadius: "50%",
-          background: "rgba(255,255,255,0.14)", border: "1px solid rgba(255,255,255,0.3)",
-          color: "#fff", cursor: "pointer", display: "grid", placeItems: "center",
-          fontFamily: "inherit"
-        }}>
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-        </svg>
-      </button>
-      {/* Figure (stop propagation so clicking the image doesn't close) */}
-      {/* Click anywhere (including the image) closes the lightbox. */}
+      {/* No close button — clicking anywhere (or Escape) closes the lightbox. */}
       <figure
         style={{ margin: portrait ? "auto" : "0 auto", maxWidth: portrait ? "none" : 1100, width: portrait ? "auto" : "100%", minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", cursor: "zoom-out" }}>
         {/* Media sizes to the image's true aspect — never cropped. */}
@@ -958,8 +983,8 @@ function ContactForm() {
             required />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-          <button className="pill-btn" type="submit" disabled={sending} style={{ fontSize: 14, padding: "11px 20px", opacity: sending ? 0.7 : 1, cursor: sending ? "default" : "pointer" }}>
-            {sending ? "Sending…" : <>Send message <span className="arr">→</span></>}
+          <button className="pill-btn about-cta" type="submit" disabled={sending} style={{ fontSize: 14, padding: "11px 20px", opacity: sending ? 0.7 : 1, cursor: sending ? "default" : "pointer" }}>
+            {sending ? "Sending…" : <>Send Message <span className="arr">→</span></>}
           </button>
           {status === "sent" &&
           <div
@@ -1064,7 +1089,8 @@ function About({ onNavigate }) {
               I've worked shoulder-to-shoulder with engineers, marketers, and clients across startups and agencies. I care less about which hat I'm wearing and more about <strong style={{ fontWeight: 600, color: "rgba(0,0,0,0.92)" }}>solving the right problem: the one with the most impact, and the one that holds up as the product grows.</strong>
             </p>
             <div style={{ marginTop: 20 }}>
-              <button className="pill-btn" onClick={scrollToContact}>
+              {/* Matches the contact form's Send message button. */}
+              <button className="pill-btn about-cta" onClick={scrollToContact} style={{ fontSize: 14, padding: "11px 20px" }}>
                 Contact Me
               </button>
             </div>
@@ -1078,7 +1104,7 @@ function About({ onNavigate }) {
         <div className="about-two-col" style={{ marginTop: 56, display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 48 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Experience</div>
-            <MetaItem role="UX Quality Manager (Software R&D)" org="Epic Systems" href="https://www.epic.com/" />
+            <MetaItem role="UX Quality Manager (Software R&D)" org="Epic Systems" orgShort="Epic" href="https://www.epic.com/" />
             <MetaItem role="UX & Visual Designer" org="Ronik Design Agency" href="https://www.ronikdesign.com/" />
             <MetaItem role="Product Designer & Researcher" roleShort="Product Designer & Research" org="Snyk Cybersecurity" orgShort="Snyk" href="https://snyk.io/" />
             <MetaItem role="UX Designer" org="SearchNEU" href="https://searchneu.com/" />
@@ -1189,6 +1215,16 @@ function About({ onNavigate }) {
 // Playground
 // ───────────────────────────────────────────────────────────────────
 // Category data lives at module scope so the Archive pages can reuse it.
+// Shorter card blurbs for mobile, where the desktop wording wraps awkwardly.
+// Falls back to the project's own blurb when there's no override.
+const DESIGN_BLURBS_MOBILE = {
+  "flo-marketing": "Brand identity redesign for a B2B marketing agency",
+  "lovers-club": "Exploring different fandoms with typography",
+  "boba-book": "A 50+ page book with typographic and layout systems",
+  "pomodoro-timer": "A non-distracting yet satisfying productivity tool",
+  "nasa-worldview": "Redesigned UI to visualize satellite imagery and data"
+};
+
 const PLAYGROUND_CATEGORIES = {
   photography: {
     emoji: "📷",
@@ -1226,7 +1262,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "flo-marketing",
       kinds: ["Branding", "Graphic"],
       title: "Flo. Marketing",
-      blurb: "Brand identity redesign for a tech-forward B2B marketing agency.",
+      blurb: "Brand identity redesign for a tech-forward B2B marketing agency",
       src: "assets/playground/design/thumbs/flo.jpg",
       client: { label: "Flo. Marketing", href: "https://www.flomktg.com/" },
       role: "Visual Designer\nBranding, Graphic Design,\nMotion Design, UI Design",
@@ -1269,7 +1305,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "boba-book",
       kind: "Graphic",
       title: "The Boba Book",
-      blurb: "A 50+ page book designed with typographic and layout systems.",
+      blurb: "A 50+ page book designed with typographic and layout systems",
       src: "assets/playground/design/thumbs/boba-book.jpg",
       year: "10 x 8 inches\nBook",
       role: "Sole Designer\nBook Design & Layout",
@@ -1319,7 +1355,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "lovers-club",
       kind: "Graphic",
       title: "Lovers' Club Magazine",
-      blurb: "Exploring different fandoms using storytelling and experimental typography.",
+      blurb: "Exploring different fandoms using storytelling and experimental typography",
       src: "assets/playground/design/thumbs/lovers-club.jpg",
       year: "8.5 x 11 inches\nMagazine",
       role: "Sole Designer\nEditorial Design & Typography",
@@ -1345,7 +1381,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "typography-poster",
       kind: "Graphic",
       title: "Typography Guide Poster",
-      blurb: "50+ typographic terms explained and illustrated.",
+      blurb: "50+ typographic terms explained and illustrated",
       src: "assets/playground/design/thumbs/typography-poster.jpg",
       year: "24 x 36 inches\nPoster",
       role: "Sole Designer\nTypographic Design",
@@ -1362,7 +1398,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "pomodoro-timer",
       kind: "UX/UI",
       title: "The Pomodoro Timer",
-      blurb: "A non-distracting, convenient, yet satisfying way to manage time on the Apple Watch.",
+      blurb: "A non-distracting yet satisfying productivity tool for the Apple Watch",
       src: "assets/playground/design/thumbs/pomodoro.jpg",
       year: "watchOS\nApple Watch App",
       role: "Sole Designer\nUI Design, Interaction Design,\nVisual Specifications",
@@ -1392,7 +1428,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "media-harmony",
       kind: "UX/UI",
       title: "Media Harmony",
-      blurb: "WordPress plugin for managing website files.",
+      blurb: "WordPress plugin for managing website files",
       src: "assets/playground/design/thumbs/media-harmony.jpg",
       year: "Web\nWordPress Plugin",
       role: "UX Designer\nProduct Design, UI Design",
@@ -1410,8 +1446,8 @@ const PLAYGROUND_CATEGORIES = {
     {
       slug: "nasa-worldview",
       kind: "UX/UI",
-      title: "Nasa Worldview",
-      blurb: "A redesigned tool for visualizing NASA's satellite imagery and data.",
+      title: "NASA Worldview",
+      blurb: "A redesigned tool for visualizing NASA's satellite imagery and data",
       src: "assets/playground/design/thumbs/nasa-worldview.jpg",
       year: "Web\nData Visualization Tool",
       role: "UX Designer\nInteraction Design, UI Design",
@@ -1429,7 +1465,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "leading-edge",
       kind: "UX/UI",
       title: "Leading Edge",
-      blurb: "Redesigned web page for a non-profit.",
+      blurb: "Redesigned web page for a non-profit",
       src: "assets/playground/design/thumbs/leading-edge.jpg",
       client: { label: "Leading Edge", href: "https://www.leadingedge.org/" },
       role: "UX Designer\nWeb Design, Interaction Design",
@@ -1446,7 +1482,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "cant-decide",
       kinds: ["Branding", "Graphic"],
       title: "Can't Decide?",
-      blurb: "Brand identity for a mystery flavored drink brand.",
+      blurb: "Brand identity for a mystery flavored drink brand",
       src: "assets/playground/design/thumbs/cant-decide.jpg",
       year: "Packaging, Print, Web\nBrand Identity",
       role: "Visual Designer\nBranding, Packaging,\nAdvertising, Web Design",
@@ -1472,7 +1508,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "airwalk-magazine",
       kind: "Graphic",
       title: "Airwalk Magazine Cover",
-      blurb: "A cover for a magazine all about skateboarding.",
+      blurb: "A cover for a magazine all about skateboarding",
       src: "assets/playground/design/thumbs/airwalk.jpg",
       year: "8.5 x 11 inches\nMagazine Cover",
       role: "Sole Designer\nEditorial Design & Typography",
@@ -1489,7 +1525,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "design-culture-now",
       kind: "Graphic",
       title: "Design Culture Now",
-      blurb: "Poster for a series of guest speaker events.",
+      blurb: "Poster for a series of guest speaker events",
       src: "assets/playground/design/thumbs/design-culture-now.jpg",
       year: "18 x 24 inches\nPoster",
       role: "Sole Designer\nTypographic Design",
@@ -1506,7 +1542,7 @@ const PLAYGROUND_CATEGORIES = {
       slug: "neu-dragon",
       kinds: ["Branding", "Graphic", "UX/UI"],
       title: "NEU Dragon and Lion Dance Troupe",
-      blurb: "Improved outreach through a revamped digital and social media presence, and an official website.",
+      blurb: "Revamped brand identity and online presence",
       src: "assets/playground/design/neu-dragon/website-home.avif",
       client: { label: "NEU Dragon & Lion Dance", href: "https://neudragonliondance.org/" },
       role: "Designer & Web Developer\nBranding, Graphic Design,\nWeb Design & Development",
@@ -1816,6 +1852,23 @@ function Archive({ slug, onNavigate }) {
   const activeSlug = slug in PLAYGROUND_CATEGORIES ? slug : "photography";
   const [zoomed, setZoomed] = useStateAb(null);
   const [filter, setFilter] = useStateAb("All");
+  // Scroll progress (0-1) drives the purple fill on the mobile filter bar.
+  const [progress, setProgress] = useStateAb(0);
+  useEffectAb(() => {
+    const read = () => {
+      const doc = document.documentElement;
+      const max = (doc.scrollHeight || 0) - window.innerHeight;
+      const y = window.scrollY || doc.scrollTop || 0;
+      setProgress(max > 0 ? Math.min(1, Math.max(0, y / max)) : 0);
+    };
+    read();
+    window.addEventListener("scroll", read, { passive: true });
+    window.addEventListener("resize", read);
+    return () => {
+      window.removeEventListener("scroll", read);
+      window.removeEventListener("resize", read);
+    };
+  }, []);
 
   // Project-driven archives (e.g. Design) filter by category and link to
   // per-project detail pages instead of opening a lightbox.
@@ -1832,14 +1885,14 @@ function Archive({ slug, onNavigate }) {
       <div style={{ maxWidth: 1080, margin: "0 auto", width: "100%", padding: "48px 40px 100px" }}>
         {/* Back to Archive */}
         <button
-          className="pill-btn ghost"
+          className="pill-btn ghost archive-top-back"
           style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 28 }}
           onClick={() => onNavigate("archive")}>
           <span style={{ display: "inline-block" }}>←</span> Back to Archive
         </button>
 
         {/* Header */}
-        <header style={{ marginBottom: 44, maxWidth: 720 }}>
+        <header className="archive-header" style={{ marginBottom: isProjectArchive ? 8 : 44, maxWidth: 720 }}>
           <div style={{ fontSize: 13, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--accent)", marginBottom: 14 }}>
             Archive
           </div>
@@ -1850,13 +1903,20 @@ function Archive({ slug, onNavigate }) {
             {category.archiveIntro}
           </p>
           <div style={{ marginTop: 18, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase", color: "rgba(0,0,0,0.4)" }}>
-            {shown.length} {isProjectArchive ? "projects · click any project to read more" : "pieces · click any image to enlarge"}
+            {isProjectArchive ? "Click any project to read more" : `${shown.length} pieces · click any image to enlarge`}
           </div>
         </header>
 
         {/* Category filters (project-driven archives only) */}
         {isProjectArchive &&
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 9, marginBottom: 28 }}>
+        <div className="archive-filters">
+            {/* Purple fill over the gray top border (mobile bottom bar only).
+                Lives in the non-scrolling shell so it can't slide away. */}
+            <div
+            aria-hidden="true"
+            className="archive-filters-progress"
+            style={{ width: `${(progress * 100).toFixed(2)}%` }} />
+            <div className="archive-filters-row" style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
             {category.filters.map((f) => {
             const on = f === filter;
             return (
@@ -1876,10 +1936,11 @@ function Archive({ slug, onNavigate }) {
                   color: on ? "#fff" : "rgba(0,0,0,0.72)",
                   transition: "background .2s ease, color .2s ease, border-color .2s ease"
                 }}>
-                  {f}
+                  {f}{on ? <span style={{ opacity: 0.62 }}>{` (${shown.length})`}</span> : ""}
                 </button>);
 
           })}
+            </div>
           </div>
         }
 
@@ -1896,14 +1957,18 @@ function Archive({ slug, onNavigate }) {
             style={{ cursor: "pointer" }}>
                 <ImageCaption title={p.title} caption={p.blurb} label={kindsOf(p)[0]} src={p.src} gradient={p.gradient} aspect="3 / 2" noHoverCaption={true} hoverZoom={true} />
                 <div style={{ marginTop: 10 }}>
-                  <div style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--accent)", marginBottom: 4 }}>
-                    {kindsOf(p).join(" · ")}
-                  </div>
-                  <div style={{ fontWeight: 600, fontSize: 16, lineHeight: "21px", letterSpacing: "-0.02em", color: "var(--ink)" }}>
-                    {p.title}
+                  {/* Title left, category tags right, sharing one baseline. */}
+                  <div className="archive-card-head" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+                    <div style={{ fontWeight: 600, fontSize: 16, lineHeight: "21px", letterSpacing: "-0.02em", color: "var(--ink)", minWidth: 0 }}>
+                      {p.title}
+                    </div>
+                    <div style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--accent)", flexShrink: 0, textAlign: "right" }}>
+                      {kindsOf(p).join(" · ")}
+                    </div>
                   </div>
                   <div style={{ marginTop: 3, fontWeight: 300, fontSize: 13.5, lineHeight: "19px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.62)" }}>
-                    {p.blurb}
+                    <span className="pg-only-desktop">{p.blurb}</span>
+                    <span className="pg-only-mobile">{DESIGN_BLURBS_MOBILE[p.slug] || p.blurb}</span>
                   </div>
                 </div>
               </div>
@@ -1945,7 +2010,17 @@ function Archive({ slug, onNavigate }) {
           </button>
         </div>
       </div>
+      {/* Mobile: the filter row pins to the bottom, so float the way back
+          above it — same pattern as the case studies. */}
+      <button
+        className={"pill-btn floating-home archive-floating-back" + (isProjectArchive ? "" : " is-low")}
+        onClick={() => onNavigate("archive")}>
+        <span style={{ display: "inline-block" }}>←</span> Back to Archive
+      </button>
       <window.SiteFooter />
+      {/* AFTER the footer: the fixed filter bar reserves no space, so this is
+          what lets the footer scroll clear of it. */}
+      <div className={"archive-bottom-spacer" + (isProjectArchive ? "" : " is-short")} aria-hidden="true" />
       {zoomed && <Lightbox item={zoomed} onClose={() => setZoomed(null)} />}
     </div>);
 
@@ -2330,10 +2405,10 @@ function DesignProject({ slug, onNavigate }) {
       <SubpageNav onNavigate={onNavigate} current="playground" activeArchiveSlug="branding" />
       <div style={{ maxWidth: 1080, margin: "0 auto", width: "100%", padding: "48px 40px 100px" }}>
         <button
-          className="pill-btn ghost"
+          className="pill-btn ghost archive-top-back"
           style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 28 }}
           onClick={() => onNavigate("archive/branding")}>
-          <span style={{ display: "inline-block" }}>←</span> Back to Design Archive
+          <span style={{ display: "inline-block" }}>←</span> Back
         </button>
 
         <header style={{ marginBottom: 36, maxWidth: 720 }}>
@@ -2559,7 +2634,17 @@ function DesignProject({ slug, onNavigate }) {
           </button>
         </div>
       </div>
+      {/* Mobile: the filter row pins to the bottom, so float the way back
+          above it — same pattern as the case studies. */}
+      <button
+        className="pill-btn floating-home archive-floating-back is-low"
+        onClick={() => onNavigate("archive/branding")}>
+        <span style={{ display: "inline-block" }}>←</span> Back
+      </button>
       <window.SiteFooter />
+      {/* AFTER the footer: the fixed filter bar reserves no space, so this is
+          what lets the footer scroll clear of it. */}
+      <div className="archive-bottom-spacer is-short" aria-hidden="true" />
       {zoomed && <Lightbox item={zoomed} onClose={() => setZoomed(null)} />}
     </div>);
 

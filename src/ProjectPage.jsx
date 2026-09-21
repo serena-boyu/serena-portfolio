@@ -436,6 +436,23 @@ function MobileTimeline({ sections, activeId, onJump }) {
     // scrollBy avoids scrollIntoView, which would also scroll the page.
     bar.scrollBy({ left: delta, behavior: "smooth" });
   }, [activeId]);
+  // Scroll progress (0-1) drives the purple fill on the bar's top border.
+  const [progress, setProgress] = useStateP(0);
+  useEffectP(() => {
+    const read = () => {
+      const doc = document.documentElement;
+      const max = (doc.scrollHeight || 0) - window.innerHeight;
+      const y = window.scrollY || doc.scrollTop || 0;
+      setProgress(max > 0 ? Math.min(1, Math.max(0, y / max)) : 0);
+    };
+    read();
+    window.addEventListener("scroll", read, { passive: true });
+    window.addEventListener("resize", read);
+    return () => {
+      window.removeEventListener("scroll", read);
+      window.removeEventListener("resize", read);
+    };
+  }, []);
   // The main site-nav compacts on scroll (its height changes) and, on case
   // study pages, slides out of view entirely. Track its VISUAL bottom edge —
   // getBoundingClientRect() accounts for the transform, so the sub-nav follows
@@ -478,20 +495,47 @@ function MobileTimeline({ sections, activeId, onJump }) {
       clearTimeout(kick._t);
     };
   }, []);
+  // navH is no longer used for positioning (the bar is pinned to the bottom),
+  // but the measurement effect above is harmless and kept for future use.
+  void navH;
   return (
+    // Outer shell owns the chrome and the progress fill. It must NOT scroll or
+    // clip — an absolutely-positioned child inside a scroll container slides
+    // away with the pills and gets clipped at the padding box.
     <div style={{
-      position: "sticky",
-      top: Math.max(0, navH - 1),
+      position: "fixed",
+      left: 0,
+      right: 0,
+      bottom: 0,
       zIndex: 20,
-      background: "rgba(255,255,255,0.96)",
-      backdropFilter: "blur(12px)",
-      WebkitBackdropFilter: "blur(12px)",
-      borderBottom: "1px solid var(--hair)",
-      padding: "10px 16px",
-      display: "flex",
-      gap: 8,
-      overflowX: "auto"
-    }} className="no-scrollbar" ref={barRef}>
+      background: "rgba(245,245,247,0.62)",
+      backdropFilter: "saturate(180%) blur(22px)",
+      WebkitBackdropFilter: "saturate(180%) blur(22px)",
+      borderTop: "1px solid var(--hair)",
+      boxShadow: "0 -8px 26px rgba(0,0,0,0.06)",
+      paddingBottom: "env(safe-area-inset-bottom)"
+    }}>
+      {/* Purple fill laid over the gray top border — how far down the page. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: 0,
+          top: -1,
+          height: 2,
+          width: `${(progress * 100).toFixed(2)}%`,
+          background: "var(--accent)",
+          transition: "width .12s linear",
+          pointerEvents: "none",
+          zIndex: 1
+        }} />
+      {/* Inner scroller holds the pills. */}
+      <div style={{
+        padding: "14px 16px",
+        display: "flex",
+        gap: 8,
+        overflowX: "auto"
+      }} className="no-scrollbar" ref={barRef}>
       {sections.map((s) => {
         // The scroll spy reports subsection ids too (e.g. "improvements-2"),
         // which match no pill here — so nothing highlighted once you scrolled
@@ -507,8 +551,8 @@ function MobileTimeline({ sections, activeId, onJump }) {
               background: isActive ? "var(--accent)" : "var(--paper)",
               color: isActive ? "white" : "rgba(0,0,0,0.7)",
               borderRadius: 999,
-              padding: "5px 11px",
-              fontSize: 12,
+              padding: "10px 16px",
+              fontSize: 13.5,
               letterSpacing: "-0.01em",
               fontFamily: "inherit",
               whiteSpace: "nowrap",
@@ -520,6 +564,7 @@ function MobileTimeline({ sections, activeId, onJump }) {
           </button>);
 
       })}
+      </div>
     </div>);
 
 }
@@ -1302,6 +1347,13 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
 
       {isMobile && <MobileTimeline sections={data.sections} activeId={activeId} onJump={jump} />}
 
+      {/* Mobile has no sidebar, so this floats the way back to the index. */}
+      {isMobile &&
+      <button className="pill-btn floating-home" onClick={() => onNavigate("home")}>
+          <span style={{ display: "inline-block" }}>←</span> Back to Home
+        </button>
+      }
+
       <div style={{
         display: "flex",
         gap: isMobile ? 0 : 68,
@@ -1312,15 +1364,6 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
         {!isMobile && <CompactSidebar sections={data.sections} activeId={activeId} onJump={jump} onTop={toTop} onHome={() => onNavigate("home")} />}
 
         <main style={{ flex: 1, minWidth: 0 }}>
-          {/* Mobile has no sidebar, so the way back lives above the hero. */}
-          {isMobile &&
-          <button
-            className="pill-btn ghost"
-            onClick={() => onNavigate("home")}
-            style={{ alignSelf: "flex-start", marginTop: 10, marginBottom: 32 }}>
-              <span style={{ display: "inline-block" }}>←</span> Back to Home
-            </button>
-          }
           {/* Hero */}
           <div style={{ paddingBottom: 32, borderBottom: "1px solid var(--hair-soft)" }}>
             <div style={{
@@ -1481,6 +1524,9 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
         </main>
       </div>
       <window.SiteFooter contentMaxWidth={1180} />
+      {/* The mobile section bar is position:fixed, so it no longer reserves
+          space — pad the page out or it permanently covers the footer. */}
+      {isMobile && <div aria-hidden="true" style={{ height: "calc(150px + env(safe-area-inset-bottom))", flexShrink: 0 }} />}
       {zoomed && window.Lightbox && <window.Lightbox item={zoomed} onClose={() => setZoomed(null)} />}
     </div>
     </ZoomCtx.Provider>);
