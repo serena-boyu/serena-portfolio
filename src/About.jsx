@@ -1321,7 +1321,7 @@ function About({ onNavigate }) {
   { label: "tinkering", imgTitle: "Tinkering", imgCaption: "I love exploring new tools and making things with my hands.", src: "assets/funPics/tinkering-arduino.png" },
   { label: "games", imgTitle: "Card & board games", imgCaption: "Some of my favs are Open-Face Chinese Poker and the Nature board game.", src: "assets/funPics/cards-chinese-poker.png" },
   { label: "concerts", imgTitle: "Concert going", imgCaption: "Most recently, I saw BTS during their Arirang world tour!", src: "assets/funPics/concert-bts.jpeg" },
-  { label: "sleight", imgTitle: "Sleight of hand", imgCaption: "Cards are a great fidget toy and party trick.", videoSrc: "assets/funPics/sleight-of-hand.mp4" }];
+  { label: "sleight", imgTitle: "Sleight of hand", imgCaption: "Cards are a great fidget toy and party trick.", videoSrc: "assets/playground/misc/sleight_of_hand_back_palm.mp4" }];
 
 
   const contactRef = useRefAb(null);

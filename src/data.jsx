@@ -29,6 +29,9 @@ const PROJECTS = [
     color: "rgb(232, 76, 76)",
     // Video thumbnail — plays silently on the home page (no controls).
     video: "assets/searchneu/searchneu-demo.mp4",
+    // First project in the list, so it's the likeliest first hover — fetch it
+    // eagerly. Every other thumbnail stays preload="metadata".
+    videoPreload: true,
     // Percentages, not px: a fixed-px inset covers fewer source rows when the
     // video renders smaller (short viewports), letting the baked-in border
     // rows peek through. A % crop scales with the rendered box.
@@ -137,7 +140,7 @@ const EMOJIS = [
     body: "I have a small home coffee bar with a Casabrews CM5418.",
     img: "assets/funPics/emojiHovers/coffee-sm.png",
     // Video hover card — loops silently, no controls.
-    video: "assets/funPics/emojiHovers/espresso.mp4",
+    video: "assets/playground/misc/espresso_shot.mp4",
   },
 ];
 

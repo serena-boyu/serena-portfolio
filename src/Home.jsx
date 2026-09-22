@@ -83,6 +83,7 @@ function ProjectThumb({ project, active }) {
           muted
           loop
           playsInline
+          preload={project.videoPreload ? "auto" : "metadata"}
           onTimeUpdate={onTimeUpdate}
           onSeeked={onSeekedOrPlay}
           aria-label={project.title}
@@ -410,6 +411,7 @@ function EmojiCard({ emoji, anchor }) {
         muted
         loop
         playsInline
+        preload="metadata"
         aria-label={emoji.title}
         style={{
           width: "100%",
@@ -529,6 +531,7 @@ function ProjectRow({ project, hovered, onHover, onOpen, isMobile }) {
             muted
             loop
             playsInline
+            preload="metadata"
             aria-label={project.title}
             style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} /> :
 

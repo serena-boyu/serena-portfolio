@@ -1,36 +1,47 @@
 # GitHub source
 
-repo: serena-boyu/Portfolio
+repo: serena-boyu/serena-portfolio
 branch: main
+live: https://serena-boyu.github.io/serena-portfolio/
 
 ## Last sync
 
-date: 2026-09-18T08:57:44Z
-commit: (read-only inspection; nothing imported — tree hash was 95b4d6df887d)
+date: 2026-09-18T09:47:08Z
+tree: 861fa1b1bda0 (tree hash, not a commit)
 
 ### Updated in this project
-- Read the repo tree to compare it against the current local build before publishing.
-- Repo is substantially behind: it has 14 asset files vs 217 referenced locally.
-- Repo entry point is `Portfolio.html`; local entry is now `index.html` (required by GitHub Pages).
-- Nothing was imported from the repo — the local build is ahead in every file.
+- Published the full local build to `serena-boyu/serena-portfolio`; GitHub Pages is live.
+- Entry point renamed from "Portfolio V1.2 Simple Playground.html" to `index.html`.
+- Added `.gitignore` (excludes 186 unreferenced full-res originals, uploads/, screenshots/)
+  and `.nojekyll`.
+- The older `serena-boyu/Portfolio` repo is stale and NOT the live site.
 
 ## Screen map
 
-| Screen / area | Repo files | Local files |
-| --- | --- | --- |
-| Entry point | `Portfolio.html` | `index.html` |
-| Home (Featured Work) | `src/Home.jsx` | `src/Home.jsx` |
-| About + Archive + design projects | `src/About.jsx` | `src/About.jsx` |
-| Case study template | `src/ProjectPage.jsx` | `src/ProjectPage.jsx` |
-| Router | `src/App.jsx` | `src/App.jsx` |
-| All copy + project data | `src/data.jsx` | `src/data.jsx` |
-| Tweaks panel | `tweaks-panel.jsx` | `tweaks-panel.jsx` |
-| Images / video | `assets/**` (14 files) | `assets/**` (217 referenced) |
+| Screen / area | Files |
+| --- | --- |
+| Entry point | `index.html` |
+| Home (Featured Work) | `src/Home.jsx` |
+| About, Archive, design projects | `src/About.jsx` |
+| Archive layout (simple variant) | `src/PlaygroundSimple.jsx` |
+| Case study template | `src/ProjectPage.jsx` |
+| Router | `src/App.jsx` |
+| All copy + project data | `src/data.jsx` |
+| Tweaks panel | `tweaks-panel.jsx` |
+| Images / video | `assets/**` (217 referenced) |
 
-## Notes
+## Publishing notes
 
-- The local build is the source of truth. The repo has not been updated in a while.
-- `.gitignore` here excludes 186 full-resolution originals that the site does not load,
-  plus `uploads/`, `screenshots/`, `.tmp/`, and the older V1.0 / V1.1 layouts.
-- `Portfolio.html` and `SerenaNgPortfolio.html` in the repo are stale and should be
-  deleted once `index.html` lands.
+- Push fix: `git config http.postBuffer 524288000` was required — pushes over
+  ~30MB failed with "remote disconnected" until the buffer was raised.
+- Local repo is at the user's unzipped project folder, managed via GitHub Desktop.
+- Workflow for updates: replace changed files locally → Commit to main → Push origin.
+
+## Known follow-ups
+
+- Videos total ~131MB across 25 files — compression is the main remaining win.
+  See the HandBrake priority list: biggest offenders are pomodoro/demo-2-watches
+  (18.9MB), misc/neu_dragon_dance (15.9MB), flo/3d-render-background (12.6MB),
+  misc/espresso_shot (10.8MB), neu-dragon/keychains-video (10.0MB).
+- React is loaded from development builds; production builds would be smaller
+  (needs correct SRI hashes).
