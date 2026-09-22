@@ -404,6 +404,25 @@ function Lightbox({ item, onClose }) {
   // below their inline size. Landscape spreads keep the fit-to-screen cap.
   const [portrait, setPortrait] = useStateAb(false);
   const [natW, setNatW] = useStateAb(0);
+  // Swipe to dismiss (touch only). Tall images scroll vertically, so for those
+  // only a horizontal swipe counts — otherwise scrolling would close it.
+  const swipe = useRefAb(null);
+  const onSwipeStart = (ev) => {
+    if (ev.pointerType === "mouse") return;
+    swipe.current = { x: ev.clientX, y: ev.clientY };
+  };
+  const onSwipeEnd = (ev) => {
+    const sw = swipe.current;
+    swipe.current = null;
+    if (!sw) return;
+    const dx = ev.clientX - sw.x;
+    const dy = ev.clientY - sw.y;
+    const THRESHOLD = 70;
+    if (Math.abs(dx) > THRESHOLD && Math.abs(dx) > Math.abs(dy)) {onClose();return;}
+    // Vertical swipe closes only when the overlay isn't actually scrolling.
+    const scrolled = ev.currentTarget.scrollHeight > ev.currentTarget.clientHeight + 4;
+    if (!scrolled && Math.abs(dy) > THRESHOLD) onClose();
+  };
   useEffectAb(() => {
     const onKey = (e) => {if (e.key === "Escape") onClose();};
     document.addEventListener("keydown", onKey);
@@ -431,6 +450,9 @@ function Lightbox({ item, onClose }) {
   return (
     <div
       onClick={onClose}
+      onPointerDown={onSwipeStart}
+      onPointerUp={onSwipeEnd}
+      onPointerCancel={() => {swipe.current = null;}}
       className="no-scrollbar"
       style={{
         position: "fixed", inset: 0, width: "100vw", zIndex: 1000,
@@ -445,6 +467,10 @@ function Lightbox({ item, onClose }) {
         scrollbarWidth: "none",
         msOverflowStyle: "none",
         overscrollBehavior: "contain",
+        // Keeps native vertical scrolling for tall images while ensuring
+        // horizontal swipes arrive as pointer events (iOS may otherwise claim
+        // them and fire pointercancel). Mirrors [data-book-stage] in index.html.
+        touchAction: "pan-y",
         cursor: "zoom-out",
         animation: "pageFade .25s ease-out both"
       }}>

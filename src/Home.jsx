@@ -1000,21 +1000,30 @@ function HomeMobile({ onOpen, onNavigate }) {
           Outside of work
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+          {/* All chips go to the Archive index — unlike the desktop emoji
+              cloud, which routes to specific sub-archives. */}
           {window.EMOJIS.map((e, i) =>
-            <div key={i} style={{
-              background: "var(--paper)",
-              border: "1px solid var(--hair)",
-              borderRadius: 999,
-              padding: "6px 12px 6px 8px",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              fontSize: 13,
-              letterSpacing: "-0.01em"
-            }}>
+            <button
+              key={i}
+              onClick={() => onNavigate("archive")}
+              aria-label={e.title + " — open the Archive"}
+              style={{
+                background: "var(--paper)",
+                border: "1px solid var(--hair)",
+                borderRadius: 999,
+                padding: "6px 12px 6px 8px",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 13,
+                letterSpacing: "-0.01em",
+                fontFamily: "inherit",
+                color: "var(--ink)",
+                cursor: "pointer"
+              }}>
               <span style={{ fontSize: 16 }}>{e.char}</span>
               <span>{e.title.split(",")[0]}</span>
-            </div>
+            </button>
             )}
         </div>
       </div>
