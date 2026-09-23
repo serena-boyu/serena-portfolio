@@ -14,7 +14,7 @@ window.ASSET = (id, path) => (window.__resources && window.__resources[id]) || p
 //   • Project cover image:       `coverSrc` on a PROJECT_PAGE entry
 //   • Case-study section images: `figures: [{ src, caption }]` on a section
 //   • Galleries / journey / archive: `src` on each item in the data below
-window.PORTRAIT_SRC = "assets/about/headshot-w.png"; // e.g. "assets/portrait.jpg"
+window.PORTRAIT_SRC = "assets/web/about/headshot-w.webp"; // e.g. "assets/portrait.jpg"
 
 const PROJECTS = [
   {
@@ -28,7 +28,7 @@ const PROJECTS = [
     thumb: "stripe",
     color: "rgb(232, 76, 76)",
     // Video thumbnail — plays silently on the home page (no controls).
-    video: "assets/searchneu/searchneu-demo.mp4",
+    video: "assets/projectThumbnails/searchneu-thumb.mp4",
     // First project in the list, so it's the likeliest first hover — fetch it
     // eagerly. Every other thumbnail stays preload="metadata".
     videoPreload: true,
@@ -47,11 +47,10 @@ const PROJECTS = [
     team: "2 designers, PM, 5 engineers",
     thumb: "stripe",
     color: "rgb(21, 60, 110)",
-    img: "assets/projectThumbnails/jfk.png",
+    img: "assets/web/projectThumbnails/jfk.webp",
     // Video thumbnail — plays silently on the home page (no controls).
     // Same recording as the case study's first figure, in browser chrome.
-    video: "assets/jfk/full-demo.mp4",
-    videoStart: 4,
+    video: "assets/projectThumbnails/jfk-thumb.mp4",
     videoFrame: "vetting.jfkt4.nyc",
   },
   {
@@ -67,7 +66,7 @@ const PROJECTS = [
     //img: "assets/projectThumbnails/ecolab.avif",
     // Video thumbnail — plays silently on the home page (no controls).
     // Same recording as the case study's first figure, in browser chrome.
-    video: "assets/ecolab/desktop-scroll.mp4",
+    video: "assets/projectThumbnails/ecolab-thumb.mp4",
     videoFrame: "plus.reuters.com",
   },
   {
@@ -81,7 +80,7 @@ const PROJECTS = [
     thumb: "stripe",
     color: "rgb(196, 30, 58)",
     img: "assets/playground/design/thumbs/pomodoro.jpg",
-    video: "assets/playground/design/pomodoro/demo-2-watches.mp4",
+    video: "assets/projectThumbnails/pomodoro-thumb.mp4",
     videoBg: "#fefefe",
     // Renders as a smaller rounded card inside the panel, not full-bleed.
     imgInset: true,
@@ -93,52 +92,52 @@ const EMOJIS = [
     char: "🍵",
     title: "I love matcha",
     body: "Not just for the taste, but also the ritual of making it.",
-    img: "assets/funPics/emojiHovers/matcha-sm.png",
+    img: "assets/web/funPics/emojiHovers/matcha-sm.webp",
   },
   {
     char: "🐉",
     title: "Chinese dragon dance",
     body: "I learned and performed dragon dance in college!",
-    img: "assets/funPics/emojiHovers/dragondance-sm.png",
+    img: "assets/web/funPics/emojiHovers/dragondance-sm.webp",
   },
   {
     char: "📷",
     to: "archive/photography",
     title: "Capturing the world",
     body: "I mostly use a Canon EOS R50, a small but mighty camera.",
-    img: "assets/funPics/emojiHovers/camera-sm.png",
+    img: "assets/web/funPics/emojiHovers/camera-sm.webp",
   },
   {
     char: "🍽️",
     title: "Certified foodie",
     body: "Follow me on Beli @serenang to see my restaurant rankings!",
-    src: "assets/funPics/emojiHovers/ramen-sm.png",
-    img: "assets/funPics/emojiHovers/ramen-sm.png",
+    src: "assets/web/funPics/emojiHovers/ramen-sm.webp",
+    img: "assets/web/funPics/emojiHovers/ramen-sm.webp",
   },
   {
     char: "💻",
     to: "archive",
     title: "Always tinkering",
     body: "Currently dabbling in using AI to develop my designs fast!",
-    img: "assets/funPics/emojiHovers/tinkering-sm2.png",
+    img: "assets/web/funPics/emojiHovers/tinkering-sm2.webp",
   },
   {
     char: "🧋",
     title: "Boba lover",
     body: "My go-to drink is earl grey milk tea with grass jelly (less sugar).",
-    img: "assets/funPics/emojiHovers/boba-sm.png",
+    img: "assets/web/funPics/emojiHovers/boba-sm.webp",
   },
   {
     char: "🎧",
     title: "Music and concerts",
     body: "I listen to a mix of pop, k-pop, r&b, lo-fi, and soundtracks.",
-    img: "assets/funPics/emojiHovers/concert-sm.png",
+    img: "assets/web/funPics/emojiHovers/concert-sm.webp",
   },
   {
     char: "☕",
     title: "Espresso making",
     body: "I have a small home coffee bar with a Casabrews CM5418.",
-    img: "assets/funPics/emojiHovers/coffee-sm.png",
+    img: "assets/web/funPics/emojiHovers/coffee-sm.webp",
     // Video hover card — loops silently, no controls.
     video: "assets/playground/misc/espresso_shot.mp4",
   },
@@ -158,7 +157,7 @@ const PROJECT_PAGE = {
     subtitle: "Redesigning the mobile experience for a course search engine.",
     cover: "image",
     // Cover image at the top of the page — swap this path to change it.
-    coverSrc: "assets/searchneu/cover-angled-screens-w.png",
+    coverSrc: "assets/web/searchneu/cover-angled-screens-w.webp",
     eyebrowDate: "2024-2025",
     tags: ["Redesign", "Mobile", "UX Design", "UX Research"],
     meta: [
@@ -192,7 +191,7 @@ const PROJECT_PAGE = {
         title: "SearchNEU's mobile experience was so unintuitive that users never opened it on mobile again.",
         body: [],
         figures: [
-          { src: "assets/searchneu/old-mobile-3-phones-w.png", caption: "SearchNEU's original mobile screens." },
+          { src: "assets/web/searchneu/old-mobile-3-phones-w.webp", caption: "SearchNEU's original mobile screens." },
         ],
         quotes: [
           { text: "I don't get why people keep telling me to use SearchNEU for course registration, I opened it before and it genuinely sucked. I could barely even select the search filters.", author: "First-year student" },
@@ -237,7 +236,7 @@ const PROJECT_PAGE = {
             ],
             figures: [
               { src: "assets/searchneu/ba-search-results-w.png", caption: "Before and after: the course search results page." },
-              { src: "assets/searchneu/anno-search-results-v3.png", caption: "The redesigned search results page, annotated." },
+              { src: "assets/web/searchneu/anno-search-results-v3.webp", caption: "The redesigned search results page, annotated." },
             ],
           },
           {
@@ -272,7 +271,7 @@ const PROJECT_PAGE = {
             ],
             figures: [
               { src: "assets/searchneu/ba-course-details-w.png", caption: "Before and after: the mobile course details experience." },
-              { src: "assets/searchneu/anno-course-details-v3.png", caption: "The dedicated course details page, annotated." },
+              { src: "assets/web/searchneu/anno-course-details-v3.webp", caption: "The dedicated course details page, annotated." },
             ],
           },
           {
@@ -283,7 +282,7 @@ const PROJECT_PAGE = {
             ],
             figures: [
               { src: "assets/searchneu/matches-desktop-w.png", caption: "The redesigned mobile experience alongside desktop." },
-              { src: "assets/searchneu/anno-notifs-table-v2.png", caption: "Translating desktop's notifications table to mobile, annotated." },
+              { src: "assets/web/searchneu/anno-notifs-table-v2.webp", caption: "Translating desktop's notifications table to mobile, annotated." },
             ],
           },
           {
@@ -401,7 +400,7 @@ const PROJECT_PAGE = {
                   "The hardest part was seat availability. We tested visual representations (dots and bars) against numeric ones, and numbers won — “11/16 sections full” answers the question directly, while the visual versions needed decoding.",
                 ],
                 figures: [
-                  { src: "assets/searchneu/process/card-exploration-v2.png", caption: "Card explorations comparing visual and numeric ways to show seat status." },
+                  { src: "assets/web/searchneu/process/card-exploration-v2.webp", caption: "Card explorations comparing visual and numeric ways to show seat status." },
                 ],
               },
               {
@@ -411,7 +410,7 @@ const PROJECT_PAGE = {
                   "Experimented with the layout and **design patterns from desktop**, but modified them for mobile to ensure **visual consistency that reduces confusion** in users when switching from desktop to mobile.",
                 ],
                 figures: [
-                  { src: "assets/searchneu/process/course-details-exploration.png", caption: "Course details page iterations, working toward parity with desktop." },
+                  { src: "assets/web/searchneu/process/course-details-exploration.webp", caption: "Course details page iterations, working toward parity with desktop." },
                   { src: "assets/searchneu/matches-desktop-w.png", caption: "The redesigned mobile experience alongside desktop." },
                 ],
               },
@@ -790,7 +789,7 @@ const PROJECT_PAGE = {
                   "I explored column ordering, row styles (strokes versus pajama stripes), tag styles for visit dates and statuses, selected-state colors, and how rows should group.",
                 ],
                 figures: [
-                  { src: "assets/jfk/web/explore-table-first-hd.png", caption: "Table style explorations." },
+                  { src: "assets/web/jfk/web/explore-table-first-hd.webp", caption: "Table style explorations." },
                 ],
               },
               {
@@ -800,7 +799,7 @@ const PROJECT_PAGE = {
                   "That let me assemble a new version of the table in seconds and test different combinations of components against each other, instead of rebuilding a layout by hand for every direction I wanted to try.",
                 ],
                 figures: [
-                  { src: "assets/jfk/web/component-system-v2.jpg", caption: "The Figma component system behind the explorations." },
+                  { src: "assets/web/jfk/web/component-system-v2.webp", caption: "The Figma component system behind the explorations." },
                 ],
               },
               {
@@ -811,7 +810,7 @@ const PROJECT_PAGE = {
                   "I explored circle indicators for each visitor, colored names, pajama stripes, visual grouping bars, and fully separate rows.",
                 ],
                 figures: [
-                  { src: "assets/jfk/web/explore-statuses-hd.png", caption: "Explorations for showing mixed visitor statuses within one request." },
+                  { src: "assets/web/jfk/web/explore-statuses-hd.webp", caption: "Explorations for showing mixed visitor statuses within one request." },
                 ],
               },
               {
@@ -820,7 +819,7 @@ const PROJECT_PAGE = {
                   "Accordion rows, a separate detail page, and a modal were all on the table. We debated the trade-offs with each of these versions to decide what to use in the final design.",
                 ],
                 figures: [
-                  { src: "assets/jfk/web/explore-accordion-hd.png", caption: "Explorations for opening full request details." },
+                  { src: "assets/web/jfk/web/explore-accordion-hd.webp", caption: "Explorations for opening full request details." },
                 ],
               },
             ],
@@ -876,7 +875,7 @@ const PROJECT_PAGE = {
     title: "Reuters x Ecolab",
     subtitle: "An interactive microsite for promoting water sustainability in industry.",
     cover: "image",
-    coverSrc: "assets/ecolab/web/hero-desktop-mobile.jpg",
+    coverSrc: "assets/web/ecolab/web/hero-desktop-mobile.webp",
     eyebrowDate: "2024",
     tags: ["Web Design", "Graphic Design", "Desktop & Mobile", "Client Work"],
     meta: [
@@ -1007,7 +1006,7 @@ const PROJECT_PAGE = {
             // first also serves as the page cover — intentional, since this
             // section walks the whole story section by section.
             figures: [
-              { src: "assets/ecolab/web/hero-desktop-mobile.jpg", caption: "The opening section on desktop and mobile." },
+              { src: "assets/web/ecolab/web/hero-desktop-mobile.webp", caption: "The opening section on desktop and mobile." },
               { src: "assets/ecolab/web/ripple-desktop-mobile.jpg", spaceAbove: 40, caption: "A Ripple Effect on desktop and mobile — the side-by-side data blocks restack into a single column." },
               { src: "assets/ecolab/web/thirsting-desktop-mobile.jpg", spaceAbove: 40, caption: "Thirsting for Change on desktop and mobile — the three-across stat row becomes a stacked list." },
               { videoSrc: "assets/ecolab/mobile-scroll.mp4", phoneFrame: "plus.reuters.com", spaceAbove: 40, caption: "Scrolling the microsite on mobile." },
@@ -1021,7 +1020,7 @@ const PROJECT_PAGE = {
               "Beyond the microsite and its PDF version, we produced additional design assets for Ecolab, including graphics, 3D rendered artwork, and animations.",
             ],
             figures: [
-              { src: "assets/ecolab/web/visual-assets-grid.jpg", caption: "Other visual assets created for the campaign." },
+              { src: "assets/web/ecolab/web/visual-assets-grid.webp", caption: "Other visual assets created for the campaign." },
               { src: "assets/ecolab/web/3d-renders-grid.jpg", flat: true, spaceAbove: 40, caption: "3D rendered visual assets produced for the campaign, made with Cinema 4D." },
               { src: "assets/ecolab/web/water-drop-renders.jpg", flat: true, spaceAbove: 40, caption: "Water droplet renders, including the artwork behind the microsite's hero animation." },
             ],

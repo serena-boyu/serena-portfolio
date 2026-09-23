@@ -24,8 +24,7 @@
 <meta name="twitter:description" content="Product designer working on patient experience and AI workflows at Epic Health Systems." />
 <meta name="twitter:image" content="https://serenang.com/assets/og-image.png" />
 
-<meta name="ext-resource-dependency" content="assets/searchneu.png" data-resource-id="searchneu" />
-<link rel="preload" as="image" href="assets/about/headshot-w.png" />
+<meta name="ext-resource-dependency" content="assets/web/searchneu.webp" data-resource-id="searchneu" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -941,6 +940,52 @@
     .page-enter.is-entering { animation: none; }
   }
 </style>
+<style>
+  /* Images still downloading start hidden and fade in on load. Anything
+     already loaded or cached never gets these classes, so it shows at once. */
+  img.img-pending { opacity: 0; }
+  /* !important: many images carry an inline transition (e.g. a hover zoom),
+     which would otherwise override this and cancel the fade. Only applied for
+     the ~half second of the fade, then removed. */
+  img.img-fading { transition: opacity .45s ease, transform .5s cubic-bezier(.22,.61,.36,1) !important; }
+</style>
+<script>
+(function () {
+  function done(img) {
+    img.classList.remove("img-pending");
+    // Drop the transition class after it runs so it can't clash with any
+    // component that animates the image's opacity itself.
+    setTimeout(function () { img.classList.remove("img-fading"); }, 500);
+  }
+  function watch(img) {
+    if (img.dataset.noFade != null) return;
+    // Already decoded (cached or finished): show instantly, no fade.
+    if (img.complete && img.naturalWidth > 0) return;
+    img.classList.add("img-pending", "img-fading");
+    var finish = function () {
+      img.removeEventListener("load", finish);
+      img.removeEventListener("error", finish);
+      // Next frame, so the opacity:0 state paints before we fade from it.
+      requestAnimationFrame(function () { done(img); });
+    };
+    img.addEventListener("load", finish);
+    img.addEventListener("error", finish);
+  }
+  function scan(node) {
+    if (node.nodeType !== 1) return;
+    if (node.tagName === "IMG") watch(node);
+    else if (node.querySelectorAll) node.querySelectorAll("img").forEach(watch);
+  }
+  new MutationObserver(function (muts) {
+    muts.forEach(function (m) {
+      if (m.type === "attributes") watch(m.target);
+      else m.addedNodes.forEach(scan);
+    });
+  }).observe(document.documentElement, {
+    childList: true, subtree: true, attributes: true, attributeFilter: ["src"]
+  });
+})();
+</script>
 </head>
 <body>
 <template id="__bundler_thumbnail" data-bg-color="#ffffff">
@@ -962,12 +1007,12 @@
 
 <!-- ?v= cache-buster: BUMP THIS NUMBER on every deploy so browsers re-fetch
      the JSX instead of serving a stale cached copy. -->
-<script type="text/babel" src="tweaks-panel.jsx?v=6"></script>
-<script type="text/babel" src="src/data.jsx?v=6"></script>
-<script type="text/babel" src="src/Home.jsx?v=6"></script>
-<script type="text/babel" src="src/ProjectPage.jsx?v=6"></script>
-<script type="text/babel" src="src/About.jsx?v=6"></script>
-<script type="text/babel" src="src/PlaygroundSimple.jsx?v=6"></script>
-<script type="text/babel" src="src/App.jsx?v=6"></script>
+<script type="text/babel" src="tweaks-panel.jsx?v=12"></script>
+<script type="text/babel" src="src/data.jsx?v=12"></script>
+<script type="text/babel" src="src/Home.jsx?v=12"></script>
+<script type="text/babel" src="src/ProjectPage.jsx?v=12"></script>
+<script type="text/babel" src="src/About.jsx?v=12"></script>
+<script type="text/babel" src="src/PlaygroundSimple.jsx?v=12"></script>
+<script type="text/babel" src="src/App.jsx?v=12"></script>
 </body>
 </html>

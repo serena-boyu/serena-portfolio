@@ -147,13 +147,59 @@ function useVideoStart(videoStart) {
   return videoStart ? { ref, onLoadedMetadata: onLoaded, onTimeUpdate } : {};
 }
 
+// Defers a figure's video until it nears the viewport. Autoplay otherwise
+// makes the browser download every video on the page at once, starving the
+// images that sit between them.
+function useNearViewport() {
+  const ref = useRefP(null);
+  const visible = useRefP(false);
+  const [near, setNear] = useStateP(false);
+  const tryPlay = () => {
+    const el = ref.current;
+    const v = el && el.querySelector("video");
+    if (!v || !visible.current || !v.getAttribute("src")) return;
+    const p = v.play && v.play();
+    if (p && p.catch) p.catch(() => {});
+  };
+  useEffectP(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {visible.current = true;setNear(true);return;}
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        visible.current = en.isIntersecting;
+        if (en.isIntersecting) {
+          setNear(true);
+          tryPlay();
+        } else {
+          const v = el.querySelector("video");
+          if (v && v.pause) v.pause();
+        }
+      });
+    }, { rootMargin: "300px 0px" });
+    io.observe(el);
+    // Covers the render where src is first assigned, and any late-ready media.
+    const onReady = () => tryPlay();
+    el.addEventListener("loadeddata", onReady, true);
+    el.addEventListener("canplay", onReady, true);
+    return () => {
+      io.disconnect();
+      el.removeEventListener("loadeddata", onReady, true);
+      el.removeEventListener("canplay", onReady, true);
+    };
+  }, []);
+  // After the render that hands the video its src, start it if still visible.
+  useEffectP(() => {if (near) tryPlay();}, [near]);
+  return [ref, near];
+}
+
 function CaseFigure({ src, videoSrc, caption, label, aspect = "16 / 10", priority = false, w = 1600, h = 1200, crop, bleed, frame, phoneFrame, flat, spaceAbove, shadow, maxWidth, videoStart }) {
   const onZoom = React.useContext(ZoomCtx);
   const canZoom = !!(onZoom && (src || videoSrc));
   const open = () => canZoom && onZoom({ caption, src, videoSrc });
   const vidStart = useVideoStart(videoStart);
+  const [nearRef, near] = useNearViewport();
   return (
-    <figure className={frame ? "browser-figure" : undefined} style={{
+    <figure ref={nearRef} className={frame ? "browser-figure" : undefined} style={{
       margin: phoneFrame ? "52px auto 34px" : frame ? "22px auto 34px" : `${spaceAbove != null ? spaceAbove : 22}px 0 0`,
       maxWidth: maxWidth || undefined
     }}>
@@ -181,8 +227,9 @@ function CaseFigure({ src, videoSrc, caption, label, aspect = "16 / 10", priorit
         <PhoneFrame url={typeof phoneFrame === "string" ? phoneFrame : frame}>
           <video
             {...vidStart}
-            src={videoSrc}
-            autoPlay
+            src={near ? videoSrc : undefined}
+            preload="none"
+            autoPlay={near}
             muted
             loop
             playsInline
@@ -202,8 +249,9 @@ function CaseFigure({ src, videoSrc, caption, label, aspect = "16 / 10", priorit
         <BrowserFrame url={frame}>
           <video
             {...vidStart}
-            src={videoSrc}
-            autoPlay
+            src={near ? videoSrc : undefined}
+            preload="none"
+            autoPlay={near}
             muted
             loop
             playsInline
@@ -215,8 +263,9 @@ function CaseFigure({ src, videoSrc, caption, label, aspect = "16 / 10", priorit
         videoSrc ?
         <video
           {...vidStart}
-          src={videoSrc}
-          autoPlay
+          src={near ? videoSrc : undefined}
+          preload="none"
+          autoPlay={near}
           muted
           loop
           playsInline
@@ -404,11 +453,8 @@ function CompactSidebar({ sections, activeId, onJump, onTop, onHome }) {
       })}
       <button
         onClick={onTop}
-        style={{
-          background: "none", border: "none", padding: "2px 0 0 12px", textAlign: "left",
-          cursor: "pointer", fontFamily: "inherit", fontSize: 12, letterSpacing: "-0.01em",
-          color: "rgba(0,0,0,0.4)", marginTop: 22
-        }}>
+        className="footer-top-btn"
+        style={{ alignSelf: "flex-start", marginTop: 22, flexShrink: 0 }}>
         ↑ Back to top
       </button>
       </nav>

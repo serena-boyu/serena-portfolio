@@ -483,6 +483,43 @@ function EmojiCard({ emoji, anchor }) {
 
 }
 
+// Mobile project-card video that only downloads when the card nears the
+// viewport, plays while on screen, and pauses when scrolled away.
+function LazyCardVideo({ src, poster, label, style }) {
+  const ref = useRef(null);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {setNear(true);return;}
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) {
+          setNear(true);
+          const p = el.play && el.play();
+          if (p && p.catch) p.catch(() => {});
+        } else if (el.pause) {
+          el.pause();
+        }
+      });
+    }, { rootMargin: "200px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <video
+      ref={ref}
+      src={near ? src : undefined}
+      poster={poster || undefined}
+      muted
+      loop
+      playsInline
+      preload="none"
+      autoPlay={near}
+      aria-label={label}
+      style={style} />);
+
+}
+
 function ProjectRow({ project, hovered, onHover, onOpen, isMobile }) {
   if (isMobile) {
     return (
@@ -525,14 +562,10 @@ function ProjectRow({ project, hovered, onHover, onOpen, isMobile }) {
           background: "var(--gray-50)"
         }}>
             {project.video ?
-          <video
+          <LazyCardVideo
             src={project.video}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-label={project.title}
+            poster={project.img}
+            label={project.title}
             style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} /> :
 
           <img

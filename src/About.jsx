@@ -24,19 +24,9 @@ function ImageCaption({ title, caption, src, videoSrc, gradient, aspect = "16 / 
   // a blank gray box.
   const [imgFailed, setImgFailed] = useStateAb(false);
   // Fade the photo in once it has actually decoded, so cards don't pop in.
-  const [loaded, setLoaded] = useStateAb(false);
-  useEffectAb(() => {
-    setImgFailed(false);
-    if (!src) {setLoaded(true);return;}
-    setLoaded(false);
-    const probe = new Image();
-    let alive = true;
-    probe.onload = () => {if (alive) setLoaded(true);};
-    probe.onerror = () => {if (alive) {setImgFailed(true);setLoaded(true);}};
-    probe.src = src;
-    if (probe.complete) setLoaded(true);
-    return () => {alive = false;};
-  }, [src]);
+  // Reset the failure flag when the image changes. The fade-in is handled
+  // site-wide in index.html (and skipped for already-cached images).
+  useEffectAb(() => {setImgFailed(false);}, [src]);
   useEffectAb(() => {
     const card = cardRef.current;
     if (!card) return;
@@ -107,12 +97,26 @@ function ImageCaption({ title, caption, src, videoSrc, gradient, aspect = "16 / 
           transform: hover && lift ? "scale(1.05)" : "scale(1)",
           transition: "transform .5s cubic-bezier(.22,.61,.36,1)"
         }} /> :
+      shownSrc ?
+      <img
+        src={shownSrc}
+        alt={title || ""}
+        loading="lazy"
+        decoding="async"
+        onError={() => setImgFailed(true)}
+        style={{
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          display: "block",
+          transform: hover && lift ? "scale(1.05)" : "scale(1)",
+          transition: "transform .5s cubic-bezier(.22,.61,.36,1)"
+        }} /> :
       <div style={{
         position: "absolute", inset: 0,
         background: media,
-        opacity: loaded ? 1 : 0,
         transform: hover && lift ? "scale(1.05)" : "scale(1)",
-        transition: "opacity .5s ease, transform .5s cubic-bezier(.22,.61,.36,1)"
+        transition: "transform .5s cubic-bezier(.22,.61,.36,1)"
       }} />
       }
       {/* Placeholder marker when there's no real image yet */}
@@ -1302,13 +1306,13 @@ function About({ onNavigate }) {
   src: "assets/funPics/journey/dad.jpg", image: "childhood", imgTitle: "Me and my dad", imgCaption: "Where the habit of looking for a better way started." },
   { year: "High school", title: "Discovering design",
    body: "I got into design in high school through a graphic design class. My teacher helped me get Adobe Creative Cloud over the summer, and I spent it working through every YouTube tutorial I could find.",
-  src: "assets/funPics/journey/highschool.png", image: "high school", imgTitle: "First designs", imgCaption: "A summer spent inside Photoshop and Illustrator." },
+  src: "assets/web/funPics/journey/highschool.webp", image: "high school", imgTitle: "First designs", imgCaption: "A summer spent inside Photoshop and Illustrator." },
   { year: "High School / College", title: "Exploring UX design",
    body: "I picked up Adobe XD next, just to try it. Watching my static designs become interactive sparked my interest, and I fell in love with the whole UX process, from research to iteration.",
-  src: "assets/funPics/journey/firstux.png", image: "UX", imgTitle: "My first ever UX project", imgCaption: "The first time I made a static design interactive." },
+  src: "assets/web/funPics/journey/firstux.webp", image: "UX", imgTitle: "My first ever UX project", imgCaption: "The first time I made a static design interactive." },
   { year: "Ronik Design", title: "Working at an agency",
    body: "My time at Ronik Design taught me to wear a lot of hats: graphic design, UX/UI, animation, often across several client projects at once. Constant feedback, revisions, and pitches made the work exciting and incredibly rewarding.",
-  src: "assets/funPics/journey/ronik.webp", image: "Ronik", imgTitle: "NYC, Ronik studio", imgCaption: "Juggling client projects across a lot of disciplines." },
+  src: "assets/web/funPics/journey/ronik.webp", image: "Ronik", imgTitle: "NYC, Ronik studio", imgCaption: "Juggling client projects across a lot of disciplines." },
   { year: "Now", title: "Always learning and growing",
    body: "Design is moving faster than ever. New tools are putting more power directly into designers' hands, and AI is already reshaping what UX even looks like.\n\nI built this portfolio with Claude in a fraction of the usual time, so I've felt that shift first-hand. I'm excited for what's next and will keep exploring.",
   src: "assets/funPics/journey/claude.png", image: "now", imgTitle: "Building with AI", imgCaption: "This portfolio, and other projects I'm experimenting with." }];
@@ -1316,10 +1320,10 @@ function About({ onNavigate }) {
 
   // Images for the "What I've been up to..." section
   const recent = [
-  { label: "photography", imgTitle: "Photography", imgCaption: "Mostly shot on my Canon EOS R50 when I'm exploring new places.", src: "assets/funPics/photography-camera.png" },
-  { label: "drinks", imgTitle: "Drink making", imgCaption: "Homemade syrups, matcha lattes, and espresso drinks.", src: "assets/funPics/matcha-homemade.png" },
-  { label: "tinkering", imgTitle: "Tinkering", imgCaption: "I love exploring new tools and making things with my hands.", src: "assets/funPics/tinkering-arduino.png" },
-  { label: "games", imgTitle: "Card & board games", imgCaption: "Some of my favs are Open-Face Chinese Poker and the Nature board game.", src: "assets/funPics/cards-chinese-poker.png" },
+  { label: "photography", imgTitle: "Photography", imgCaption: "Mostly shot on my Canon EOS R50 when I'm exploring new places.", src: "assets/web/funPics/photography-camera.webp" },
+  { label: "drinks", imgTitle: "Drink making", imgCaption: "Homemade syrups, matcha lattes, and espresso drinks.", src: "assets/web/funPics/matcha-homemade.webp" },
+  { label: "tinkering", imgTitle: "Tinkering", imgCaption: "I love exploring new tools and making things with my hands.", src: "assets/web/funPics/tinkering-arduino.webp" },
+  { label: "games", imgTitle: "Card & board games", imgCaption: "Some of my favs are Open-Face Chinese Poker and the Nature board game.", src: "assets/web/funPics/cards-chinese-poker.webp" },
   { label: "concerts", imgTitle: "Concert going", imgCaption: "Most recently, I saw BTS during their Arirang world tour!", src: "assets/funPics/concert-bts.jpeg" },
   { label: "sleight", imgTitle: "Sleight of hand", imgCaption: "Cards are a great fidget toy and party trick.", videoSrc: "assets/playground/misc/sleight_of_hand_back_palm.mp4" }];
 
@@ -1513,16 +1517,16 @@ const PLAYGROUND_CATEGORIES = {
     body: "",
     archiveLabel: "Photo Archive",
     items: [
-    { label: "autumn", imgTitle: "Autumn in Wisconsin", imgCaption: "The view of Wisconsin's colorful trees in autumn.", src: "assets/playground/photography/autumn_wisconsin.jpg" },
-    { label: "chinatown", imgTitle: "Boston's Chinatown", imgCaption: "The Chinatown Gate after a fresh snowfall.", src: "assets/playground/photography/chinatown.jpg" },
+    { label: "autumn", imgTitle: "Autumn in Wisconsin", imgCaption: "The view of Wisconsin's colorful trees in autumn.", src: "assets/web/playground/photography/autumn_wisconsin.webp" },
+    { label: "chinatown", imgTitle: "Boston's Chinatown", imgCaption: "The Chinatown Gate after a fresh snowfall.", src: "assets/web/playground/photography/chinatown.webp" },
     { label: "clocktower", imgTitle: "The Custom House Tower", imgCaption: "The clocktower peeping through the streets of Boston.", src: "assets/playground/photography/clocktower.jpeg" },
-    { label: "foggyTreeBranch", imgTitle: "A foggy night", imgCaption: "Every foggy night is optimal photography time.", src: "assets/playground/photography/foggy_tree_branch.jpg" },
-    { label: "foggyTreeCar", imgTitle: "Autumn at night", imgCaption: "A street light illuminating autumn leaves and a car.", src: "assets/playground/photography/foggy_tree_car.jpg" },
-    { label: "westEnd", imgTitle: "Boston's West End", imgCaption: "Looking down Causeway St, where the old brick meets the new glass.", src: "assets/playground/photography/boston_west_end.png" },
-    { label: "balconies", imgTitle: "Milwaukee balconies", imgCaption: "Afternoon light on a row of apartment balconies.", src: "assets/playground/photography/milwaukee_balconies.jpg" },
-    { label: "riMansion", imgTitle: "A Rhode Island mansion", imgCaption: "Light pouring into one of the Newport mansions.", src: "assets/playground/photography/ri_mansion.png" },
-    { label: "foggyNight", imgTitle: "Streetlight in the fog", imgCaption: "An overgrown street light on a foggy night in Wisconsin.", src: "assets/playground/photography/foggy_streetlight.jpg" },
-    { label: "longWharf", imgTitle: "Long Wharf in the rain", imgCaption: "Boston Harbor on a rainy night, captured with flash.", src: "assets/playground/photography/long_wharf_rain.webp" }]
+    { label: "foggyTreeBranch", imgTitle: "A foggy night", imgCaption: "Every foggy night is optimal photography time.", src: "assets/web/playground/photography/foggy_tree_branch.webp" },
+    { label: "foggyTreeCar", imgTitle: "Autumn at night", imgCaption: "A street light illuminating autumn leaves and a car.", src: "assets/web/playground/photography/foggy_tree_car.webp" },
+    { label: "westEnd", imgTitle: "Boston's West End", imgCaption: "Looking down Causeway St, where the old brick meets the new glass.", src: "assets/web/playground/photography/boston_west_end.webp" },
+    { label: "balconies", imgTitle: "Milwaukee balconies", imgCaption: "Afternoon light on a row of apartment balconies.", src: "assets/web/playground/photography/milwaukee_balconies.webp" },
+    { label: "riMansion", imgTitle: "A Rhode Island mansion", imgCaption: "Light pouring into one of the Newport mansions.", src: "assets/web/playground/photography/ri_mansion.webp" },
+    { label: "foggyNight", imgTitle: "Streetlight in the fog", imgCaption: "An overgrown street light on a foggy night in Wisconsin.", src: "assets/web/playground/photography/foggy_streetlight.webp" },
+    { label: "longWharf", imgTitle: "Long Wharf in the rain", imgCaption: "Boston Harbor on a rainy night, captured with flash.", src: "assets/web/playground/photography/long_wharf_rain.webp" }]
 
   },
   branding: {
@@ -1575,7 +1579,7 @@ const PLAYGROUND_CATEGORIES = {
       { src: "assets/playground/design/flo/business-cards.webp", flat: true, caption: "Business cards in the brand's black, white, and mint palette." },
       { src: "assets/playground/design/flo/assets.webp", flat: true, caption: "Brand assets and templates across formats." },
       { src: "assets/playground/design/flo/social-media.webp", flat: true, caption: "Social media posts applying the system at scale." },
-      { src: "assets/playground/design/flo/info-sheet.webp", flat: true, caption: "The one-page info sheet, front and back." },
+      { src: "assets/web/playground/design/flo/info-sheet.webp", flat: true, caption: "The one-page info sheet, front and back." },
       { src: "assets/playground/design/flo/3d-logo-render.webp", flat: true, caption: "An artistic 3D render of the logo." }]
 
     },
@@ -1650,7 +1654,7 @@ const PLAYGROUND_CATEGORIES = {
         "assets/playground/design/lovers-club/web/page-04.jpg",
         "assets/playground/design/lovers-club/web/page-05.jpg",
         "assets/playground/design/lovers-club/web/page-06.jpg",
-        "assets/playground/design/lovers-club/web/page-07.jpg"]
+        "assets/web/playground/design/lovers-club/web/page-07.webp"]
 
       },
       images: []
@@ -1668,8 +1672,8 @@ const PLAYGROUND_CATEGORIES = {
         "The design is themed around Santiago Calatrava, the Spanish architect, structural engineer, sculptor, and painter known for his bridges, railway stations, and other structures heavily inspired by organic sculptural forms. Designed in Adobe InDesign and Illustrator."
       ],
       images: [
-      { src: "assets/playground/design/typography-poster/thumbnail.png", caption: "The poster, displayed on a wall." },
-      { src: "assets/playground/design/typography-poster/web/poster.jpg", caption: "The full poster — click for fullscreen.", flat: true }]
+      { src: "assets/web/playground/design/typography-poster/thumbnail.webp", caption: "The poster, displayed on a wall." },
+      { src: "assets/web/playground/design/typography-poster/web/poster.webp", caption: "The full poster — click for fullscreen.", flat: true }]
 
     },
     {
@@ -1686,19 +1690,19 @@ const PLAYGROUND_CATEGORIES = {
         "I documented the full system \u2014 color, type, UI component dimensions, complications, and the end-to-end workflow \u2014 as a set of visual design specs ready for handoff."
       ],
       images: [
-      { src: "assets/playground/design/pomodoro/thumbnail.png", caption: "The app's primary screens across a set of Apple Watches.", shadow: true },
+      { src: "assets/web/playground/design/pomodoro/thumbnail.webp", caption: "The app's primary screens across a set of Apple Watches.", shadow: true },
       { videoSrc: "assets/playground/design/pomodoro/demo-2-watches.mp4", plain: true, flat: true },
-      { src: "assets/playground/design/pomodoro/3d-mockup.png", caption: "3D render of the app and its complications on device." },
+      { src: "assets/web/playground/design/pomodoro/3d-mockup.webp", caption: "3D render of the app and its complications on device." },
       { src: "assets/playground/design/pomodoro/slide-01-title.png", flat: true, caption: "Visual design specs \u2014 title." },
-      { src: "assets/playground/design/pomodoro/slide-02-overview.png", flat: true, caption: "Overview." },
-      { src: "assets/playground/design/pomodoro/slide-03-screens-1.png", flat: true, caption: "Primary app screens \u2014 home, setup, and productivity stats." },
+      { src: "assets/web/playground/design/pomodoro/slide-02-overview.webp", flat: true, caption: "Overview." },
+      { src: "assets/web/playground/design/pomodoro/slide-03-screens-1.webp", flat: true, caption: "Primary app screens \u2014 home, setup, and productivity stats." },
       { src: "assets/playground/design/pomodoro/slide-04-screens-2.png", flat: true, caption: "Primary app screens \u2014 focus timer, controls, and break." },
       { src: "assets/playground/design/pomodoro/slide-05-colors.png", flat: true, caption: "Specifications \u2014 colors." },
       { src: "assets/playground/design/pomodoro/slide-06-typography.png", flat: true, caption: "Specifications \u2014 typography." },
       { src: "assets/playground/design/pomodoro/slide-07-ui-components.png", flat: true, caption: "Specifications \u2014 UI components." },
       { src: "assets/playground/design/pomodoro/slide-08-complications-1.png", flat: true, caption: "Specifications \u2014 complications." },
-      { src: "assets/playground/design/pomodoro/slide-09-complications-2.png", flat: true, caption: "Specifications \u2014 complications on the watch face." },
-      { src: "assets/playground/design/pomodoro/slide-10-workflow.png", flat: true, caption: "Implementation \u2014 the end-to-end workflow." },
+      { src: "assets/web/playground/design/pomodoro/slide-09-complications-2.webp", flat: true, caption: "Specifications \u2014 complications on the watch face." },
+      { src: "assets/web/playground/design/pomodoro/slide-10-workflow.webp", flat: true, caption: "Implementation \u2014 the end-to-end workflow." },
       { videoSrc: "assets/playground/design/pomodoro/final-demo.mp4", plain: true, flat: true }]
 
     },
@@ -1735,8 +1739,8 @@ const PLAYGROUND_CATEGORIES = {
         "A guided walkthrough introduces the dataset behind what you're looking at, so a first-time visitor can understand a wildfire detection map without needing to know which satellite captured it."
       ],
       images: [
-      { src: "assets/playground/design/nasa-worldview/full.png", caption: "The redesigned Worldview interface, with grouped layers and a guided dataset walkthrough." },
-      { src: "assets/playground/design/nasa-worldview/zoomed.png", caption: "A closer look at the layer panel, per-layer controls, and map elements." }]
+      { src: "assets/web/playground/design/nasa-worldview/full.webp", caption: "The redesigned Worldview interface, with grouped layers and a guided dataset walkthrough." },
+      { src: "assets/web/playground/design/nasa-worldview/zoomed.webp", caption: "A closer look at the layer panel, per-layer controls, and map elements." }]
 
     },
     {
@@ -1753,7 +1757,7 @@ const PLAYGROUND_CATEGORIES = {
         "A sticky navigation bar pins to the top as you scroll, letting visitors quickly jump between different Our Team sections of the page which now runs long by necessity."
       ],
       images: [
-      { src: "assets/playground/design/leading-edge/our-team.png", caption: "The redesigned Our Team & Board page, with the slanted gallery and sticky section nav." }]
+      { src: "assets/web/playground/design/leading-edge/our-team.webp", caption: "The redesigned Our Team & Board page, with the slanted gallery and sticky section nav." }]
 
     },
     {
@@ -1770,15 +1774,15 @@ const PLAYGROUND_CATEGORIES = {
         "Online, that curiosity breeds virality and is extended to the website brand touchpoint. A quiz of intentionally absurd questions picks a flavor on your behalf, and visitors can request any flavor idea and follow upcoming drops. The rewards system allows you to unlock a rare special flavor after ten purchases, thus rewarding the risk-taking the brand runs on."
       ],
       images: [
-      { src: "assets/playground/design/cant-decide/cover.png", caption: "Brand cover for Can't Decide?" },
-      { src: "assets/playground/design/cant-decide/drinks.png", caption: "Packaging across the three product lines: seltzer, tea, and coffee." },
-      { src: "assets/playground/design/cant-decide/subway.png", caption: "The campaign in place \u2014 three subway posters announcing flavor drops." },
+      { src: "assets/web/playground/design/cant-decide/cover.webp", caption: "Brand cover for Can't Decide?" },
+      { src: "assets/web/playground/design/cant-decide/drinks.webp", caption: "Packaging across the three product lines: seltzer, tea, and coffee." },
+      { src: "assets/web/playground/design/cant-decide/subway.webp", caption: "The campaign in place \u2014 three subway posters announcing flavor drops." },
       { row: [
-        { src: "assets/playground/design/cant-decide/poster-1.png", caption: "Flavor #7 \u2014 a grouping of five galaxies." },
-        { src: "assets/playground/design/cant-decide/poster-2.png", caption: "\u201cSame boring routine? Spice it up.\u201d" },
-        { src: "assets/playground/design/cant-decide/poster-3.png", caption: "Flavor #4.8 \u2014 beloved by dolphins, but not sea turtles." }],
+        { src: "assets/web/playground/design/cant-decide/poster-1.webp", caption: "Flavor #7 \u2014 a grouping of five galaxies." },
+        { src: "assets/web/playground/design/cant-decide/poster-2.webp", caption: "\u201cSame boring routine? Spice it up.\u201d" },
+        { src: "assets/web/playground/design/cant-decide/poster-3.webp", caption: "Flavor #4.8 \u2014 beloved by dolphins, but not sea turtles." }],
         flat: true, gap: 28, spaceAbove: 8 },
-      { src: "assets/playground/design/cant-decide/website-home.png", caption: "The homepage, leading with the next incoming flavor drop." },
+      { src: "assets/web/playground/design/cant-decide/website-home.webp", caption: "The homepage, leading with the next incoming flavor drop." },
       { src: "assets/playground/design/cant-decide/website-quiz.png", caption: "The Discover Your Flavor quiz \u2014 nonsense questions, decisive answers." }]
 
     },
@@ -1795,8 +1799,8 @@ const PLAYGROUND_CATEGORIES = {
         "The masthead uses a heavy bubble letterform that nods to 90s skate graphics and graffiti, paired with stencil and typewriter faces for the cover lines. Hand-drawn stars, arrows, and a starburst badge keep the layout feeling closer to a sticker-covered board than a newsstand grid. Designed in Adobe Illustrator."
       ],
       images: [
-      { src: "assets/playground/design/airwalk/mockup.png", caption: "The printed cover, mocked up." },
-      { src: "assets/playground/design/airwalk/web/cover.jpg", caption: "The full cover \u2014 click for fullscreen.", flat: true, spaceAbove: 34, width: "min(100%, 480px)" }]
+      { src: "assets/web/playground/design/airwalk/mockup.webp", caption: "The printed cover, mocked up." },
+      { src: "assets/web/playground/design/airwalk/web/cover.webp", caption: "The full cover \u2014 click for fullscreen.", flat: true, spaceAbove: 34, width: "min(100%, 480px)" }]
 
     },
     {
@@ -1812,7 +1816,7 @@ const PLAYGROUND_CATEGORIES = {
         "Oversized display serifs stack down the sheet in green, yellow, and coral against deep navy, while a white connective line threads between each speaker's details \u2014 tying four separate events into one continuous conversation. Designed in Adobe InDesign and Illustrator."
       ],
       images: [
-      { src: "assets/playground/design/design-culture-now/mockup.png", caption: "The poster, framed and displayed." },
+      { src: "assets/web/playground/design/design-culture-now/mockup.webp", caption: "The poster, framed and displayed." },
       { src: "assets/playground/design/design-culture-now/web/poster.jpg", caption: "The full poster \u2014 click for fullscreen.", flat: true, spaceAbove: 34, width: "min(100%, 420px)" }]
 
     },
@@ -1834,7 +1838,7 @@ const PLAYGROUND_CATEGORIES = {
       { src: "assets/playground/design/neu-dragon/logo-iterations.avif", shadow: true, caption: "Logo iterations exploring color, containment, and how the two heads share the circle." },
       { src: "assets/playground/design/neu-dragon/business-cards.avif", caption: "Business cards for booking performances." },
       { src: "assets/playground/design/neu-dragon/info-poster.avif", caption: "An informational poster for tabling and campus events." },
-      { src: "assets/playground/design/neu-dragon/social-grid.avif", caption: "A selection from 30+ social media posts \u2014 events, interest meetings, and announcements." },
+      { src: "assets/web/playground/design/neu-dragon/social-grid.webp", caption: "A selection from 30+ social media posts \u2014 events, interest meetings, and announcements." },
       { src: "assets/playground/design/neu-dragon/instagram-scroll.avif", caption: "A multi-panel Instagram post recapping the year in review." },
       { videoSrc: "assets/playground/design/neu-dragon/website-home.mp4", caption: "The homepage of the website I designed and built from scratch." },
       { videoSrc: "assets/playground/design/neu-dragon/website-our-team.mp4", caption: "The Our Team page, introducing the troupe and recruiting new members." },
@@ -1864,13 +1868,13 @@ const PLAYGROUND_CATEGORIES = {
     archiveLabel: "View Archive",
     items: [
     { videoSrc: "assets/playground/misc/neu_dragon_dance.mp4", label: "dragonDance", imgTitle: "Chinese dragon dance", imgCaption: "Performing with the NEU Dragon & Lion Dance Troupe in college." },
-    { src: "assets/playground/misc/homemade_matcha.png", label: "matcha", imgTitle: "Homemade matcha latte", imgCaption: "One of my favorite recipes is an iced earl grey matcha latte." },
+    { src: "assets/web/playground/misc/homemade_matcha.webp", label: "matcha", imgTitle: "Homemade matcha latte", imgCaption: "One of my favorite recipes is an iced earl grey matcha latte." },
     { videoSrc: "assets/playground/misc/sleight_of_hand_back_palm.mp4", label: "sleight", imgTitle: "Sleight of hand", imgCaption: "Cards are a great fidget toy and party trick." },
     { src: "assets/playground/misc/laser_cut_keychains.jpeg", label: "keychains", imgTitle: "Laser cut keychains", imgCaption: "Learning new tools to make merch for my dragon dance troupe." },
     { videoSrc: "assets/playground/misc/espresso_shot.mp4", label: "espresso", imgTitle: "Espresso making", imgCaption: "An espresso shot pulled from my Casabrews CM5418." },
-    { src: "assets/playground/misc/tinkering_arduino.png", label: "tinkering", imgTitle: "Tinkering", imgCaption: "I love exploring new tools and making things with my hands." },
-    { src: "assets/playground/misc/chinese_poker.png", label: "games", imgTitle: "Card & board games", imgCaption: "Some of my favs are Open-Face Chinese Poker and the Nature board game." },
-    { src: "assets/playground/misc/bts_concert.png", label: "concerts", imgTitle: "Concert going", imgCaption: "Most recently, I saw BTS during their Arirang world tour!" }]
+    { src: "assets/web/playground/misc/tinkering_arduino.webp", label: "tinkering", imgTitle: "Tinkering", imgCaption: "I love exploring new tools and making things with my hands." },
+    { src: "assets/web/playground/misc/chinese_poker.webp", label: "games", imgTitle: "Card & board games", imgCaption: "Some of my favs are Open-Face Chinese Poker and the Nature board game." },
+    { src: "assets/web/playground/misc/bts_concert.webp", label: "concerts", imgTitle: "Concert going", imgCaption: "Most recently, I saw BTS during their Arirang world tour!" }]
 
   }
 };
