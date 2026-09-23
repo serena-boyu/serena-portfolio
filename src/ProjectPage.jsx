@@ -27,7 +27,7 @@ function BrowserFrame({ url, children }) {
       overflow: "hidden",
       background: "#fff",
       border: "1px solid rgba(0,0,0,0.13)",
-      boxShadow: "0 10px 34px rgba(0,0,0,0.13)"
+      boxShadow: "var(--frame-shadow, 0 10px 34px rgba(0,0,0,0.13))"
     }}>
       {/* Toolbar — deliberately minimal so the recording stays the focus. */}
       <div style={{
@@ -296,7 +296,7 @@ function CaseFigure({ src, videoSrc, caption, label, aspect = "16 / 10", priorit
         <div style={{
           position: "absolute", inset: 0, display: "grid", placeItems: "center",
           fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-          fontSize: 11, letterSpacing: "0.04em", color: "rgba(0,0,0,0.4)",
+          fontSize: 11, letterSpacing: "0.04em", color: "rgb(var(--ink-rgb) / var(--label-alpha, 0.4))",
           textTransform: "uppercase"
         }}>
             {label || "image"}
@@ -310,7 +310,7 @@ function CaseFigure({ src, videoSrc, caption, label, aspect = "16 / 10", priorit
         fontSize: 13,
         fontWeight: 300,
         letterSpacing: "-0.01em",
-        color: "rgba(0,0,0,0.5)"
+        color: "rgb(var(--ink-rgb) / 0.5)"
       }}>
           {caption}
         </figcaption>
@@ -388,7 +388,7 @@ function CompactSidebar({ sections, activeId, onJump, onTop, onHome }) {
                 fontSize: 13,
                 lineHeight: "18px",
                 letterSpacing: "-0.01em",
-                color: isActive ? "var(--accent)" : "rgba(0,0,0,0.55)",
+                color: isActive ? "var(--accent)" : "rgb(var(--ink-rgb) / 0.55)",
                 fontWeight: isActive ? 600 : 400,
                 transition: "color .2s ease"
               }}>
@@ -428,7 +428,7 @@ function CompactSidebar({ sections, activeId, onJump, onTop, onHome }) {
                       fontSize: 11.5,
                       lineHeight: "16px",
                       letterSpacing: "-0.01em",
-                      color: subActive ? "var(--accent)" : "rgba(0,0,0,0.42)",
+                      color: subActive ? "var(--accent)" : "rgb(var(--ink-rgb) / var(--label-alpha, 0.42))",
                       fontWeight: subActive ? 600 : 400,
                       transition: "color .2s ease"
                     }}>
@@ -571,7 +571,7 @@ function MobileTimeline({ sections, activeId, onJump }) {
       right: 0,
       bottom: 0,
       zIndex: 20,
-      background: "rgba(245,245,247,0.62)",
+      background: "var(--bar-glass, rgba(245,245,247,0.62))",
       backdropFilter: "saturate(180%) blur(22px)",
       WebkitBackdropFilter: "saturate(180%) blur(22px)",
       borderTop: "1px solid var(--hair)",
@@ -588,7 +588,7 @@ function MobileTimeline({ sections, activeId, onJump }) {
           top: -1,
           height: 2,
           width: 0,
-          background: "var(--accent)",
+          background: "var(--accent-solid)",
           pointerEvents: "none",
           zIndex: 1
         }} />
@@ -611,8 +611,8 @@ function MobileTimeline({ sections, activeId, onJump }) {
             onClick={() => onJump(s.id)}
             style={{
               border: "1px solid var(--hair)",
-              background: isActive ? "var(--accent)" : "var(--paper)",
-              color: isActive ? "white" : "rgba(0,0,0,0.7)",
+              background: isActive ? "var(--accent-solid)" : "var(--paper)",
+              color: isActive ? "#fff" : "rgb(var(--ink-rgb) / 0.7)",
               borderRadius: 999,
               padding: "7px 13px",
               fontSize: 12.5,
@@ -676,7 +676,7 @@ function StatsBand({ stats }) {
           fontSize: 13.5,
           lineHeight: "19px",
           letterSpacing: "-0.01em",
-          color: "rgba(0,0,0,0.7)"
+          color: "rgb(var(--ink-rgb) / 0.7)"
         }}>{s.label}</div>
         </div>
       )}
@@ -710,7 +710,7 @@ function QuoteWall({ quotes, maxWidth }) {
           fontSize: 14,
           lineHeight: "21px",
           letterSpacing: "-0.01em",
-          color: "rgba(0,0,0,0.82)",
+          color: "rgb(var(--ink-rgb) / 0.82)",
           textWrap: "pretty"
         }}>
             “{q.text}”
@@ -740,7 +740,7 @@ function KeyList({ title, items }) {
         fontWeight: 600,
         letterSpacing: "0.06em",
         textTransform: "uppercase",
-        color: "rgba(0,0,0,0.5)",
+        color: "rgb(var(--ink-rgb) / 0.5)",
         marginBottom: 10
       }}>{title}</div>
       }
@@ -753,7 +753,7 @@ function KeyList({ title, items }) {
           fontSize: 14.5,
           lineHeight: "22px",
           letterSpacing: "-0.01em",
-          color: "rgba(0,0,0,0.78)"
+          color: "rgb(var(--ink-rgb) / 0.78)"
         }}>
             <span style={{
             position: "absolute", left: 2, top: 8,
@@ -774,7 +774,7 @@ function RichText({ text }) {
   const parts = String(text).split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g);
   return parts.map((p, i) => {
     if (p.startsWith("**") && p.endsWith("**") && p.length > 4) {
-      return <strong key={i} style={{ fontWeight: 600, color: "rgba(0,0,0,0.92)" }}>{p.slice(2, -2)}</strong>;
+      return <strong key={i} style={{ fontWeight: 600, color: "rgb(var(--ink-rgb) / 0.92)" }}>{p.slice(2, -2)}</strong>;
     }
     const link = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(p);
     if (link) {
@@ -803,7 +803,7 @@ function Paras({ body }) {
     fontSize: 15,
     lineHeight: "24px",
     letterSpacing: "-0.01em",
-    color: "rgba(0,0,0,0.78)",
+    color: "rgb(var(--ink-rgb) / 0.78)",
     textWrap: "pretty"
   }}>
       <RichText text={p} />
@@ -830,7 +830,7 @@ function NotesBlock({ title, notes, boxed, columns, spaceAbove }) {
         fontWeight: 600,
         letterSpacing: "0.06em",
         textTransform: "uppercase",
-        color: boxed ? "var(--accent)" : "rgba(0,0,0,0.5)",
+        color: boxed ? "var(--accent)" : "rgb(var(--ink-rgb) / 0.5)",
         marginBottom: 16
       }}>{title}</div>
       }
@@ -961,7 +961,7 @@ function Section({ section, registerRef, projectId }) {
             fontSize: 14,
             lineHeight: "20px",
             letterSpacing: "-0.01em",
-            color: "rgba(0,0,0,0.7)"
+            color: "rgb(var(--ink-rgb) / 0.7)"
           }}>
               {section.callout.label}
             </div>
@@ -1038,7 +1038,7 @@ function Section({ section, registerRef, projectId }) {
             width: 24, height: 24,
             borderRadius: "50%",
             background: "var(--accent)",
-            color: "#fff",
+            color: "var(--on-accent, #fff)",
             fontSize: 12,
             fontWeight: 600,
             display: "grid",
@@ -1194,7 +1194,7 @@ function PasswordGate({ project, onUnlock, onNavigate }) {
           <h1 style={{ margin: 0, fontWeight: 700, fontSize: 30, letterSpacing: "-0.03em" }}>
             {project.title}
           </h1>
-          <p style={{ margin: "14px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
+          <p style={{ margin: "14px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)" }}>
             This case study is password protected.
           </p>
 
@@ -1217,7 +1217,7 @@ function PasswordGate({ project, onUnlock, onNavigate }) {
                   position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
                   width: 32, height: 32, display: "grid", placeItems: "center",
                   border: "none", background: "transparent", cursor: "pointer",
-                  color: reveal ? "var(--accent)" : "rgba(0,0,0,0.42)",
+                  color: reveal ? "var(--accent)" : "rgb(var(--ink-rgb) / var(--label-alpha, 0.42))",
                   transition: "color .2s ease", padding: 0
                 }}>
                 {reveal ?
@@ -1244,7 +1244,7 @@ function PasswordGate({ project, onUnlock, onNavigate }) {
             </button>
           </form>
 
-          <p style={{ margin: "28px 0 0", fontSize: 13, lineHeight: "20px", letterSpacing: "-0.01em", color: "rgba(0,0,0,0.55)" }}>
+          <p style={{ margin: "28px 0 0", fontSize: 13, lineHeight: "20px", letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.55)" }}>
             Need the password? Email me at{" "}
             <a className="footer-link" href={"mailto:serena.ng.contact@gmail.com?subject=" + encodeURIComponent("Password for " + project.title + " case study")}>
               serena.ng.contact@gmail.com
@@ -1287,7 +1287,7 @@ function UnderConstruction({ data, projectId, onNavigate }) {
           <h1 style={{ margin: 0, fontWeight: 700, fontSize: 30, letterSpacing: "-0.03em" }}>
             {data.title}
           </h1>
-          <p style={{ margin: "16px auto 0", maxWidth: 420, fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.01em", color: "rgba(0,0,0,0.7)", textWrap: "pretty" }}>
+          <p style={{ margin: "16px auto 0", maxWidth: 420, fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.7)", textWrap: "pretty" }}>
             This case study is currently under construction. A less detailed project overview is available in my design archive.
           </p>
 
@@ -1453,7 +1453,7 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
               fontSize: isMobile ? 16 : 17,
               lineHeight: "26px",
               letterSpacing: "-0.01em",
-              color: "rgba(0,0,0,0.7)",
+              color: "rgb(var(--ink-rgb) / 0.7)",
               maxWidth: 640,
               textWrap: "pretty"
             }}>
@@ -1491,7 +1491,7 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
                   fontSize: 10,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
-                  color: "rgba(0,0,0,0.42)",
+                  color: "rgb(var(--ink-rgb) / var(--label-alpha, 0.42))",
                   marginBottom: 5
                 }}>{m.label}</div>
                   <div style={{
@@ -1504,7 +1504,7 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
                   // Parenthesised qualifiers read as secondary — gray them out.
                   m.value.split(/(\([^)]*\))/g).map((part, pi) =>
                   part.startsWith("(") && part.endsWith(")") ?
-                  <span key={pi} style={{ color: "rgba(0,0,0,0.5)", fontWeight: 300 }}>{part}</span> :
+                  <span key={pi} style={{ color: "rgb(var(--ink-rgb) / 0.5)", fontWeight: 300 }}>{part}</span> :
                   <React.Fragment key={pi}>{part}</React.Fragment>
                   ) :
                   m.value}</div>
@@ -1514,7 +1514,7 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
                   letterSpacing: "0.005em",
                   fontWeight: 300,
                   lineHeight: "21px",
-                  color: "rgba(0,0,0,0.5)",
+                  color: "rgb(var(--ink-rgb) / 0.5)",
                   whiteSpace: "pre-line"
                 }}>{m.sub}</div>
                 }
@@ -1565,13 +1565,13 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
                 }
               </div>
               <div className="upnext-copy" style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(0,0,0,0.42)", marginBottom: 6 }}>
+                <div style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--accent)", fontWeight: 600, marginBottom: 6 }}>
                   Up next
                 </div>
                 <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em" }}>
                   {next.title}
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 300, letterSpacing: "-0.01em", color: "rgba(0,0,0,0.62)", marginTop: 3 }}>
+                <div style={{ fontSize: 14, fontWeight: 300, letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.62)", marginTop: 3 }}>
                   {next.blurb}
                 </div>
                 {/* Shown only on mobile — stacks under the copy. */}

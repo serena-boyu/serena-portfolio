@@ -58,7 +58,7 @@ function ProjectThumb({ project, active }) {
     if (v && v.currentTime - start < FADE) setVidFade(1);
   };
   return (
-    <div
+    <div className={"home-thumb-stage" + (project.videoFrame ? " is-framed" : project.video ? " has-card" : "")}
       style={{
         position: "absolute",
         inset: 0,
@@ -106,12 +106,20 @@ function ProjectThumb({ project, active }) {
         // Optional browser chrome, matching the case-study figures.
         if (project.videoFrame && window.BrowserFrame) {
           return (
-            <div style={{ width: "100%", padding: "0 34px", boxSizing: "border-box" }}>
+            <div className="home-thumb-frame" style={{
+              "--fw": project.videoFrameWidth || "100%",
+              "--fw-dark": project.videoFrameWidthDark || project.videoFrameWidth || "100%",
+              padding: "0 34px", boxSizing: "border-box" }}>
               <window.BrowserFrame url={project.videoFrame}>{vid}</window.BrowserFrame>
             </div>);
 
         }
-        return vid;
+        // Wrapper is layout-neutral in light mode (display: contents); in dark
+        // mode it becomes a smaller light card so the panel can go dark.
+        return (
+          <div className="home-thumb-card" style={{ "--card-bg": project.videoBg || "#f6f8fb" }}>
+            {vid}
+          </div>);
       })() :
       imgSrc ?
       <img
@@ -398,7 +406,7 @@ function EmojiCard({ emoji, anchor }) {
         border: "1px solid var(--hair)",
         borderRadius: 16,
         padding: 12,
-        boxShadow: "2px 2px 6px -1px var(--shadow-soft), 0 12px 28px rgba(0,0,0,0.08)",
+        boxShadow: "var(--emoji-card-shadow, 2px 2px 6px -1px var(--shadow-soft), 0 12px 28px rgba(0,0,0,0.08))",
         zIndex: 5,
         pointerEvents: "none",
         animation: "cardIn .25s cubic-bezier(.22,.61,.36,1) both"
@@ -456,7 +464,7 @@ function EmojiCard({ emoji, anchor }) {
         fontSize: 12,
         lineHeight: "16px",
         letterSpacing: "-0.02em",
-        color: "rgba(0,0,0,0.6)",
+        color: "rgb(var(--ink-rgb) / var(--emoji-caption-alpha, 0.6))",
         textAlign: "center",
         fontWeight: 300
       }}>
@@ -538,14 +546,14 @@ function ProjectRow({ project, hovered, onHover, onOpen, isMobile }) {
           display: "flex",
           flexDirection: "column",
           gap: 12,
-          boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05)"
+          boxShadow: "var(--home-card-shadow, 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05))"
         }}>
         
         <div>
           <div style={{ fontWeight: 700, fontSize: 20, letterSpacing: "-0.03em" }}>
             {project.title}
           </div>
-          <div style={{ fontWeight: 300, fontSize: 16, letterSpacing: "-0.02em", marginTop: 4, color: "rgba(0,0,0,0.7)" }}>
+          <div style={{ fontWeight: 300, fontSize: 16, letterSpacing: "-0.02em", marginTop: 4, color: "rgb(var(--ink-rgb) / 0.7)" }}>
             {project.blurb}
           </div>
         </div>
@@ -653,8 +661,8 @@ function ProjectRow({ project, hovered, onHover, onOpen, isMobile }) {
           display: "grid",
           placeItems: "center",
           background: active ? "var(--accent)" : "transparent",
-          border: active ? "none" : "1.5px solid rgba(0,0,0,0.2)",
-          color: active ? "white" : "rgba(0,0,0,0.55)",
+          border: active ? "none" : "1.5px solid rgb(var(--ink-rgb) / 0.2)",
+          color: active ? "var(--on-accent, white)" : "rgb(var(--ink-rgb) / 0.55)",
           transition: "background .3s ease, color .3s ease, border-color .3s ease, transform .35s cubic-bezier(.22,.61,.36,1)",
           // Non-hover: the whole card is shifted left 24px (translateX(-24px)),
           // which also pulls this arrow left. Counter it by +24px so the arrow
@@ -886,7 +894,7 @@ function HomeDesktop({ onOpen, onNavigate }) {
       {/* LEFT — gradient panel for thumbnails / emojis */}
       <div data-left-panel="true" style={{
         position: "relative",
-        background: "linear-gradient(180deg, rgb(255,255,255) 0%, rgb(226,226,226) 100%)",
+        background: "linear-gradient(180deg, var(--panel-top, rgb(255,255,255)) 0%, var(--panel-bottom, rgb(226,226,226)) 100%)",
         overflow: "hidden",
         height: "100vh"
       }}>
@@ -906,7 +914,7 @@ function HomeDesktop({ onOpen, onNavigate }) {
           left: 40,
           bottom: 30,
           fontSize: 13,
-          color: "rgba(0,0,0,0.45)",
+          color: "rgb(var(--ink-rgb) / var(--hint-alpha, 0.45))",
           letterSpacing: "-0.01em",
           opacity: showEmojis && hoveredEmoji === null ? 1 : 0,
           transition: "opacity .6s ease"
@@ -954,7 +962,7 @@ function HomeDesktop({ onOpen, onNavigate }) {
                 fontSize: 16.5,
                 lineHeight: "26px",
                 letterSpacing: "-0.02em",
-                color: "rgba(0,0,0,0.78)"
+                color: "rgb(var(--ink-rgb) / 0.78)"
               }}>
             <div>Patient experience + AI workflows @ <CompanyLink href="https://www.epic.com">Epic Health Systems</CompanyLink></div>
             <div>Previously designed for <CompanyLink href="https://www.ronikdesign.com/">Ronik</CompanyLink>, <CompanyLink href="https://snyk.io">Snyk</CompanyLink>, <CompanyLink href="https://www.jfkairport.com/">JFK Airport</CompanyLink>, <CompanyLink href="https://plus.reuters.com/p/1">Reuters</CompanyLink>, and more.</div>
@@ -1015,7 +1023,7 @@ function HomeMobile({ onOpen, onNavigate }) {
             fontSize: 15,
             lineHeight: "23px",
             letterSpacing: "-0.02em",
-            color: "rgba(0,0,0,0.78)"
+            color: "rgb(var(--ink-rgb) / 0.78)"
           }}>
           <div>Patient experience + AI workflows @ <CompanyLink href="https://www.epic.com">Epic</CompanyLink></div>
           <div>Previously designed for <CompanyLink href="https://www.ronikdesign.com/">Ronik</CompanyLink>, <CompanyLink href="https://snyk.io">Snyk</CompanyLink>, <CompanyLink href="https://www.jfkairport.com/">JFK Airport</CompanyLink>, etc.</div>
@@ -1032,7 +1040,7 @@ function HomeMobile({ onOpen, onNavigate }) {
 
       {/* About me — quick bits (replaces emoji hover on mobile) */}
       <div style={{ paddingTop: 16, paddingBottom: 24 }}>
-        <div style={{ fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase", color: "rgba(0,0,0,0.5)", marginBottom: 12 }}>
+        <div style={{ fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase", color: "rgb(var(--ink-rgb) / 0.5)", marginBottom: 12 }}>
           Outside of work
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>

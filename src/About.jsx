@@ -124,7 +124,7 @@ function ImageCaption({ title, caption, src, videoSrc, gradient, aspect = "16 / 
       <div style={{
         position: "absolute", inset: 0, display: "grid", placeItems: "center",
         fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-        fontSize: 11, letterSpacing: "0.04em", color: "rgba(0,0,0,0.4)",
+        fontSize: 11, letterSpacing: "0.04em", color: "rgb(var(--ink-rgb) / var(--label-alpha, 0.45))",
         textTransform: "uppercase", pointerEvents: "none"
       }}>
           {label || "photo"}
@@ -141,7 +141,7 @@ function ImageCaption({ title, caption, src, videoSrc, gradient, aspect = "16 / 
       <div style={{
         position: "absolute", top: 12, right: 12,
         width: 34, height: 34, borderRadius: "50%",
-        background: "rgba(255,255,255,0.92)",
+        background: "var(--badge-bg, rgba(255,255,255,0.92))",
         border: "1px solid var(--hair)",
         display: "grid", placeItems: "center",
         boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
@@ -172,7 +172,7 @@ function ImageCaption({ title, caption, src, videoSrc, gradient, aspect = "16 / 
           {title}
         </div>
         {caption && !titleOnly &&
-        <div style={{ marginTop: 2, fontWeight: 300, fontSize: 13, lineHeight: "18px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.62)" }}>
+        <div style={{ marginTop: 2, fontWeight: 300, fontSize: 13, lineHeight: "18px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.62)" }}>
             {caption}
           </div>
         }
@@ -280,7 +280,7 @@ function WavingPortrait() {
           // ONE shadow for the whole silhouette. Per-shape box-shadows made the
           // big circle's arc visible through the bubble above it; a filter on
           // the group traces the merged outline instead, so they read as one.
-          filter: "drop-shadow(0 5px 12px rgba(0,0,0,0.13)) drop-shadow(0 1px 3px rgba(0,0,0,0.09))"
+          filter: "drop-shadow(1px 0 0 var(--hair-solid)) drop-shadow(-1px 0 0 var(--hair-solid)) drop-shadow(0 1px 0 var(--hair-solid)) drop-shadow(0 -1px 0 var(--hair-solid)) drop-shadow(0 6px 16px var(--accent-shadow)) drop-shadow(0 1px 3px rgba(0,0,0,0.1))"
         }}>
         {/* Trail circles sit BEHIND the body so they merge into its edge. */}
         <span className="about-fact-tail" style={{
@@ -309,7 +309,7 @@ function WavingPortrait() {
           fontSize: 13.5,
           lineHeight: "19px",
           letterSpacing: "-0.01em",
-          color: "rgba(0,0,0,0.72)"
+          color: "rgb(var(--ink-rgb) / 0.72)"
         }}>
           {factIdx % FUN_FACTS.length < FUN_FACTS_UNLABELED_FROM &&
           <><span style={{ fontWeight: 600, color: "var(--accent)" }}>Fun fact:</span>{" "}</>
@@ -339,7 +339,7 @@ function WavingPortrait() {
         style={{
           width: "100%", height: "100%", borderRadius: "50%",
           background: "var(--gray-50)",
-          color: "rgba(0,0,0,0.4)", fontSize: 12,
+          color: "rgb(var(--ink-rgb) / var(--label-alpha, 0.45))", fontSize: 12,
           fontFamily: "ui-monospace, monospace", letterSpacing: "0.04em",
           border: "1px solid var(--hair)",
           position: "relative",
@@ -368,7 +368,7 @@ function WavingPortrait() {
           transition: "opacity .45s ease"
         }} /> :
       <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center" }}>
-          <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 12, color: "rgba(0,0,0,0.4)", letterSpacing: "0.04em" }}>[ portrait ]</span>
+          <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 12, color: "rgb(var(--ink-rgb) / var(--label-alpha, 0.45))", letterSpacing: "0.04em" }}>[ portrait ]</span>
         </div>
       }
       {/* Custom waving-hand cursor — soft fade + scale in, then waves. */}
@@ -380,7 +380,7 @@ function WavingPortrait() {
           top: pos.y,
           fontSize: 30,
           lineHeight: 1,
-          color: "#000",
+          color: "var(--ink)",
           pointerEvents: isTouch && hover ? "auto" : "none",
           cursor: isTouch && hover ? "pointer" : "default",
           visibility: hover && !isTouch ? "visible" : "hidden",
@@ -402,12 +402,29 @@ function WavingPortrait() {
 }
 
 // Fullscreen popup showing a larger version of a clicked archive image.
-function Lightbox({ item, onClose }) {
+function Lightbox({ item: single, items, startIndex = 0, onClose, galleryTitle }) {
+  // Gallery mode: pass `items` + `startIndex` to step through a grid with
+  // arrows, arrow keys, or a horizontal swipe. A lone `item` behaves as before.
+  const gallery = Array.isArray(items) && items.length > 1;
+  const [idx, setIdx] = useStateAb(startIndex);
+  const item = gallery ? items[idx] : single || (items && items[startIndex]);
+  const go = (d) => {if (gallery) setIdx((i) => (i + d + items.length) % items.length);};
+  const goRef = useRefAb(go);
+  goRef.current = go;
+  const justSwiped = useRefAb(false);
   // Tall (portrait) images are shown at full width and scrolled, so
   // "enlarge" always means bigger — a viewport-height cap would shrink them
   // below their inline size. Landscape spreads keep the fit-to-screen cap.
   const [portrait, setPortrait] = useStateAb(false);
   const [natW, setNatW] = useStateAb(0);
+  useEffectAb(() => {
+    setPortrait(false);
+    if (!gallery) return;
+    [1, -1].forEach((d) => {
+      const n = items[(idx + d + items.length) % items.length];
+      if (n && n.src) {const im = new Image();im.src = n.src;}
+    });
+  }, [idx]);
   // Swipe to dismiss (touch only). Tall images scroll vertically, so for those
   // only a horizontal swipe counts — otherwise scrolling would close it.
   const swipe = useRefAb(null);
@@ -422,13 +439,23 @@ function Lightbox({ item, onClose }) {
     const dx = ev.clientX - sw.x;
     const dy = ev.clientY - sw.y;
     const THRESHOLD = 70;
-    if (Math.abs(dx) > THRESHOLD && Math.abs(dx) > Math.abs(dy)) {onClose();return;}
+    if (Math.abs(dx) > THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+      // The tap that ends a swipe can still fire a click — swallow it.
+      justSwiped.current = true;
+      setTimeout(() => {justSwiped.current = false;}, 350);
+      if (gallery) go(dx < 0 ? 1 : -1);else onClose();
+      return;
+    }
     // Vertical swipe closes only when the overlay isn't actually scrolling.
     const scrolled = ev.currentTarget.scrollHeight > ev.currentTarget.clientHeight + 4;
     if (!scrolled && Math.abs(dy) > THRESHOLD) onClose();
   };
   useEffectAb(() => {
-    const onKey = (e) => {if (e.key === "Escape") onClose();};
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();else
+      if (e.key === "ArrowRight") goRef.current(1);else
+      if (e.key === "ArrowLeft") goRef.current(-1);
+    };
     document.addEventListener("keydown", onKey);
     // Lock BOTH html and body. Locking body alone leaves the root's scrollbar
     // track rendered beside the overlay (which spans clientWidth only), showing
@@ -453,17 +480,23 @@ function Lightbox({ item, onClose }) {
   const media = item.src ? `url(${item.src}) center / cover no-repeat` : item.gradient || "linear-gradient(135deg, #e8e2d9, #c8baa6)";
   return (
     <div
-      onClick={onClose}
+      onClick={() => {if (!justSwiped.current) onClose();}}
       onPointerDown={onSwipeStart}
       onPointerUp={onSwipeEnd}
       onPointerCancel={() => {swipe.current = null;}}
-      className="no-scrollbar"
+      className={"no-scrollbar lb-overlay" + (gallery ? " is-gallery" : "")}
       style={{
         position: "fixed", inset: 0, width: "100vw", zIndex: 1000,
         background: "rgba(20,20,22,0.82)",
         backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)",
-        display: "flex", alignItems: portrait ? "flex-start" : "center", justifyContent: "center",
+        display: "flex", alignItems: portrait || gallery ? "flex-start" : "center", justifyContent: "center",
+        // Gallery mode reserves a band at the top for the counter pill (which
+        // otherwise sits on the image). The mobile bottom floor for the arrows
+        // lives in CSS (.lb-overlay.is-gallery) since it's breakpoint-specific.
         padding: portrait ? "3vh 3vw" : "5vh 5vw",
+        // Always set explicitly: leaving this undefined next to the shorthand makes
+        // React clear padding-top, dropping the single-image lightbox's top gap.
+        paddingTop: gallery ? "max(" + (portrait ? "3vh" : "5vh") + ", " + (galleryTitle ? 132 : 76) + "px)" : portrait ? "3vh" : "5vh",
         // Scrollable for tall portrait images, but the gutter is hidden — on
         // mobile an always-visible scrollbar reads as a pale bar down the
         // right edge of the dark overlay.
@@ -480,10 +513,20 @@ function Lightbox({ item, onClose }) {
       }}>
       {/* No close button — clicking anywhere (or Escape) closes the lightbox. */}
       <figure
-        style={{ margin: portrait ? "auto" : "0 auto", maxWidth: portrait ? "none" : 1100, width: portrait ? "auto" : "100%", minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", cursor: "zoom-out" }}>
+        // Taps on the photo itself stay put (so a swipe can't read as a close);
+        // only the dark backdrop around it dismisses.
+        onClick={(e) => e.stopPropagation()}
+        style={{ margin: portrait || gallery ? "auto" : "0 auto", maxWidth: portrait ? "none" : 1100, width: portrait ? "auto" : "100%", minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", cursor: "default" }}>
+        {gallery &&
+        <div className="lb-head-m" aria-hidden="true">
+            {galleryTitle && <div className="lb-title">{galleryTitle}</div>}
+            <div className="lb-count">{idx + 1} / {items.length}</div>
+          </div>
+        }
         {/* Media sizes to the image's true aspect — never cropped. */}
         {item.videoSrc ?
         <video
+          key={"v" + idx}
           src={item.videoSrc}
           autoPlay
           muted
@@ -491,7 +534,7 @@ function Lightbox({ item, onClose }) {
           playsInline
           style={{
             maxWidth: "100%",
-            maxHeight: "78vh",
+            maxHeight: gallery ? "var(--lb-media-max)" : "78vh",
             width: "auto",
             height: "auto",
             display: "block",
@@ -502,13 +545,14 @@ function Lightbox({ item, onClose }) {
           }} /> :
         item.src ?
         <img
+          key={"i" + idx}
           src={item.src}
           alt={item.title || ""}
           onLoad={(e) => {setNatW(e.target.naturalWidth);setPortrait(e.target.naturalHeight > e.target.naturalWidth);}}
           style={{
             width: "auto",
             maxWidth: "100%",
-            maxHeight: portrait ? "calc(100vh - 130px)" : "78vh",
+            maxHeight: gallery ? "var(--lb-media-max)" : portrait ? "calc(100vh - 130px)" : "78vh",
             height: "auto",
             display: "block",
             borderRadius: 14,
@@ -535,7 +579,45 @@ function Lightbox({ item, onClose }) {
           }
           </figcaption>
         }
+        <button
+          className="lb-close-m"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {e.stopPropagation();onClose();}}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M5 1.5V5H1.5M9 1.5V5h3.5M5 12.5V9H1.5M9 12.5V9h3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Exit fullscreen
+        </button>
       </figure>
+      <button
+        className="lb-close-x"
+        aria-label="Close fullscreen"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => {e.stopPropagation();onClose();}}>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+      </button>
+      {gallery &&
+      <>
+          <div className="lb-head" aria-live="polite">
+            {galleryTitle && <div className="lb-title">{galleryTitle}</div>}
+            <div className="lb-count">{idx + 1} / {items.length}</div>
+          </div>
+          <button
+          className="lb-arrow lb-prev"
+          aria-label="Previous image"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {e.stopPropagation();go(-1);}}>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M11 3.5 5.5 9l5.5 5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
+          <button
+          className="lb-arrow lb-next"
+          aria-label="Next image"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {e.stopPropagation();go(1);}}>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M7 3.5 12.5 9 7 14.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
+        </>
+      }
     </div>);
 
 }
@@ -544,7 +626,90 @@ window.Lightbox = Lightbox;
 // Shared top nav used on EVERY page — "Serena Ng" left, links right.
 // Sticky; collapses to a compact translucent bar once the page is scrolled.
 // `overlay` makes it float over the fixed Home split-screen (which doesn't scroll).
+// Light/dark toggle. Remembers a manual choice; with no choice saved, the
+// site follows the device setting. (Dark mode is piloting on About only.)
+function ThemeToggle() {
+  const [dark, setDark] = useStateAb(() => document.documentElement.dataset.theme === "dark");
+  useEffectAb(() => {
+    const sync = () => setDark(document.documentElement.dataset.theme === "dark");
+    window.addEventListener("themechange", sync);
+    return () => window.removeEventListener("themechange", sync);
+  }, []);
+  const flip = (btn) => {
+    const apply = () => {
+      try {localStorage.setItem("theme", dark ? "light" : "dark");} catch (e) {}
+      if (window.__applyTheme) window.__applyTheme();
+    };
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!document.startViewTransition || reduce || !btn) {apply();return;}
+    // Circle grows from the toggle's centre to the farthest page corner.
+    const r = btn.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    // Slide the knob FIRST, live, while the page is still interactive — during
+    // a view transition the page is frozen into snapshots, so any motion inside
+    // the toggle would jump. Once it settles, start the reveal.
+    setDark(!dark);
+    setTimeout(() => runReveal(x, y, end), 340);
+  };
+  const runReveal = (x, y, end) => {
+    const apply = () => {
+      try {localStorage.setItem("theme", document.documentElement.dataset.theme === "dark" ? "light" : "dark");} catch (e) {}
+      if (window.__applyTheme) window.__applyTheme();
+    };
+    const t = document.startViewTransition(apply);
+    t.ready.then(() => {
+      document.documentElement.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+        { duration: 1100, easing: "cubic-bezier(.4,0,.2,1)", pseudoElement: "::view-transition-new(root)" }
+      );
+    }).catch(() => {});
+  };
+  return (
+    <button
+      className={"theme-toggle" + (dark ? " is-dark" : "")}
+      role="switch"
+      aria-checked={dark}
+      onClick={(e) => {const b = e.currentTarget;b.blur();flip(b);}}
+      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+      title={dark ? "Light mode" : "Dark mode"}>
+      {/* Two-state switch: sun and moon both visible, the knob sits on the
+          active one — reads as a setting rather than a mystery icon. */}
+      <span className="theme-knob" aria-hidden="true" />
+      <svg className="theme-ic theme-ic-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="2" />
+        <path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+      <svg className="theme-ic theme-ic-moon" width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      </svg>
+    </button>);
+
+}
+
 function SiteNav({ onNavigate, current, overlay, activeProjectId, activeArchiveSlug, contentMaxWidth = 1080, autoHide }) {
+  // Mobile: if the row can't fit with the logo (links are nowrap, so a squeeze
+  // would overflow or break "Featured Work"), hide the logo to free the space.
+  const innerRef = useRefAb(null);
+  const [tight, setTight] = useStateAb(false);
+  useEffectAb(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    const check = () => {
+      if (!window.matchMedia("(max-width: 720px)").matches) {setTight(false);return;}
+      // Measure the row as it would be WITH the logo.
+      el.classList.remove("is-tight");
+      const fits = el.scrollWidth <= el.clientWidth + 1;
+      el.classList.toggle("is-tight", !fits);
+      setTight(!fits);
+    };
+    check();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(check) : null;
+    if (ro) ro.observe(el);
+    window.addEventListener("resize", check);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(check);
+    return () => {if (ro) ro.disconnect();window.removeEventListener("resize", check);};
+  }, []);
   const [compact, setCompact] = useStateAb(false);
   // `autoHide` (case study pages): the nav slides away on scroll-down and
   // returns on scroll-up or when the pointer nears the top of the window.
@@ -604,11 +769,18 @@ function SiteNav({ onNavigate, current, overlay, activeProjectId, activeArchiveS
     <header
       className={"site-nav" + (overlay ? " overlay" : "") + (compact ? " is-compact" : "") + (hidden ? " is-hidden" : "")}
       onMouseEnter={autoHide ? () => setHidden(false) : undefined}>
-      <div className="site-nav-inner" style={{ maxWidth: overlay ? "none" : contentMaxWidth }}>
+      <div className={"site-nav-inner" + (tight ? " is-tight" : "")} ref={innerRef} style={{ maxWidth: overlay ? "none" : contentMaxWidth }}>
         {overlay ?
         <span aria-hidden="true" /> :
         <button className="nav-wordmark" onClick={(e) => {e.currentTarget.blur();onNavigate("home");}}>Serena Ng</button>
         }
+        {/* Mobile only: the site's folder mark stands in for the wordmark. */}
+        <button
+          className="nav-logo"
+          aria-label="Serena Ng — home"
+          onClick={(e) => {e.currentTarget.blur();onNavigate("home");}}>
+          <img src="assets/favicon.png" alt="" width="26" height="26" />
+        </button>
         <nav className="site-nav-links">
         <div className="nav-item">
           <button className={"nav-link" + (current === "work" ? " is-current" : "")} onClick={(e) => {e.currentTarget.blur();onNavigate("home");}}>
@@ -641,6 +813,7 @@ function SiteNav({ onNavigate, current, overlay, activeProjectId, activeArchiveS
           </div>
         </div>
         <button className={"nav-link" + (current === "about" ? " is-current" : "")} onClick={(e) => {e.currentTarget.blur();onNavigate("about");}}>About</button>
+        {window.__onThemePilot && window.__onThemePilot() && <ThemeToggle />}
       </nav>
       </div>
     </header>);
@@ -675,13 +848,14 @@ function SecretPrompt({ onYes, onNo }) {
           borderRadius: 20,
           padding: "28px 30px",
           width: "100%", maxWidth: 420,
-          boxShadow: "0 24px 60px rgba(0,0,0,0.22)",
+          border: "1px solid var(--dialog-border, transparent)",
+          boxShadow: "var(--dialog-shadow, 0 24px 60px rgba(0,0,0,0.22))",
           textAlign: "center"
         }}>
         <div style={{ fontWeight: 700, fontSize: 20, letterSpacing: "-0.03em", color: "var(--ink)" }}>
           Activate attention enhancer tool?
         </div>
-        <div style={{ marginTop: 8, fontSize: 13, fontWeight: 300, letterSpacing: "-0.01em", color: "rgba(0,0,0,0.5)" }}>
+        <div style={{ marginTop: 8, fontSize: 13, fontWeight: 300, letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.5)" }}>
           (Btw this was my brother's idea)
         </div>
         <div style={{ marginTop: 22, display: "flex", gap: 9, justifyContent: "center", flexWrap: "wrap" }}>
@@ -902,8 +1076,8 @@ function SiteFooter({ bare, big, noResume, contentMaxWidth = 1080 }) {
       <div className="footer-top">
         <div className="footer-left">
           <div className="footer-meta">
-            <div className="footer-signoff-title">Thanks for stopping by! ❤︎</div>
-            <span style={{ color: "rgba(0,0,0,0.62)", fontSize: 13 }}>
+            <div className="footer-signoff-title">Thanks for stopping by! <span style={{ color: "var(--accent)" }}>❤︎</span></div>
+            <span style={{ color: "rgb(var(--ink-rgb) / 0.62)", fontSize: 13 }}>
               Designed by Serena + crafted with{" "}
               <a className="footer-link" href="https://www.anthropic.com/claude" target="_blank" rel="noreferrer noopener">Claude</a>
             </span>
@@ -969,9 +1143,9 @@ function MetaItem({ label, value, link, role, org, href, roleShort, orgShort }) 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 12 }}>
       {label &&
-      <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: "-0.01em", color: "rgba(0,0,0,0.85)" }}>{label}</div>
+      <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.85)" }}>{label}</div>
       }
-      <div style={{ fontSize: 15, fontWeight: 300, lineHeight: "22px", letterSpacing: "-0.02em", color: link ? "var(--accent)" : "rgba(0,0,0,0.7)" }}>
+      <div style={{ fontSize: 15, fontWeight: 300, lineHeight: "22px", letterSpacing: "-0.02em", color: link ? "var(--accent)" : "rgb(var(--ink-rgb) / 0.7)" }}>
         {org ?
         <>
             {/* Long / short variants swap by CSS so the row fits on a phone. */}
@@ -981,7 +1155,7 @@ function MetaItem({ label, value, link, role, org, href, roleShort, orgShort }) 
                 <span className="meta-short">{roleShort}</span>
               </> :
           role
-          } <span style={{ color: "rgba(0,0,0,0.4)" }}>@</span>{" "}
+          } <span className="at-sep">@</span>{" "}
             <a className="org-link" href={href} target="_blank" rel="noreferrer noopener">
               {orgShort ?
             <>
@@ -1145,9 +1319,9 @@ function Journey({ items }) {
               transition: "background .5s ease, border-color .5s ease, box-shadow .5s ease, transform .5s cubic-bezier(.22,.61,.36,1)"
             }}>
               <div>
-                <div style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: active ? "var(--accent)" : "rgba(0,0,0,0.45)", marginBottom: 6, transition: "color .5s ease" }}>{j.year}</div>
+                <div style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: active ? "var(--accent)" : "rgb(var(--ink-rgb) / var(--label-alpha, 0.45))", marginBottom: 6, transition: "color .5s ease" }}>{j.year}</div>
                 <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: "-0.02em", marginBottom: 6 }}>{j.title}</div>
-                <div style={{ fontWeight: 300, fontSize: 15, lineHeight: "21px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)", whiteSpace: "pre-line" }}>
+                <div style={{ fontWeight: 300, fontSize: 15, lineHeight: "21px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)", whiteSpace: "pre-line" }}>
                   {String(j.body).split(/(Claude)/g).map((part, k) =>
                   part === "Claude" ?
                   <a key={k} className="footer-link" href="https://www.anthropic.com/claude" target="_blank" rel="noreferrer noopener">Claude</a> :
@@ -1155,12 +1329,12 @@ function Journey({ items }) {
                   )}
                 </div>
               </div>
-              <ImageCaption src={j.src} title={j.imgTitle} caption={j.imgCaption} label={j.image} aspect="3 / 2" onZoom={setZoomed} />
+              <ImageCaption src={j.src} title={j.imgTitle} caption={j.imgCaption} label={j.image} aspect="3 / 2" onZoom={() => setZoomed(i)} />
             </div>
           </div>);
 
       })}
-      {zoomed && <Lightbox item={zoomed} onClose={() => setZoomed(null)} />}
+      {zoomed != null && <Lightbox items={items.map((x) => ({ title: x.imgTitle, caption: x.imgCaption, src: x.src, videoSrc: x.videoSrc, gradient: x.gradient, label: x.label }))} startIndex={zoomed} galleryTitle="My Journey" onClose={() => setZoomed(null)} />}
     </div>);
 
 }
@@ -1220,7 +1394,7 @@ function ContactForm() {
         <h2 style={{ margin: 0, fontWeight: 700, fontSize: 24, letterSpacing: "-0.03em" }}>
           Contact Me
         </h2>
-        <p style={{ margin: "12px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)", maxWidth: 360 }}>
+        <p style={{ margin: "12px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)", maxWidth: 360 }}>
           Feel free to reach out to me, even if it's just a small question or for a coffee chat! Any portfolio feedback is also greatly appreciated :)
         </p>
         <a className="org-link" href={"mailto:" + EMAIL} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 16, fontSize: 14 }}>
@@ -1364,11 +1538,11 @@ function About({ onNavigate }) {
             <h1 style={{ margin: 0, fontWeight: 700, fontSize: 32, letterSpacing: "-0.035em" }}>
               <span className="howdy-word">Howdy</span>,<span className="howdy-break" />{" "}I'm Serena! <span className="howdy-wave" style={{ display: "inline-block" }}>👋</span>
             </h1>
-            <p style={{ margin: "14px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.78)", textWrap: "pretty" }} className="about-intro-p">
-              I'm a designer who's worn a lot of hats, including product research, UX/UI, visual design, development, and marketing. <strong style={{ fontWeight: 600, color: "rgba(0,0,0,0.92)" }}>I've learned that the best solutions rarely stay inside one discipline.</strong>
+            <p style={{ margin: "14px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.78)", textWrap: "pretty" }} className="about-intro-p">
+              I'm a designer who's worn a lot of hats, including product research, UX/UI, visual design, development, and marketing. <strong style={{ fontWeight: 600, color: "rgb(var(--ink-rgb) / 0.92)" }}>I've learned that the best solutions rarely stay inside one discipline.</strong>
             </p>
-            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.78)", textWrap: "pretty" }} className="about-intro-p">
-              I've worked shoulder-to-shoulder with engineers, marketers, and clients across startups and agencies. I care less about which hat I'm wearing and more about <strong style={{ fontWeight: 600, color: "rgba(0,0,0,0.92)" }}>solving the right problem: the one with the most impact, and the one that holds up as the product grows.</strong>
+            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "24px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.78)", textWrap: "pretty" }} className="about-intro-p">
+              I've worked shoulder-to-shoulder with engineers, marketers, and clients across startups and agencies. I care less about which hat I'm wearing and more about <strong style={{ fontWeight: 600, color: "rgb(var(--ink-rgb) / 0.92)" }}>solving the right problem: the one with the most impact, and the one that holds up as the product grows.</strong>
             </p>
             <div style={{ marginTop: 20 }}>
               {/* Matches the contact form's Send message button. */}
@@ -1397,7 +1571,7 @@ function About({ onNavigate }) {
           </div>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Client Work</div>
-            <p style={{ margin: 0, fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
+            <p style={{ margin: 0, fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)" }}>
               My client work has spanned UX/UI, research, and visual design for organizations like{" "}
               <a href="https://plus.reuters.com/p/1" className="org-link" target="_blank" rel="noreferrer noopener">Reuters Plus</a>,{" "}
               <a href="https://www.jfkairport.com/explore-jfk/terminals/terminal-4" className="org-link" target="_blank" rel="noreferrer noopener">JFK Airport</a>,{" "}
@@ -1409,10 +1583,10 @@ function About({ onNavigate }) {
               <a href="https://www.flomktg.com/" className="org-link" target="_blank" rel="noreferrer noopener">Flo. Marketing</a>,
               and more.
             </p>
-            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
+            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)" }}>
               These projects range from large-scale B2B SaaS enterprise platforms to fast-moving agency campaigns.
             </p>
-            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)", fontStyle: "italic" }}>
+            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)", fontStyle: "italic" }}>
               Got an opportunity for me?{" "}
               {/* Only this phrase is the link — purple, scrolls to Contact. */}
               <span
@@ -1472,15 +1646,15 @@ function About({ onNavigate }) {
         {/* What I've been up to */}
         <div style={{ marginTop: 64 }}>
           <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>What I've been up to lately...</div>
-          <div style={{ fontSize: 14, fontWeight: 300, color: "rgba(0,0,0,0.6)", letterSpacing: "-0.02em", marginBottom: 24 }}>
+          <div style={{ fontSize: 14, fontWeight: 300, color: "rgb(var(--ink-rgb) / 0.6)", letterSpacing: "-0.02em", marginBottom: 24 }}>
             A few things I spend my time on outside of work.
           </div>
           <div className="recent-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
             {recent.map((r, i) =>
-            <ImageCaption key={i} src={r.src} videoSrc={r.videoSrc} title={r.imgTitle} caption={r.imgCaption} label={r.label} aspect="4 / 3" mobileTitleOnly={true} onZoom={setZoomedRecent} />
+            <ImageCaption key={i} src={r.src} videoSrc={r.videoSrc} title={r.imgTitle} caption={r.imgCaption} label={r.label} aspect="4 / 3" mobileTitleOnly={true} onZoom={() => setZoomedRecent(i)} />
             )}
           </div>
-          {zoomedRecent && <Lightbox item={zoomedRecent} onClose={() => setZoomedRecent(null)} />}
+          {zoomedRecent != null && <Lightbox items={recent.map((x) => ({ title: x.imgTitle, caption: x.imgCaption, src: x.src, videoSrc: x.videoSrc, gradient: x.gradient, label: x.label }))} startIndex={zoomedRecent} galleryTitle="What I’ve been up to lately…" onClose={() => setZoomedRecent(null)} />}
         </div>
 
         {/* Contact — separated section with its own form */}
@@ -1561,6 +1735,7 @@ const PLAYGROUND_CATEGORIES = {
       { videoSrc: "assets/playground/design/flo/logo-icons-animation.mp4", flat: true,
         half: "left",
         plain: true,
+        invertDark: true,
         textTitle: "Iconography built from the logo",
         text: [
           "Every icon is constructed from the same geometry as the logotype \u2014 circles, quarter-rounds, and the signature dot \u2014 so the whole set reads as one family and traces directly back to the mark.",
@@ -1569,6 +1744,7 @@ const PLAYGROUND_CATEGORIES = {
       { videoSrc: "assets/playground/design/flo/iconography-animation.mp4", flat: true,
         half: "right",
         plain: true,
+        invertDark: true,
         textTitle: "Motion that shows the system working",
         text: [
           "I animated the icons so their construction becomes visible \u2014 shapes rotate and resolve into the final form, reinforcing that each one is built from the same parts.",
@@ -2052,7 +2228,7 @@ function PlaygroundSection({ slug, category, onNavigate }) {
             {label} <span>{emoji}</span>
           </div>
           {body &&
-          <div style={{ maxWidth: 540, marginTop: 20, fontSize: 14, fontWeight: 300, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
+          <div style={{ maxWidth: 540, marginTop: 20, fontSize: 14, fontWeight: 300, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)" }}>
               {body}
             </div>
           }
@@ -2097,7 +2273,7 @@ function Playground({ onNavigate }) {
             <h1 style={{ margin: 0, fontWeight: 700, fontSize: 44, lineHeight: 1.08, letterSpacing: "-0.04em" }}>
               Welcome to<br />my Archive! <span>📁</span>
             </h1>
-            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
+            <p style={{ margin: "13px 0 0", fontWeight: 300, fontSize: 15, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)" }}>
               A space to showcase the other things outside my case studies...
             </p>
           </div>
@@ -2202,10 +2378,10 @@ function Archive({ slug, onNavigate }) {
           <h1 className="archive-title" style={{ margin: 0, fontWeight: 700, fontSize: 44, lineHeight: 1.05, letterSpacing: "-0.04em" }}>
             {category.title} <span style={{ fontWeight: 400 }}>{category.emoji}</span>
           </h1>
-          <p style={{ margin: "18px 0 0", maxWidth: 540, fontWeight: 300, fontSize: 17, lineHeight: "27px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)", textWrap: "pretty" }}>
+          <p style={{ margin: "18px 0 0", maxWidth: 540, fontWeight: 300, fontSize: 17, lineHeight: "27px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)", textWrap: "pretty" }}>
             {category.archiveIntro}
           </p>
-          <div style={{ marginTop: 18, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase", color: "rgba(0,0,0,0.4)" }}>
+          <div style={{ marginTop: 18, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase", color: "rgb(var(--ink-rgb) / var(--label-alpha, 0.45))" }}>
             {isProjectArchive ? "Click any project to read more" : `${shown.length} pieces · click any image to enlarge`}
           </div>
         </header>
@@ -2238,9 +2414,9 @@ function Archive({ slug, onNavigate }) {
                   letterSpacing: "-0.01em",
                   padding: "7px 15px",
                   borderRadius: 999,
-                  border: `1px solid ${on ? "var(--accent)" : "var(--hair)"}`,
-                  background: on ? "var(--accent)" : "var(--paper)",
-                  color: on ? "#fff" : "rgba(0,0,0,0.72)",
+                  border: `1px solid ${on ? "var(--accent-solid)" : "var(--hair)"}`,
+                  background: on ? "var(--accent-solid)" : "var(--paper)",
+                  color: on ? "#fff" : "rgb(var(--ink-rgb) / 0.72)",
                   transition: "background .2s ease, color .2s ease, border-color .2s ease"
                 }}>
                   {f}{on ? <span style={{ opacity: 0.62 }}>{` (${shown.length})`}</span> : ""}
@@ -2273,7 +2449,7 @@ function Archive({ slug, onNavigate }) {
                       {kindsOf(p).join(" · ")}
                     </div>
                   </div>
-                  <div style={{ marginTop: 3, fontWeight: 300, fontSize: 13.5, lineHeight: "19px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.62)" }}>
+                  <div style={{ marginTop: 3, fontWeight: 300, fontSize: 13.5, lineHeight: "19px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.62)" }}>
                     <span className="pg-only-desktop">{p.blurb}</span>
                     <span className="pg-only-mobile">{DESIGN_BLURBS_MOBILE[p.slug] || p.blurb}</span>
                   </div>
@@ -2283,14 +2459,14 @@ function Archive({ slug, onNavigate }) {
 
           shown.map((it, i) =>
           <div key={i}>
-              <ImageCaption title={it.imgTitle} caption={it.imgCaption} label={it.label} src={it.src} videoSrc={it.videoSrc} gradient={it.gradient} aspect="3 / 2" onZoom={setZoomed} />
+              <ImageCaption title={it.imgTitle} caption={it.imgCaption} label={it.label} src={it.src} videoSrc={it.videoSrc} gradient={it.gradient} aspect="3 / 2" onZoom={() => setZoomed(i)} />
               {/* Static caption — shown on mobile (no hover) */}
               <div className="archive-static-caption">
                 <div style={{ fontWeight: 500, fontSize: 15, lineHeight: "20px", letterSpacing: "-0.02em", color: "var(--ink)" }}>
                   {it.imgTitle}
                 </div>
                 {it.imgCaption &&
-              <div style={{ marginTop: 2, fontWeight: 300, fontSize: 13, lineHeight: "18px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.62)" }}>
+              <div style={{ marginTop: 2, fontWeight: 300, fontSize: 13, lineHeight: "18px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.62)" }}>
                   {it.imgCaption}
                 </div>
               }
@@ -2305,7 +2481,7 @@ function Archive({ slug, onNavigate }) {
           display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, flexWrap: "wrap"
         }}>
           <div>
-            <div style={{ fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(0,0,0,0.4)", marginBottom: 6 }}>
+            <div style={{ fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--accent)", marginBottom: 6 }}>
               Next archive
             </div>
             <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: "-0.03em" }}>
@@ -2328,7 +2504,7 @@ function Archive({ slug, onNavigate }) {
       {/* AFTER the footer: the fixed filter bar reserves no space, so this is
           what lets the footer scroll clear of it. */}
       <div className="archive-bottom-spacer is-short" aria-hidden="true" />
-      {zoomed && <Lightbox item={zoomed} onClose={() => setZoomed(null)} />}
+      {zoomed != null && <Lightbox items={shown.map((x) => ({ title: x.imgTitle, caption: x.imgCaption, src: x.src, videoSrc: x.videoSrc, gradient: x.gradient, label: x.label }))} startIndex={zoomed} galleryTitle={category.archiveTitle || (category.title + " Archive")} onClose={() => setZoomed(null)} />}
     </div>);
 
 }
@@ -2502,12 +2678,14 @@ function BookFlipper({ cover, spreads, aspect = "2.375 / 1" }) {
     opacity: on ? 1 : 0,
     transition: "opacity .45s ease"
   });
-  const pageShadow = "0 2px 14px rgba(0,0,0,0.12)";
+  // In dark mode a pale halo traces the book's edges, which otherwise melt
+  // into the page on spreads that are mostly black (e.g. Lovers' Club).
+  const pageShadow = "var(--book-page-shadow, 0 2px 14px rgba(0,0,0,0.12))";
   // Closed on the cover: there is no left page, so the shadow must not bleed
   // past the spine (offset it right/down) and the desk shadow only sits under
   // the right half.
   const closed = idx === 0 && !flip;
-  const coverShadow = "7px 5px 18px rgba(0,0,0,0.16)";
+  const coverShadow = "var(--book-cover-shadow, 7px 5px 18px rgba(0,0,0,0.16))";
 
   // Both leaves stay mounted for the life of the book so their 3D compositor
   // layers are already rasterized when a turn starts. Idle = no animation.
@@ -2615,7 +2793,7 @@ function BookFlipper({ cover, spreads, aspect = "2.375 / 1" }) {
 
       <div style={{
         marginTop: 30, textAlign: "center", fontSize: 12.5,
-        letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(0,0,0,0.42)"
+        letterSpacing: "0.06em", textTransform: "uppercase", color: "rgb(var(--ink-rgb) / var(--label-alpha, 0.45))"
       }}>
         {idx === 0 ? "Cover" : `Spread ${idx} of ${N}`}
       </div>
@@ -2656,7 +2834,7 @@ function BookFlipper({ cover, spreads, aspect = "2.375 / 1" }) {
         </div>
         <div style={{
           display: "flex", justifyContent: "space-between",
-          fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(0,0,0,0.35)"
+          fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgb(var(--ink-rgb) / var(--label-alpha, 0.35))"
         }}>
           <span>Cover</span>
           <span>End</span>
@@ -2667,8 +2845,9 @@ function BookFlipper({ cover, spreads, aspect = "2.375 / 1" }) {
         <button className="book-tool-restart pill-btn ghost" onClick={() => jump(0)} disabled={idx === 0 && !playing}>
           Back to start
         </button>
+        {/* Filled purple, matching the Fullscreen button (.book-tool). */}
         <button
-          className="pill-btn ghost"
+          className="book-tool"
           onClick={() => {
             // Starting auto-play from the end restarts at the cover.
             if (!playing && idx === N) {
@@ -2725,7 +2904,7 @@ function DesignProject({ slug, onNavigate }) {
           <h1 style={{ margin: 0, fontWeight: 700, fontSize: 38, lineHeight: 1.08, letterSpacing: "-0.04em" }}>
             {project.title}
           </h1>
-          <p style={{ margin: "16px 0 0", fontWeight: 300, fontSize: 17, lineHeight: "27px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)", textWrap: "pretty" }}>
+          <p style={{ margin: "16px 0 0", fontWeight: 300, fontSize: 17, lineHeight: "27px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)", textWrap: "pretty" }}>
             {project.blurb}
           </p>
           <div style={{ marginTop: 24, display: "flex", gap: 40, flexWrap: "wrap" }}>
@@ -2739,7 +2918,7 @@ function DesignProject({ slug, onNavigate }) {
             project.client ? { label: "Client", value: project.client.label, href: project.client.href } : { label: "Medium", value: project.year }].
             filter((m) => m.value).map((m) =>
             <div key={m.label}>
-                <div style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(0,0,0,0.42)", marginBottom: 5 }}>
+                <div style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgb(var(--ink-rgb) / var(--label-alpha, 0.45))", marginBottom: 5 }}>
                   {m.label}
                 </div>
                 <div style={{ fontSize: 13, letterSpacing: "0.005em", fontWeight: 400, lineHeight: "21px", whiteSpace: "pre-line" }}>
@@ -2759,7 +2938,7 @@ function DesignProject({ slug, onNavigate }) {
                 letterSpacing: "0.005em",
                 fontWeight: 300,
                 lineHeight: "21px",
-                color: "rgba(0,0,0,0.5)",
+                color: "rgb(var(--ink-rgb) / 0.5)",
                 whiteSpace: "pre-line"
               }}>{m.sub}</div>
               }
@@ -2774,7 +2953,7 @@ function DesignProject({ slug, onNavigate }) {
           <p key={k} style={{
             margin: k === 0 ? 0 : "13px 0 0",
             fontWeight: 300, fontSize: 15, lineHeight: "24px",
-            letterSpacing: "-0.01em", color: "rgba(0,0,0,0.78)", textWrap: "pretty"
+            letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.78)", textWrap: "pretty"
           }}>
               {p}
             </p>
@@ -2824,7 +3003,7 @@ function DesignProject({ slug, onNavigate }) {
                       }
                         </div>
                         {r.caption &&
-                      <figcaption style={{ marginTop: 10, fontSize: 13, fontWeight: 300, letterSpacing: "-0.01em", color: "rgba(0,0,0,0.55)" }}>
+                      <figcaption style={{ marginTop: 10, fontSize: 13, fontWeight: 300, letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.55)" }}>
                             {r.caption}
                           </figcaption>
                       }
@@ -2851,13 +3030,13 @@ function DesignProject({ slug, onNavigate }) {
                 overflow: "hidden", cursor: plain ? "default" : "zoom-in", display: "block"
               }}>
                   {im.videoSrc ?
-              <video src={im.videoSrc} autoPlay muted loop playsInline preload="metadata" disablePictureInPicture controlsList="nodownload noplaybackrate noremoteplayback" style={{ width: "100%", height: "auto", display: "block", pointerEvents: plain ? "none" : undefined }} /> :
+              <video className={im.invertDark ? "invert-dark" : undefined} src={im.videoSrc} autoPlay muted loop playsInline preload="metadata" disablePictureInPicture controlsList="nodownload noplaybackrate noremoteplayback" style={{ width: "100%", height: "auto", display: "block", pointerEvents: plain ? "none" : undefined }} /> :
               <img src={im.src} alt={im.caption || project.title} loading="lazy" decoding="async" style={{ width: "100%", height: "auto", display: "block" }} />
               }
                 </div>;
 
             const cap = im.caption &&
-            <figcaption style={{ marginTop: 10, fontSize: 13, fontWeight: 300, letterSpacing: "-0.01em", color: "rgba(0,0,0,0.55)", textAlign: im.width ? "center" : undefined }}>
+            <figcaption style={{ marginTop: 10, fontSize: 13, fontWeight: 300, letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.55)", textAlign: im.width ? "center" : undefined }}>
                   {im.caption}
                 </figcaption>;
 
@@ -2883,7 +3062,7 @@ function DesignProject({ slug, onNavigate }) {
                     <p key={j} style={{
                       margin: j === 0 ? 0 : "12px 0 0",
                       fontWeight: 300, fontSize: 15, lineHeight: "24px",
-                      letterSpacing: "-0.01em", color: "rgba(0,0,0,0.78)", textWrap: "pretty"
+                      letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.78)", textWrap: "pretty"
                     }}>
                           {t}
                         </p>
@@ -2926,7 +3105,7 @@ function DesignProject({ slug, onNavigate }) {
               }
             </div>
             <div className="upnext-copy" style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(0,0,0,0.4)", marginBottom: 6 }}>
+              <div style={{ fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--accent)", marginBottom: 6 }}>
                 Next project
               </div>
               <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em" }}>{next.title}</div>

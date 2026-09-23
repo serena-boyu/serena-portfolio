@@ -2,6 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
+<script>
+// Same rule as the main site: saved choice, else the device setting.
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+  var dark = saved ? saved === "dark" : !!(mq && mq.matches);
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
 <!-- Google Analytics (GA4) — live domain only. -->
 <script>
 (function () {
@@ -40,6 +50,21 @@
     --gray-50: rgb(244,244,244);
     --accent: rgb(87,94,219);
     --accent-shadow: rgba(87,94,219,0.28);
+    --ink-rgb: 0 0 0;
+    --on-accent: #fff;
+    --nav-glass: rgba(255,255,255,0.82);
+  }
+  /* Dark mode — mirrors index.html's tokens. */
+  html[data-theme="dark"] {
+    --ink: rgb(242,242,245);
+    --ink-rgb: 242 242 245;
+    --paper: rgb(18,18,20);
+    --hair: rgba(255,255,255,0.13);
+    --accent: rgb(146,152,248);
+    --accent-shadow: rgba(146,152,248,0.28);
+    --on-accent: rgb(0,0,0);
+    --nav-glass: rgba(18,18,20,0.82);
+    color-scheme: dark;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -62,7 +87,7 @@
     transition: background .25s ease, box-shadow .25s ease;
   }
   .nav.is-compact {
-    background: rgba(255,255,255,0.82);
+    background: var(--nav-glass);
     -webkit-backdrop-filter: saturate(180%) blur(14px);
     backdrop-filter: saturate(180%) blur(14px);
     box-shadow: 0 1px 0 var(--hair), 0 6px 22px rgba(0,0,0,0.05);
@@ -75,7 +100,7 @@
   .wordmark { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; transition: color .2s ease; }
   .wordmark:hover { color: var(--accent); }
   .nav-links { display: flex; gap: 44px; }
-  .nav-links a { font-size: 13.5px; letter-spacing: -0.01em; color: rgba(0,0,0,0.82); transition: color .2s ease; }
+  .nav-links a { font-size: 13.5px; letter-spacing: -0.01em; color: rgb(var(--ink-rgb) / 0.82); transition: color .2s ease; }
   .nav-links a:hover { color: var(--accent); }
 
   /* Body */
@@ -98,7 +123,7 @@
   .sub {
     margin: 18px 0 0;
     font-weight: 300; font-size: 17px; line-height: 27px; letter-spacing: -0.02em;
-    color: rgba(0,0,0,0.7); max-width: 520px; text-wrap: pretty;
+    color: rgb(var(--ink-rgb) / 0.7); max-width: 520px; text-wrap: pretty;
   }
   .emoji {
     font-size: 46px; line-height: 1; margin-bottom: 22px;
@@ -116,7 +141,7 @@
   .actions { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px; }
   /* Mirrors .pill-btn in index.html — keep these in sync. */
   .pill {
-    background: var(--accent); color: #fff;
+    background: var(--accent); color: var(--on-accent);
     border: none; border-radius: 999px;
     padding: 9px 16px; font-family: inherit; font-size: 13px;
     letter-spacing: -0.01em; cursor: pointer;
@@ -146,10 +171,10 @@
     border-top: 1px solid var(--hair);
     max-width: 1080px; width: 100%; margin: 0 auto;
     padding: 22px 40px 30px;
-    font-size: 12.5px; letter-spacing: -0.01em; color: rgba(0,0,0,0.45);
+    font-size: 12.5px; letter-spacing: -0.01em; color: rgb(var(--ink-rgb) / 0.56);
     display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between;
   }
-  .foot a { color: rgba(0,0,0,0.62); transition: color .2s ease; }
+  .foot a { color: rgb(var(--ink-rgb) / 0.7); transition: color .2s ease; }
   .foot a:hover { color: var(--accent); }
 
   @media (max-width: 720px) {
@@ -169,7 +194,7 @@
       <a class="wordmark" href="/">Serena Ng</a>
       <nav class="nav-links">
         <a href="/#/">Featured Work</a>
-        <a href="/#/playground">Archive</a>
+        <a href="/#/archive">Archive</a>
         <a href="/#/about">About</a>
       </nav>
     </div>
@@ -182,7 +207,7 @@
     <p class="sub">The link might be outdated, or I may have moved something while tidying up. Either way, there's plenty left to look at.</p>
     <div class="actions">
       <a class="pill" href="/#/">Featured Work <span class="arr">→</span></a>
-      <a class="pill ghost" href="/#/playground">Browse the Archive</a>
+      <a class="pill ghost" href="/#/archive">Browse the Archive</a>
     </div>
   </main>
 

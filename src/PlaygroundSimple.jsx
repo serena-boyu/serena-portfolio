@@ -71,7 +71,7 @@ function PlaygroundSectionSimple({ slug, category, onNavigate }) {
               <span className="pg-only-desktop">{title}</span>
               <span className="pg-only-mobile">{PS_TITLES_MOBILE[slug] || title}</span> <span>{emoji}</span>
             </div>
-            <div style={{ fontSize: 14, fontWeight: 300, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
+            <div style={{ fontSize: 14, fontWeight: 300, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)" }}>
               <span className="pg-only-desktop">{PS_BLURBS[slug] || ""}</span>
               <span className="pg-only-mobile">{PS_BLURBS_MOBILE[slug] || PS_BLURBS[slug] || ""}</span>
             </div>
@@ -143,7 +143,7 @@ function PlaygroundSimple({ onNavigate }) {
                 {folderOpen ? "📂" : "📁"}
               </span>
             </h1>
-            <p style={{ margin: "12px 0 0", fontWeight: 300, fontSize: 14, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgba(0,0,0,0.7)" }}>
+            <p style={{ margin: "12px 0 0", fontWeight: 300, fontSize: 14, lineHeight: "22px", letterSpacing: "-0.02em", color: "rgb(var(--ink-rgb) / 0.7)" }}>
               A place where things other than my case studies live...
             </p>
           </div>

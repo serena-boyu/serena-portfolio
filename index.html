@@ -2,6 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
+<script>
+// Theme: a saved manual choice wins; otherwise follow the device setting.
+// Every page has been converted to theme tokens, so dark mode applies
+// site-wide. (Kept as a function so existing callers still work.)
+window.__onThemePilot = function () { return true; };
+(function () {
+  var mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  window.__applyTheme = function () {
+    var saved = null;
+    try { saved = localStorage.getItem("theme"); } catch (e) {}
+    var wantDark = saved ? saved === "dark" : !!(mq && mq.matches);
+    var onPilot = window.__onThemePilot();
+    var root = document.documentElement;
+    if (wantDark && onPilot) root.setAttribute("data-theme", "dark");
+    else root.removeAttribute("data-theme");
+    window.dispatchEvent(new Event("themechange"));
+  };
+  window.__applyTheme();
+  window.addEventListener("hashchange", window.__applyTheme);
+  if (mq && mq.addEventListener) mq.addEventListener("change", window.__applyTheme);
+})();
+</script>
 <!-- Google Analytics (GA4). Only runs on the live domain, so local previews
      don't pollute the stats. -->
 <script>
@@ -65,14 +87,272 @@
     --ink: rgb(0,0,0);
     --paper: rgb(255,255,255);
     --hair: rgb(215,215,215);
+    --hair-solid: rgb(215,215,215);
     --hair-soft: rgba(160,160,160,0.35);
     --muted: rgb(160,160,160);
     --gray-50: rgb(244,244,244);
     --gray-100: rgb(226,226,226);
     --accent: rgb(87,94,219);
     --accent-shadow: rgba(87,94,219,0.28);
+    /* Solid-button purple. Stays the deep purple in dark mode (with white
+       text), matching .pill-btn — --accent itself lightens there for text. */
+    --accent-solid: rgb(87,94,219);
     --shadow-soft: rgba(0,0,0,0.07);
+    --ink-rgb: 0 0 0;
   }
+
+  /* ── Dark mode (pilot: About page only) ─────────────────────────────── */
+  html[data-theme="dark"] {
+    --label-alpha: 0.56;
+    --ink: rgb(242,242,245);
+    --ink-rgb: 242 242 245;
+    --paper: rgb(18,18,20);
+    --hair: rgba(255,255,255,0.13);
+    --hair-solid: rgb(52,52,56);
+    /* Text/icons on a filled purple — the lighter dark-mode purple needs black. */
+    --on-accent: rgb(0,0,0);
+    /* Home's idle hint sits on the darkest part of the left panel. */
+    --hint-alpha: 0.66;
+    --book-page-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 0 22px rgba(255,255,255,0.1);
+    --book-cover-shadow: 0 0 0 1px rgba(255,255,255,0.08), 6px 4px 22px rgba(255,255,255,0.1);
+    /* Secret~ dialog: a hairline edge + soft light halo separates it from the
+       dark backdrop, which otherwise swallows the dark panel. */
+    --dialog-border: rgba(255,255,255,0.14);
+    --dialog-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 18px 50px rgba(255,255,255,0.07), 0 24px 60px rgba(0,0,0,0.6);
+    /* Home project cards on mobile: a soft purple glow lifts them off the dark page. */
+    --home-card-shadow: 0 0 0 1px rgba(146,152,248,0.14), 0 6px 22px rgba(146,152,248,0.18), 0 2px 8px rgba(0,0,0,0.45);
+    --bar-glass: rgba(28,28,32,0.72);
+    --emoji-caption-alpha: 0.78;
+    /* Black shadows vanish on near-black — lift cards with a purple glow. */
+    --emoji-card-shadow: 0 0 0 1px rgba(146,152,248,0.18), 0 12px 30px rgba(146,152,248,0.22);
+    --frame-shadow: 0 10px 34px rgba(146,152,248,0.24), 0 2px 8px rgba(146,152,248,0.12);
+    --panel-top: rgb(26,26,30);
+    --panel-bottom: rgb(14,14,16);
+    --hair-soft: rgba(255,255,255,0.08);
+    --muted: rgb(130,130,138);
+    --gray-50: rgb(30,30,34);
+    --gray-100: rgb(42,42,47);
+    /* Lighter purple so links stay readable on near-black. */
+    /* !important: App.jsx writes --accent inline on <html> from the tweak
+       value, and an inline custom property otherwise beats this rule. */
+    --accent: rgb(146,152,248) !important;
+    --accent-shadow: rgba(146,152,248,0.28) !important;
+    --shadow-soft: rgba(0,0,0,0.5);
+    color-scheme: dark;
+  }
+  html, body { transition: background-color .25s ease, color .25s ease; }
+  /* Filled buttons keep the original purple so white text stays legible. */
+  html[data-theme="dark"] .pill-btn:not(.ghost) { background: rgb(87,94,219); border-color: rgb(87,94,219); }
+  html[data-theme="dark"] .pill-btn:not(.ghost):hover { background: rgb(104,111,232); }
+  /* The purple glow reads as a grey smudge on a dark page — drop it. */
+  html[data-theme="dark"] .pill-btn:not(.ghost),
+  html[data-theme="dark"] .pill-btn:not(.ghost):hover,
+  html[data-theme="dark"] .pill-btn.is-hot { box-shadow: none !important; }
+  /* Black logos flip to white. */
+  /* Invert black ink to white; screen-blend so any flattened-on-white box
+     (PGIM, JFK) — now black after inversion — drops into the background. */
+  /* Partial invert maps the flattened white box (PGIM, JFK) onto the page
+     color and the ink to near-white. A blend mode can't do this: the marquee's
+     transform and mask isolate the logos from the page background. */
+  html[data-theme="dark"] .logo-track img { filter: invert(0.93); }
+  /* Lightbox gallery: prev/next arrows + counter. */
+  .lb-arrow {
+    position: fixed; top: 50%; translate: 0 -50%; z-index: 1001;
+    width: 46px; height: 46px; border-radius: 999px;
+    display: grid; place-items: center; cursor: pointer;
+    color: #fff; border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.12);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    transition: background .2s ease, transform .2s ease;
+  }
+  .lb-arrow:hover { background: rgba(255,255,255,0.24); }
+  .lb-arrow:active { transform: scale(0.94); }
+  .lb-close-x {
+    position: fixed; top: 22px; right: 22px; z-index: 1002;
+    width: 44px; height: 44px; border-radius: 999px;
+    display: grid; place-items: center; cursor: pointer;
+    color: #fff; border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.12);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    transition: background .2s ease;
+  }
+  .lb-close-x:hover { background: rgba(255,255,255,0.24); }
+  .lb-close-m { display: none; }
+  .lb-head-m { display: none; }
+  .lb-prev { left: 22px; }
+  .lb-next { right: 22px; }
+  /* Gallery media cap: viewport minus the 108px header band, ~56px of
+     caption, and the bottom padding (5vh desktop / arrow floor on mobile). */
+  .lb-overlay.is-gallery { --lb-media-max: calc(100vh - 132px - 56px - 5vh); }
+  .lb-head {
+    position: fixed; top: 30px; left: 50%; translate: -50% 0; z-index: 1001;
+    display: flex; flex-direction: column; align-items: center; gap: 9px;
+    pointer-events: none; max-width: calc(100vw - 32px); text-align: center;
+  }
+  .lb-title { color: #fff; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .lb-count {
+    padding: 4px 11px; border-radius: 999px;
+    font-size: 12.5px; letter-spacing: 0.04em; font-variant-numeric: tabular-nums;
+    color: rgba(255,255,255,0.86); background: rgba(255,255,255,0.1);
+  }
+  @media (max-width: 720px) {
+    /* Swipe is the primary gesture on phones; keep small arrows as a hint. */
+    .lb-arrow { width: 38px; height: 38px; top: auto; bottom: calc(22px + env(safe-area-inset-bottom)); translate: 0 0; }
+    .lb-prev { left: 16px; }
+    .lb-next { right: 16px; }
+    .lb-close-x { display: none; }
+    /* Pinned to the bottom, in the same row as the prev/next arrows. */
+    .lb-close-m {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      position: fixed; left: 50%; translate: -50% 0; z-index: 1002;
+      bottom: calc(22px + env(safe-area-inset-bottom));
+      margin: 0; padding: 10px 18px; border-radius: 999px; cursor: pointer;
+      font-family: inherit; font-size: 14px; letter-spacing: -0.01em;
+      color: #fff; border: 1px solid rgba(255,255,255,0.28);
+      background: rgba(255,255,255,0.14);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    }
+    /* Header moves into the flow, just above the photo. */
+    .lb-head { display: none; }
+    .lb-head-m { display: flex; flex-direction: column; align-items: center; gap: 9px; margin-bottom: 22px; }
+    .lb-overlay { padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important; }
+    .lb-overlay.is-gallery { padding-top: calc(24px + env(safe-area-inset-top)) !important; }
+    /* Keep captions clear of the bottom-corner arrows. */
+    .lb-overlay.is-gallery {
+      padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+      --lb-media-max: calc(100vh - 24px - 84px - 56px - 80px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+  }
+  /* Fullscreen/zoom badge on image cards. */
+  html[data-theme="dark"] { --badge-bg: rgba(30,30,34,0.92); }
+  /* Nav: dark glass instead of white. */
+  html[data-theme="dark"] .site-nav { background: rgba(18,18,20,0.82) !important; }
+  html[data-theme="dark"] .site-nav.is-compact { background: rgba(18,18,20,0.78) !important; box-shadow: 0 1px 0 var(--hair) !important; }
+  html[data-theme="dark"] .nav-menu { background: rgb(30,30,34) !important; border-color: var(--hair) !important; }
+  /* Theme change reveal: new theme expands in a circle from the toggle while
+     the old one fades beneath it. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+  ::view-transition-old(root) { animation: themeOldFade 1.1s ease-out both; z-index: 1; }
+  ::view-transition-new(root) { z-index: 2; }
+  /* The knob slides live before the reveal starts (see ThemeToggle), so the
+     icons crossfade alongside it rather than popping in afterwards. */
+  .theme-knob { transition: transform .32s cubic-bezier(.4,0,.2,1), background-color .32s ease; }
+  .theme-ic { transition: color .32s ease, opacity .32s ease; }
+  @keyframes themeOldFade { from { opacity: 1; } to { opacity: 0.35; } }
+  /* Theme switch: a track with sun + moon, the knob slides to the active one. */
+  .theme-toggle {
+    position: relative; display: inline-flex; align-items: center; justify-content: space-between;
+    width: 62px; height: 32px; padding: 0 8px; border-radius: 999px;
+    border: 1px solid var(--hair); background: rgb(var(--ink-rgb) / 0.05);
+    color: rgb(var(--ink-rgb) / 0.55); cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .theme-toggle:hover { border-color: var(--accent); }
+  .theme-knob {
+    position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--paper); box-shadow: 0 1px 3px rgba(0,0,0,0.22);
+    transition: transform .25s cubic-bezier(.22,.61,.36,1);
+  }
+  .theme-toggle.is-dark .theme-knob { transform: translateX(30px); }
+  .theme-ic { position: relative; z-index: 1; transition: color .2s ease; }
+  /* Active icon sits on the knob and takes the accent. */
+  .theme-toggle:not(.is-dark) .theme-ic-sun,
+  .theme-toggle.is-dark .theme-ic-moon { color: var(--accent); }
+  /* Home (desktop) is a fixed split screen that never scrolls, so its overlay
+     nav needs no fill — in dark mode the 82% bar showed as a band across the
+     top of the thumbnail panel. */
+  @media (min-width: 721px) {
+    html[data-theme="dark"] .site-nav.overlay { background: transparent !important; box-shadow: none !important; }
+  }
+  /* Home thumbnails in dark mode: the videos carry a light background baked
+     in, so the panel stays light — but dimmed slightly so hovering a project
+     isn't a flash against the dark page. Dimming the whole stage (panel +
+     video together) keeps the video's edges invisible. */
+  html[data-theme="dark"] .home-thumb-stage { filter: brightness(0.86); }
+  /* Unframed video thumbs (SearchNEU, Pomodoro): dark panel, with the video
+     sitting on a smaller light card in its own background colour. */
+  .home-thumb-card { display: contents; }
+  .home-thumb-frame { width: var(--fw); }
+  html[data-theme="dark"] .home-thumb-frame { width: var(--fw-dark); }
+  html[data-theme="dark"] .home-thumb-stage.has-card { background: transparent !important; filter: none; }
+  html[data-theme="dark"] .home-thumb-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 78%;
+    max-height: 82%;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--card-bg);
+    box-shadow: var(--frame-shadow);
+  }
+  html[data-theme="dark"] .home-thumb-card > video {
+    width: 100% !important;
+    max-height: 100% !important;
+  }
+  /* Framed thumbnails (JFK, Ecolab): the browser chrome is its own light
+     object, so the panel behind it can go dark. Frame + video stay as-is. */
+  html[data-theme="dark"] .home-thumb-stage.is-framed { background: transparent !important; filter: none; }
+  /* Mobile: collapse the switch to a single round icon button to save nav
+     space. Shows the mode you'd switch TO (moon in light, sun in dark). */
+  @media (max-width: 720px) {
+    /* A true circle: equal sides + 50% radius, hairline border like the track. */
+    .theme-toggle {
+      width: 38px; height: 38px; padding: 0; justify-content: center;
+      border-radius: 50% !important;
+      background: transparent; color: var(--ink);
+    }
+    .theme-knob { display: none; }
+    .theme-toggle .theme-ic { color: currentColor !important; }
+    .theme-toggle:not(.is-dark) .theme-ic-sun,
+    .theme-toggle.is-dark .theme-ic-moon { display: none; }
+    .theme-toggle .theme-ic-sun,
+    .theme-toggle .theme-ic-moon { width: 17px; height: 17px; }
+    /* The wordmark is swapped for the folder mark on mobile. */
+    .site-nav .nav-wordmark { display: none !important; }
+    .site-nav .nav-logo {
+      display: grid; place-items: center;
+      width: 38px; height: 38px; margin-left: -6px; padding: 0;
+      background: none; border: none; border-radius: 10px; cursor: pointer;
+      flex-shrink: 0;
+    }
+    .site-nav .nav-logo img { display: block; width: 26px; height: 26px; }
+    .site-nav .nav-logo:active { transform: scale(0.94); }
+    /* Row too cramped to fit the logo: drop it so the links stay on one line. */
+    .site-nav-inner.is-tight .nav-logo { display: none !important; }
+    /* The logo takes width from the row, so: keep the toggle a true circle,
+       keep link labels on one line, and tighten the gaps to make room. */
+    .theme-toggle { flex-shrink: 0; }
+    .site-nav .site-nav-links > * { white-space: nowrap; flex-shrink: 0; }
+    /* Spread logo, links and toggle evenly across the whole bar: flattening
+       the links' wrapper makes them siblings of the logo, so one
+       space-between distributes every gap equally. */
+    .site-nav .site-nav-links { display: contents !important; }
+    /* space-between sets the spacing; the gap is only a floor for tight widths. */
+    .site-nav .site-nav-inner { justify-content: space-between !important; gap: 6px !important; }
+  }
+  /* Small phones (iPhone SE / mini): trim the gaps and logo box so the row
+     still fits on one line without overflowing. */
+  @media (max-width: 374px) {
+    .site-nav .site-nav-links { gap: 11px !important; }
+    .site-nav .nav-logo { width: 32px !important; margin-left: -4px !important; }
+    .site-nav .nav-logo img { width: 24px !important; height: 24px !important; }
+  }
+  /* 320px phones: smaller link text and a smaller toggle, still circular. */
+  @media (max-width: 340px) {
+    .site-nav .site-nav-links { gap: 8px !important; }
+    .site-nav .nav-link { font-size: 12.5px !important; }
+    .theme-toggle { width: 32px !important; height: 32px !important; }
+    .site-nav-inner { padding-left: 12px !important; padding-right: 12px !important; }
+  }
+  .nav-logo { display: none; }
+  /* Black-on-white icon videos: invert in dark mode so they stay borderless.
+     0.93 (not 1) lands the white ground on the page's near-black instead of
+     pure black; hue-rotate keeps any colour close to its original hue. */
+  html[data-theme="dark"] video.invert-dark { filter: invert(0.93) hue-rotate(180deg); }
+  /* "@" between role and company: dimmer than the role text so it reads as a divider. */
+  .at-sep { color: rgb(var(--ink-rgb) / 0.38); font-weight: 400; }
 
   * { box-sizing: border-box; }
 
@@ -120,7 +400,7 @@
         transparent 1px,
         transparent 14px),
       linear-gradient(180deg, #fafafa, #f0f0f0);
-    color: rgba(0,0,0,0.45);
+    color: rgb(var(--ink-rgb) / var(--label-alpha, 0.45));
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
     font-size: 12px;
     letter-spacing: 0.02em;
@@ -229,7 +509,7 @@
     font-size: 12px;
     font-weight: 600;
     letter-spacing: -0.01em;
-    color: rgba(0,0,0,0.65);
+    color: rgb(var(--ink-rgb) / 0.65);
     margin-bottom: 7px;
   }
   .field-input {
@@ -245,7 +525,7 @@
     padding: 12px 14px;
     transition: border-color .2s ease, box-shadow .2s ease;
   }
-  .field-input::placeholder { color: rgba(0,0,0,0.35); }
+  .field-input::placeholder { color: rgb(var(--ink-rgb) / 0.35); }
   .field-input:focus {
     outline: none;
     border-color: var(--accent);
@@ -365,14 +645,22 @@
     padding: 11px 17px !important;
     font-size: 13px !important;
     /* Solid accent pill so it reads as the primary escape hatch. */
-    background: var(--accent) !important;
-    border: 1px solid var(--accent) !important;
+    background: var(--accent-solid) !important;
+    border: 1px solid var(--accent-solid) !important;
     color: #fff !important;
     box-shadow: 0 10px 30px var(--accent-shadow), 0 4px 12px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.1);
     animation: pageFade .5s ease-out both;
   }
   /* Pages with no bottom nav bar: the pill sits lower, with a tighter shadow
      since it's floating over content rather than above a bar. */
+  /* Dark mode: a neutral shadow instead of the purple glow, which muddies
+     against the dark page. Mostly-dark depth reads as a clean lift. */
+  html[data-theme="dark"] .floating-home {
+    box-shadow: 0 10px 28px rgba(0,0,0,0.55), 0 3px 10px rgba(0,0,0,0.4) !important;
+  }
+  html[data-theme="dark"] .floating-home.is-low {
+    box-shadow: 0 5px 14px rgba(0,0,0,0.5), 0 2px 5px rgba(0,0,0,0.35) !important;
+  }
   .floating-home.is-low {
     bottom: calc(12px + env(safe-area-inset-bottom));
     box-shadow: 0 4px 12px var(--accent-shadow), 0 2px 5px rgba(0,0,0,0.14) !important;
@@ -400,7 +688,7 @@
     font-size: 12px;
     font-weight: 400;
     letter-spacing: -0.01em;
-    color: rgba(0,0,0,0.75);
+    color: rgb(var(--ink-rgb) / 0.75);
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     animation: pageFade .16s ease-out;
   }
@@ -487,10 +775,10 @@
   /* Book flipper arrows */
   @keyframes leafTurnNext { from { transform: rotateY(0deg); } to { transform: rotateY(-180deg); } }
   @keyframes leafTurnPrev { from { transform: rotateY(0deg); } to { transform: rotateY(180deg); } }
-  .book-arrow { flex-shrink: 0; width: 52px; height: 52px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-family: inherit; font-size: 22px; font-weight: 500; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: 0 3px 12px var(--accent-shadow); transition: background .2s ease, color .2s ease, border-color .2s ease, opacity .2s ease, transform .2s ease, box-shadow .2s ease; }
-  .book-arrow:hover:not(:disabled) { background: color-mix(in oklch, var(--accent) 86%, black); border-color: color-mix(in oklch, var(--accent) 86%, black); color: #fff; transform: scale(1.08); box-shadow: 0 6px 20px var(--accent-shadow); }
+  .book-arrow { flex-shrink: 0; width: 52px; height: 52px; border-radius: 999px; border: 1px solid var(--accent-solid); background: var(--accent-solid); color: #fff; font-family: inherit; font-size: 22px; font-weight: 500; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: 0 3px 12px var(--accent-shadow); transition: background .2s ease, color .2s ease, border-color .2s ease, opacity .2s ease, transform .2s ease, box-shadow .2s ease; }
+  .book-arrow:hover:not(:disabled) { background: color-mix(in oklch, var(--accent-solid) 86%, black); border-color: color-mix(in oklch, var(--accent-solid) 86%, black); color: #fff; transform: scale(1.08); box-shadow: 0 6px 20px var(--accent-shadow); }
   .book-arrow:active:not(:disabled) { transform: scale(0.96); }
-  .book-arrow:disabled { background: var(--paper); border-color: var(--hair); color: rgba(0,0,0,0.28); box-shadow: none; cursor: default; }
+  .book-arrow:disabled { background: var(--paper); border-color: var(--hair); color: rgb(var(--ink-rgb) / 0.28); box-shadow: none; cursor: default; }
   /* Book: fullscreen shell, progress slider, small tool button */
   .book-wrap:fullscreen { background: var(--paper); padding: 5vh 5vw; display: flex; flex-direction: column; justify-content: center; }
   .book-wrap:-webkit-full-screen { background: var(--paper); padding: 5vh 5vw; display: flex; flex-direction: column; justify-content: center; }
@@ -507,8 +795,8 @@
   .book-progress::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 999px; background: #000; border: 0; }
   .book-progress::-moz-range-thumb { width: 22px; height: 22px; border: 0; border-radius: 999px; background: #000; }
   .book-progress:focus-visible { opacity: 1; outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 999px; }
-  .book-tool { border: 1px solid var(--accent); background: var(--accent); color: #fff; font-family: inherit; font-size: 12.5px; letter-spacing: -0.01em; border-radius: 999px; padding: 6px 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease; }
-  .book-tool:hover { background: color-mix(in oklch, var(--accent) 86%, black); border-color: color-mix(in oklch, var(--accent) 86%, black); color: #fff; box-shadow: 0 4px 14px var(--accent-shadow); }
+  .book-tool { border: 1px solid var(--accent-solid); background: var(--accent-solid); color: #fff; font-family: inherit; font-size: 12.5px; letter-spacing: -0.01em; border-radius: 999px; padding: 6px 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease; }
+  .book-tool:hover { background: color-mix(in oklch, var(--accent-solid) 86%, black); border-color: color-mix(in oklch, var(--accent-solid) 86%, black); color: #fff; box-shadow: 0 4px 14px var(--accent-shadow); }
   @media (max-width: 720px) {
     .book-arrow { width: 42px; height: 42px; font-size: 18px; }
   }
@@ -644,7 +932,9 @@
       padding: 18px !important;
       margin: 0 !important;
       transform: none !important;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05) !important;
+      /* Same token as the home project cards, so dark mode picks up the
+         identical purple glow. */
+      box-shadow: var(--home-card-shadow, 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05)) !important;
     }
     /* Swap in the mobile-worded title and blurb. */
     .pg-only-desktop { display: none !important; }
@@ -685,7 +975,7 @@
       transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
     .archive-filters.is-stuck {
-      background: rgba(245,245,247,0.62);
+      background: var(--bar-glass, rgba(245,245,247,0.62));
       -webkit-backdrop-filter: saturate(180%) blur(22px);
       backdrop-filter: saturate(180%) blur(22px);
       border-bottom-color: var(--hair);
@@ -767,7 +1057,7 @@
     .site-nav { padding: 12px 0; }
     .site-nav.is-compact { padding: 8px 0; }
     .site-nav-inner { padding: 0 20px; }
-    .site-nav .site-nav-links { gap: 26px; }
+    .site-nav .site-nav-links { gap: 16px; }
   }
 
   /* ── Nav dropdown menus (Work / Playground) ───────────────────────── */
@@ -844,7 +1134,7 @@
     font-family: inherit;
     font-size: 13.5px;
     letter-spacing: -0.01em;
-    color: rgba(0,0,0,0.72);
+    color: rgb(var(--ink-rgb) / 0.72);
     padding: 9px 12px;
     border-radius: 9px;
     transition: background-color .15s ease, color .15s ease;
@@ -860,7 +1150,7 @@
     padding: 34px 0 40px;
     font-size: 12px;
     letter-spacing: -0.01em;
-    color: rgba(0,0,0,0.45);
+    color: rgb(var(--ink-rgb) / var(--label-alpha, 0.45));
   }
   .site-footer.bare { padding-bottom: 0; }
   .footer-inner { margin: 0 auto; padding: 0 40px; }
@@ -895,7 +1185,7 @@
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(0,0,0,0.45);
+    color: rgb(var(--ink-rgb) / var(--label-alpha, 0.45));
   }
   /* Bottom band: legal + credit, divided from the links above. */
   /* Back-to-top, grouped with the nav columns at the end of the row. */
@@ -911,7 +1201,7 @@
     font-family: inherit;
     font-size: 12px;
     letter-spacing: -0.01em;
-    color: rgba(0,0,0,0.6);
+    color: rgb(var(--ink-rgb) / 0.6);
     cursor: pointer;
     transition: color .2s ease, border-color .2s ease, background .2s ease;
   }
@@ -921,7 +1211,7 @@
     background: color-mix(in oklch, var(--accent) 7%, transparent);
   }
   .footer-link {
-    color: rgba(0,0,0,0.6);
+    color: rgb(var(--ink-rgb) / 0.6);
     text-decoration: none;
     border-bottom: 1px solid color-mix(in oklch, var(--ink) 16%, transparent);
     padding-bottom: 1px;
@@ -1039,12 +1329,12 @@
 
 <!-- ?v= cache-buster: BUMP THIS NUMBER on every deploy so browsers re-fetch
      the JSX instead of serving a stale cached copy. -->
-<script type="text/babel" src="tweaks-panel.jsx?v=12"></script>
-<script type="text/babel" src="src/data.jsx?v=12"></script>
-<script type="text/babel" src="src/Home.jsx?v=12"></script>
-<script type="text/babel" src="src/ProjectPage.jsx?v=12"></script>
-<script type="text/babel" src="src/About.jsx?v=12"></script>
-<script type="text/babel" src="src/PlaygroundSimple.jsx?v=12"></script>
-<script type="text/babel" src="src/App.jsx?v=12"></script>
+<script type="text/babel" src="tweaks-panel.jsx?v=70"></script>
+<script type="text/babel" src="src/data.jsx?v=70"></script>
+<script type="text/babel" src="src/Home.jsx?v=70"></script>
+<script type="text/babel" src="src/ProjectPage.jsx?v=70"></script>
+<script type="text/babel" src="src/About.jsx?v=70"></script>
+<script type="text/babel" src="src/PlaygroundSimple.jsx?v=70"></script>
+<script type="text/babel" src="src/App.jsx?v=70"></script>
 </body>
 </html>

@@ -52,6 +52,8 @@ const PROJECTS = [
     // Same recording as the case study's first figure, in browser chrome.
     video: "assets/projectThumbnails/jfk-thumb.mp4",
     videoFrame: "vetting.jfkt4.nyc",
+    // Slightly smaller in dark mode, where the bright window reads larger.
+    videoFrameWidthDark: "88%",
   },
   {
     id: "ecolab",
@@ -68,6 +70,8 @@ const PROJECTS = [
     // Same recording as the case study's first figure, in browser chrome.
     video: "assets/projectThumbnails/ecolab-thumb.mp4",
     videoFrame: "plus.reuters.com",
+    // Mostly-white page, so a smaller window keeps it from overpowering the panel.
+    videoFrameWidth: "80%",
   },
   {
     id: "pomodoro",
