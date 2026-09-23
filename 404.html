@@ -2,6 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
+<!-- Google Analytics (GA4) — live domain only. -->
+<script>
+(function () {
+  var host = location.hostname;
+  if (!/(^|\.)serenang\.com$/.test(host) && !/\.github\.io$/.test(host)) return;
+  var ID = "G-HZJK4XFBM0";
+  var s = document.createElement("script");
+  s.async = true;
+  s.src = "https://www.googletagmanager.com/gtag/js?id=" + ID;
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag("js", new Date());
+  gtag("config", ID, { send_page_view: false });
+  // Record which broken URL was hit, so bad links can be spotted.
+  gtag("event", "page_view", {
+    page_title: "404",
+    page_location: location.origin + "/404" + location.pathname,
+    page_path: "/404" + location.pathname
+  });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Page not found — Serena Ng</title>
 <meta name="robots" content="noindex" />

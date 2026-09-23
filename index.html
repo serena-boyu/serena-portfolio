@@ -2,6 +2,38 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
+<!-- Google Analytics (GA4). Only runs on the live domain, so local previews
+     don't pollute the stats. -->
+<script>
+(function () {
+  var host = location.hostname;
+  if (!/(^|\.)serenang\.com$/.test(host) && !/\.github\.io$/.test(host)) return;
+  var ID = "G-HZJK4XFBM0";
+  var s = document.createElement("script");
+  s.async = true;
+  s.src = "https://www.googletagmanager.com/gtag/js?id=" + ID;
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag("js", new Date());
+  // Page views are sent manually below: the site changes pages via the URL
+  // hash (#/about, #/project/jfk), which GA wouldn't count on its own.
+  gtag("config", ID, { send_page_view: false });
+  var last = null;
+  function sendView() {
+    var route = (location.hash || "").replace(/^#\/?/, "") || "home";
+    if (route === last) return;
+    last = route;
+    gtag("event", "page_view", {
+      page_title: document.title + " \u2014 " + route,
+      page_location: location.origin + "/" + route,
+      page_path: "/" + route
+    });
+  }
+  sendView();
+  window.addEventListener("hashchange", sendView);
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Serena Ng — Product Designer</title>
 <meta name="description" content="Serena Ng is a product-obsessed designer working on patient experience and AI workflows at Epic Health Systems. Previously Ronik, Snyk, JFK Airport, and Reuters." />
