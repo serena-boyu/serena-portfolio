@@ -10,14 +10,63 @@ This site was redesigned in 2026. The full plain-text profile is at https://sere
 - [Reuters x Ecolab](https://serenang.com/ecolab/): Interactive microsite promoting water sustainability in industry.
 - [The Pomodoro Timer](https://serenang.com/pomodoro/): A productivity tool for the Apple Watch.
 
-## Experience
-- UX Quality Manager (Software R&D) @ Epic Systems
-- UX & Visual Designer @ Ronik Design Agency
-- Product Designer & Researcher @ Snyk Cybersecurity
-- UX Designer @ SearchNEU
-- UX Designer @ Sandbox Software Consultancy
-- Game UX/UI Design Intern @ Tanbii
-- Graphic & UI Design Intern @ Waquoit Bay National Research Reserve
+## Résumé
+Product designer experienced in healthcare, cybersecurity, and enterprise tools. Designs with AI in the loop to prototype faster and close the gap between design and engineering.
+
+LinkedIn: https://www.linkedin.com/in/ng-serena
+
+### Experience
+**Epic Systems — User Experience Quality Manager, Software R&D** (2025 – 2026)
+- Removed MyChart Bedside's #1 adoption barrier by prompt-engineering an AI agent to auto-map configurations, and designing a human-in-the-loop confirmation workflow so analysts could trust its output, increasing adoption 30%
+- Built a validation framework to QA the AI agent across 1,000+ real and edge-case scenarios, reaching a 97% AI mapping success rate
+- Designed a MyChart lab result time estimate feature and prototyped it with Anthropic Claude, giving patients visibility into their visit
+- Created a 0→1 Trauma Score calculator that turns a time-critical scoring protocol into a live workflow pre-populated with vitals and chart data
+- Caught a color-accessibility gap that kept clinicians from distinguishing patient acuity, owned the safety escalation, and shipped a fix in 3 days
+- Shadowed clinicians through full 12-hour shifts in NYC, Oklahoma, and Texas, running contextual interviews and usability tests on live workflows
+
+**Ronik Design Agency — UX Designer** (2024)
+- 1 of 3 designers at a design agency, owning projects end-to-end as sole or lead designer for 10+ clients including Reuters, Ogilvy, Ecolab, and PGIM
+- Created a 0→1 security dashboard (desktop & mobile) for JFK Airport T4, replacing an email-based process for 7K+ monthly security vetting requests
+- Built a 50+ component Figma design system to scale the JFK dashboard
+- Redesigned login and signup for NBCUniversal Together, a B2B advertiser portal, making key actions easier to find and cutting user error 70%
+- Designed and built a responsive infographic microsite (desktop & mobile) for Reuters and Ecolab with 30+ data visualizations and 15+ animated elements
+- Presented multiple design directions per project and iterated through 15+ client feedback cycles, often on same-day turnarounds
+
+**Snyk Cybersecurity — Product Designer and Researcher** (2023)
+- Created 10+ workflows and 30+ screens for the flagship developer security platform, used by 2M+ users, and added 15+ components to the design system
+- Designed Snyk's first SBOM import/export system, shaped by 10+ customer calls and usability tests amid rising government compliance requirements
+- Proposed and led design of Snyk's first persistent notification center, scaling beyond one-off toasts to support ongoing async processes
+- Led AI-assisted churn and renewal research across 5+ products and 3 years of data, presenting insights to 200+ stakeholders
+
+**SearchNEU — Product Designer (Part-time)** (2022 – 2025)
+- Owned the full mobile redesign of a course search platform with 7,000+ monthly active users, rebuilding 30+ components for mobile constraints while staying consistent with desktop
+- Extended course-opening alerts from desktop to mobile, letting students track high-demand classes and reaching 25,000+ notifications sent per month
+
+### Education
+- Northeastern University — BFA in UX Design, Computer Science Minor, Summa Cum Laude
+
+### Tools & skills
+- **AI & Prototyping:** Anthropic Claude, Claude Design, Claude Code, ChatGPT, Framer, Perplexity, Gemini
+- **Design:** Figma, Sketch, Miro, Ceros, Adobe CC (Illustrator, Photoshop, InDesign, After Effects)
+- **Technical:** HTML, CSS, JavaScript, Python, Java, GitHub
+- **Research & Workflow:** Dovetail, Asana, Salesforce, Jira, Sagetap
+- **Skills:** UX/UI Design, UX Research, AI Prototyping, Design Engineering, Usability Testing, Wireframing, Data Analysis, Visual Design, Graphic Design, Accessibility, Motion Design
+
+### How this portfolio was built
+Serena designed this portfolio in Figma, then built it with Anthropic's Claude — working iteratively in conversation to turn the designs into a live, responsive site — and deployed it herself through GitHub Pages on a custom domain.
+
+- Figma to live site in 7 days
+- Optimized for humans and AI
+- Dark mode shipped in 1 day
+- AI-assisted motion design
+- Built as a single-page React app, with every page, interaction, and animation directed by Serena and implemented with Claude
+- Fully responsive, with dedicated mobile patterns: a bottom section nav with scroll progress, floating back buttons, and swipe gestures in galleries and book flippers
+- Dark mode that follows the visitor's device setting, with a manual toggle and a radial transition that expands from the toggle
+- Interactive details including a hover-to-reveal project preview panel, an animated journey timeline, a flippable book viewer, a fun-fact bubble, and a full-screen gallery slideshow
+- Performance work for slow connections: compressed images and videos, lazy loading, and fade-in on load
+- Made readable by AI tools and search engines: plain-text versions of every page, structured profile data, a sitemap, and an llms.txt summary
+- Old portfolio URLs automatically redirect to their new pages, with a custom 404 page listing current links
+- Deployed with GitHub Pages on a custom domain, with Google Analytics and Search Console set up
 
 ## More
 - [About](https://serenang.com/about/): Background, experience, and design journey.

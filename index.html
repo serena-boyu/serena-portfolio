@@ -1269,6 +1269,8 @@ window.__onThemePilot = function () { return true; };
   html.js .static-profile { display: none; }
   .static-profile { max-width: 680px; margin: 0 auto; padding: 72px 24px 80px; font-family: "Inter", -apple-system, system-ui, sans-serif; color: var(--ink); line-height: 1.6; font-size: 15px; }
   .static-profile h1 { font-size: 28px; letter-spacing: -0.03em; margin: 0 0 16px; }
+  .static-profile h3 { font-size: 15px; margin: 22px 0 6px; }
+  .static-profile h4 { font-size: 14px; margin: 16px 0 4px; }
   .static-profile h2 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 36px 0 10px; }
   .static-profile p { margin: 0 0 12px; font-weight: 300; }
   .static-profile ul { margin: 0; padding-left: 18px; font-weight: 300; }
@@ -1352,17 +1354,27 @@ window.__onThemePilot = function () { return true; };
       <li><a href="/pomodoro/">The Pomodoro Timer</a> — A non-distracting yet satisfying productivity tool for the Apple Watch.</li>
     </ul>
 
-    <h2>Experience</h2>
-    <ul>
-      <li>UX Quality Manager (Software R&amp;D) @ Epic Systems</li>
-      <li>UX &amp; Visual Designer @ Ronik Design Agency</li>
-      <li>Product Designer &amp; Researcher @ Snyk Cybersecurity</li>
-      <li>UX Designer @ SearchNEU</li>
-      <li>UX Designer @ Sandbox Software Consultancy</li>
-      <li>Game UX/UI Design Intern @ Tanbii</li>
-      <li>Graphic &amp; UI Design Intern @ Waquoit Bay National Research Reserve</li>
-      <li>BFA in UX Design @ Northeastern University</li>
-    </ul>
+    <h2>Résumé</h2>
+    <p>Product designer experienced in healthcare, cybersecurity, and enterprise tools. Designs with AI in the loop to prototype faster and close the gap between design and engineering.</p>
+    <p>LinkedIn: <a href="https://www.linkedin.com/in/ng-serena">linkedin.com/in/ng-serena</a> · Email: <a href="mailto:serena.ng.contact@gmail.com">serena.ng.contact@gmail.com</a></p>
+    <h3>Experience</h3>
+    <h4>Epic Systems — User Experience Quality Manager, Software R&amp;D (2025 – 2026)</h4>
+    <ul><li>Removed MyChart Bedside's #1 adoption barrier by prompt-engineering an AI agent to auto-map configurations, and designing a human-in-the-loop confirmation workflow so analysts could trust its output, increasing adoption 30%</li><li>Built a validation framework to QA the AI agent across 1,000+ real and edge-case scenarios, reaching a 97% AI mapping success rate</li><li>Designed a MyChart lab result time estimate feature and prototyped it with Anthropic Claude, giving patients visibility into their visit</li><li>Created a 0→1 Trauma Score calculator that turns a time-critical scoring protocol into a live workflow pre-populated with vitals and chart data</li><li>Caught a color-accessibility gap that kept clinicians from distinguishing patient acuity, owned the safety escalation, and shipped a fix in 3 days</li><li>Shadowed clinicians through full 12-hour shifts in NYC, Oklahoma, and Texas, running contextual interviews and usability tests on live workflows</li></ul>
+    <h4>Ronik Design Agency — UX Designer (2024)</h4>
+    <ul><li>1 of 3 designers at a design agency, owning projects end-to-end as sole or lead designer for 10+ clients including Reuters, Ogilvy, Ecolab, and PGIM</li><li>Created a 0→1 security dashboard (desktop &amp; mobile) for JFK Airport T4, replacing an email-based process for 7K+ monthly security vetting requests</li><li>Built a 50+ component Figma design system to scale the JFK dashboard</li><li>Redesigned login and signup for NBCUniversal Together, a B2B advertiser portal, making key actions easier to find and cutting user error 70%</li><li>Designed and built a responsive infographic microsite (desktop &amp; mobile) for Reuters and Ecolab with 30+ data visualizations and 15+ animated elements</li><li>Presented multiple design directions per project and iterated through 15+ client feedback cycles, often on same-day turnarounds</li></ul>
+    <h4>Snyk Cybersecurity — Product Designer and Researcher (2023)</h4>
+    <ul><li>Created 10+ workflows and 30+ screens for the flagship developer security platform, used by 2M+ users, and added 15+ components to the design system</li><li>Designed Snyk's first SBOM import/export system, shaped by 10+ customer calls and usability tests amid rising government compliance requirements</li><li>Proposed and led design of Snyk's first persistent notification center, scaling beyond one-off toasts to support ongoing async processes</li><li>Led AI-assisted churn and renewal research across 5+ products and 3 years of data, presenting insights to 200+ stakeholders</li></ul>
+    <h4>SearchNEU — Product Designer (Part-time) (2022 – 2025)</h4>
+    <ul><li>Owned the full mobile redesign of a course search platform with 7,000+ monthly active users, rebuilding 30+ components for mobile constraints while staying consistent with desktop</li><li>Extended course-opening alerts from desktop to mobile, letting students track high-demand classes and reaching 25,000+ notifications sent per month</li></ul>
+    <h3>Education</h3>
+    <p>Northeastern University — BFA in UX Design, Computer Science Minor, Summa Cum Laude</p>
+    <h3>Tools &amp; skills</h3>
+    <ul><li><strong>AI &amp; Prototyping:</strong> Anthropic Claude, Claude Design, Claude Code, ChatGPT, Framer, Perplexity, Gemini</li><li><strong>Design:</strong> Figma, Sketch, Miro, Ceros, Adobe CC (Illustrator, Photoshop, InDesign, After Effects)</li><li><strong>Technical:</strong> HTML, CSS, JavaScript, Python, Java, GitHub</li><li><strong>Research &amp; Workflow:</strong> Dovetail, Asana, Salesforce, Jira, Sagetap</li><li><strong>Skills:</strong> UX/UI Design, UX Research, AI Prototyping, Design Engineering, Usability Testing, Wireframing, Data Analysis, Visual Design, Graphic Design, Accessibility, Motion Design</li></ul>
+    <h3>How this portfolio was built</h3>
+    <p>Serena designed this portfolio in Figma, then built it with Anthropic's Claude — working iteratively in conversation to turn the designs into a live, responsive site — and deployed it herself through GitHub Pages on a custom domain.</p>
+    <ul><li>Figma to live site in 7 days</li><li>Optimized for humans and AI</li><li>Dark mode shipped in 1 day</li><li>AI-assisted motion design</li></ul>
+    <ul><li>Built as a single-page React app, with every page, interaction, and animation directed by Serena and implemented with Claude</li><li>Fully responsive, with dedicated mobile patterns: a bottom section nav with scroll progress, floating back buttons, and swipe gestures in galleries and book flippers</li><li>Dark mode that follows the visitor's device setting, with a manual toggle and a radial transition that expands from the toggle</li><li>Interactive details including a hover-to-reveal project preview panel, an animated journey timeline, a flippable book viewer, a fun-fact bubble, and a full-screen gallery slideshow</li><li>Performance work for slow connections: compressed images and videos, lazy loading, and fade-in on load</li><li>Made readable by AI tools and search engines: plain-text versions of every page, structured profile data, a sitemap, and an llms.txt summary</li><li>Old portfolio URLs automatically redirect to their new pages, with a custom 404 page listing current links</li><li>Deployed with GitHub Pages on a custom domain, with Google Analytics and Search Console set up</li></ul>
+
 
     <h2>Client work</h2>
     <p>Client work spanning UX/UI, research, and visual design for organizations including Reuters Plus, JFK Airport, NBCUniversal, Ogilvy, Ecolab, PGIM, Leading Edge, and Flo. Marketing.</p>
