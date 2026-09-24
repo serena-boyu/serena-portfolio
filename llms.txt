@@ -5,8 +5,8 @@
 This site was redesigned in 2026. The full plain-text profile is at https://serenang.com/ (visible without JavaScript).
 
 ## Case studies
-- [SearchNEU](https://serenang.com/searchneu/): Mobile redesign of a course search engine for Northeastern students.
 - [JFK Airport](https://serenang.com/jfk/): Streamlining visitor escort requests for JFK Terminal 4.
+- [SearchNEU](https://serenang.com/searchneu/): Mobile redesign of a course search engine for Northeastern students.
 - [Reuters x Ecolab](https://serenang.com/ecolab/): Interactive microsite promoting water sustainability in industry.
 - [The Pomodoro Timer](https://serenang.com/pomodoro/): A productivity tool for the Apple Watch.
 

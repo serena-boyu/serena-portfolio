@@ -18,6 +18,24 @@ window.PORTRAIT_SRC = "assets/web/about/headshot-w.webp"; // e.g. "assets/portra
 
 const PROJECTS = [
   {
+    id: "jfk",
+    title: "JFK Airport",
+    blurb: "Streamlining security escort requests",
+    role: "Product Designer, Reuters Studio",
+    year: "2023",
+    duration: "8 weeks",
+    team: "2 designers, PM, 5 engineers",
+    thumb: "stripe",
+    color: "rgb(21, 60, 110)",
+    img: "assets/web/projectThumbnails/jfk.webp",
+    // Video thumbnail — plays silently on the home page (no controls).
+    // Same recording as the case study's first figure, in browser chrome.
+    video: "assets/projectThumbnails/jfk-thumb.mp4",
+    videoFrame: "vetting.jfkt4.nyc",
+    // Slightly smaller in dark mode, where the bright window reads larger.
+    videoFrameWidthDark: "88%",
+  },
+  {
     id: "searchneu",
     title: "SearchNEU",
     blurb: "Redesigning a course search engine for mobile",
@@ -36,24 +54,6 @@ const PROJECTS = [
     // video renders smaller (short viewports), letting the baked-in border
     // rows peek through. A % crop scales with the rendered box.
     videoCrop: "1.4% 0.5% 1.4% 0.5%",
-  },
-  {
-    id: "jfk",
-    title: "JFK Airport",
-    blurb: "Streamlining security escort requests",
-    role: "Product Designer, Reuters Studio",
-    year: "2023",
-    duration: "8 weeks",
-    team: "2 designers, PM, 5 engineers",
-    thumb: "stripe",
-    color: "rgb(21, 60, 110)",
-    img: "assets/web/projectThumbnails/jfk.webp",
-    // Video thumbnail — plays silently on the home page (no controls).
-    // Same recording as the case study's first figure, in browser chrome.
-    video: "assets/projectThumbnails/jfk-thumb.mp4",
-    videoFrame: "vetting.jfkt4.nyc",
-    // Slightly smaller in dark mode, where the bright window reads larger.
-    videoFrameWidthDark: "88%",
   },
   {
     id: "ecolab",
