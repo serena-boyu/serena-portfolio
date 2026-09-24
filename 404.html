@@ -3,6 +3,53 @@
 <head>
 <meta charset="utf-8" />
 <script>
+// Old site (Framer) used real paths like /about and /playground. The new site
+// uses hash routes, so GitHub Pages serves this 404 for those old links.
+// Send them to the matching new page before anything renders.
+(function () {
+  // Live site only — otherwise a preview's own path (e.g. .../serve/404.html)
+  // can match a rule and navigate away.
+  var host = location.hostname;
+  if (host !== "serenang.com" && host !== "www.serenang.com" && host !== "serena-boyu.github.io") return;
+
+  var p = location.pathname.toLowerCase().replace(/\/+$/, "");
+  // GitHub's project-page prefix isn't part of the old site's paths.
+  p = p.replace(/^\/serena-portfolio(?=\/|$)/, "");
+  if (!p) return;
+  var segs = p.split("/").filter(Boolean);
+  var has = function (list) {
+    for (var i = 0; i < segs.length; i++) if (list.indexOf(segs[i]) >= 0) return true;
+    return false;
+  };
+
+  // Exact old slugs, matched as whole path segments so words like "designer"
+  // or "workflow" can't trigger the wrong page.
+  var rules = [
+    [["about", "about-me"], "about"],
+    [["photography", "photos", "photo"], "archive/photography"],
+    [["misc", "miscellaneous"], "archive/misc"],
+    [["design-archive", "branding"], "archive/branding"],
+    [["searchneu", "search-neu"], "project/searchneu"],
+    [["jfk", "jfk-airport", "jfkt4", "jfk-t4"], "project/jfk"],
+    [["ecolab", "reuters", "reuters-x-ecolab", "reuters-ecolab"], "project/ecolab"],
+    [["pomodoro", "pomodoro-timer"], "design/pomodoro-timer"],
+    [["boba", "boba-book", "the-boba-book"], "design/boba-book"],
+    [["lovers-club", "lovers-club-magazine"], "design/lovers-club"],
+    [["flo", "flo-marketing"], "design/flo-marketing"],
+    // Parent-segment catch-alls go LAST, so /work/<slug> and /archive/<slug>
+    // reach the specific rules above before falling back to the index page.
+    [["playground", "archive"], "archive"],
+    [["home", "work", "featured-work", "projects", "index.html"], ""]
+  ];
+  for (var i = 0; i < rules.length; i++) {
+    if (has(rules[i][0])) {
+      location.replace("/" + (rules[i][1] ? "#/" + rules[i][1] : ""));
+      return;
+    }
+  }
+})();
+</script>
+<script>
 // Same rule as the main site: saved choice, else the device setting.
 (function () {
   var saved = null;
@@ -185,6 +232,48 @@
     .sub { font-size: 15px; line-height: 24px; }
     .foot { padding: 20px 22px 26px; }
   }
+  /* Directory: divider, heading, then labelled groups of name + description. */
+  .directory {
+    margin: 64px 0 0; width: 100%; max-width: 580px; text-align: left;
+    padding-top: 32px; border-top: 1px solid var(--hair);
+  }
+  .directory-title { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; color: rgb(var(--ink-rgb) / 0.92); }
+  .directory-note { margin: 6px 0 0; font-size: 13.5px; line-height: 21px; letter-spacing: -0.01em; color: rgb(var(--ink-rgb) / 0.6); }
+  .directory-cols {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+    margin-top: 28px;
+  }
+  .directory-label {
+    font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: rgb(var(--ink-rgb) / 0.9); margin-bottom: 12px;
+  }
+  .directory-row {
+    display: block; padding: 0; margin-bottom: 16px;
+    color: inherit; text-decoration: none;
+  }
+  .directory-row:last-child { margin-bottom: 0; }
+  .directory-name {
+    display: inline;
+    font-size: 14px; font-weight: 500; letter-spacing: -0.01em;
+    color: var(--accent);
+    text-decoration: underline; text-decoration-color: transparent;
+    text-underline-offset: 3px; transition: text-decoration-color .2s ease;
+  }
+  /* Arrow marks each name as a link; it slides on hover like the site's other CTAs. */
+  .directory-name::after {
+    content: "\2192"; font-weight: 400; display: inline-block;
+    margin-left: 5px; text-decoration: none;
+    transition: transform .2s ease;
+  }
+  .directory-row:hover .directory-name,
+  .directory-row:focus-visible .directory-name { text-decoration-color: currentColor; }
+  .directory-row:hover .directory-name::after,
+  .directory-row:focus-visible .directory-name::after { transform: translateX(3px); }
+  .directory-desc { display: block; margin-top: 2px; font-size: 13px; line-height: 19px; letter-spacing: -0.01em; color: rgb(var(--ink-rgb) / 0.55); }
+  @media (max-width: 560px) {
+    .directory-cols { grid-template-columns: 1fr; gap: 28px; }
+  }
+
 </style>
 </head>
 <body>
@@ -204,11 +293,52 @@
     <span class="emoji">📁</span>
     <div class="eyebrow">Error 404</div>
     <h1>This page seems to have wandered off.</h1>
-    <p class="sub">The link might be outdated, or I may have moved something while tidying up. Either way, there's plenty left to look at.</p>
+    <p class="sub">This portfolio was redesigned in 2026, so this link may be outdated. Either way, there's plenty left to look at.</p>
     <div class="actions">
-      <a class="pill" href="/#/">Featured Work <span class="arr">→</span></a>
-      <a class="pill ghost" href="/#/archive">Browse the Archive</a>
+      <a class="pill" href="/">Go to Home <span class="arr">→</span></a>
     </div>
+
+    <!-- Plain-text directory. Tools that don't run JavaScript (search crawlers,
+         AI assistants) never see the redirect above, so this tells them where
+         the current content lives. -->
+    <section class="directory" aria-label="Current pages on this site">
+      <h2 class="directory-title">Looking for something specific?</h2>
+      <p class="directory-note">Here's where everything lives now.</p>
+
+      <div class="directory-cols">
+      <div class="directory-group">
+        <div class="directory-label">Case studies</div>
+        <a class="directory-row" href="https://serenang.com/#/project/searchneu">
+          <span class="directory-name">SearchNEU</span>
+          <span class="directory-desc">Redesigning a course search engine for mobile</span>
+        </a>
+        <a class="directory-row" href="https://serenang.com/#/project/jfk">
+          <span class="directory-name">JFK Airport</span>
+          <span class="directory-desc">Streamlining security escort requests</span>
+        </a>
+        <a class="directory-row" href="https://serenang.com/#/project/ecolab">
+          <span class="directory-name">Reuters x Ecolab</span>
+          <span class="directory-desc">An interactive microsite promoting water sustainability in industry</span>
+        </a>
+      </div>
+
+      <div class="directory-group">
+        <div class="directory-label">Pages</div>
+        <a class="directory-row" href="https://serenang.com/">
+          <span class="directory-name">Featured Work</span>
+          <span class="directory-desc">Selected case studies</span>
+        </a>
+        <a class="directory-row" href="https://serenang.com/#/about">
+          <span class="directory-name">About</span>
+          <span class="directory-desc">Background, experience, and contact</span>
+        </a>
+        <a class="directory-row" href="https://serenang.com/#/archive">
+          <span class="directory-name">Archive</span>
+          <span class="directory-desc">Design, photography, and other projects</span>
+        </a>
+      </div>
+      </div>
+    </section>
   </main>
 
   <footer class="foot">
