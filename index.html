@@ -1261,6 +1261,15 @@ window.__onThemePilot = function () { return true; };
   @media (prefers-reduced-motion: reduce) {
     .page-enter.is-entering { animation: none; }
   }
+
+  /* Plain-text fallback shown only until React mounts. */
+  .static-profile { max-width: 680px; margin: 0 auto; padding: 72px 24px 80px; font-family: "Inter", -apple-system, system-ui, sans-serif; color: var(--ink); line-height: 1.6; font-size: 15px; }
+  .static-profile h1 { font-size: 28px; letter-spacing: -0.03em; margin: 0 0 16px; }
+  .static-profile h2 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 36px 0 10px; }
+  .static-profile p { margin: 0 0 12px; font-weight: 300; }
+  .static-profile ul { margin: 0; padding-left: 18px; font-weight: 300; }
+  .static-profile li { margin-bottom: 6px; }
+  .static-profile a { color: var(--accent); text-decoration: none; }
 </style>
 <style>
   /* Images still downloading start hidden and fade in on load. Anything
@@ -1308,6 +1317,9 @@ window.__onThemePilot = function () { return true; };
   });
 })();
 </script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Serena Ng","jobTitle":"Product Designer","url":"https://serenang.com/","email":"mailto:serena.ng.contact@gmail.com","worksFor":{"@type":"Organization","name":"Epic Systems"},"alumniOf":{"@type":"CollegeOrUniversity","name":"Northeastern University"},"knowsAbout":["UX Design","UI Design","Product Design","UX Research","Visual Design","Branding","Prototyping"]}
+</script>
 </head>
 <body>
 <template id="__bundler_thumbnail" data-bg-color="#ffffff">
@@ -1320,7 +1332,58 @@ window.__onThemePilot = function () { return true; };
     <rect x="700" y="470" width="180" height="14" rx="7" fill="#d7d7d7"/>
   </svg>
 </template>
-<div id="root"></div>
+<div id="root">
+  <!-- Plain-text version of the site for search engines and AI tools that don't
+       run JavaScript. React replaces this entirely once the app loads. -->
+  <main class="static-profile">
+    <h1>Serena Ng — Product Designer</h1>
+    <p>Serena Ng is a product-obsessed designer who believes good design is never finished. She currently works on patient experience and AI workflows at Epic Systems, and previously designed for Ronik Design Agency, Snyk, JFK Airport, and Reuters.</p>
+    <p>She has worn a lot of hats, including product research, UX/UI, visual design, development, and marketing, and has worked shoulder-to-shoulder with engineers, marketers, and clients across startups and agencies. She believes the best solutions rarely stay inside one discipline, and cares most about solving the right problem: the one with the most impact, and the one that holds up as the product grows.</p>
+
+    <h2>Featured case studies</h2>
+    <ul>
+      <li><a href="/#/project/searchneu">SearchNEU</a> — Redesigning the mobile experience for a course search engine used by Northeastern University students.</li>
+      <li><a href="/#/project/jfk">JFK Airport</a> — Streamlining visitor escort requests for the largest terminal at JFK International Airport.</li>
+      <li><a href="/#/project/ecolab">Reuters x Ecolab</a> — An interactive microsite promoting water sustainability in industry, built for Reuters Plus and Ecolab.</li>
+      <li><a href="/#/project/pomodoro">The Pomodoro Timer</a> — A non-distracting yet satisfying productivity tool for the Apple Watch.</li>
+    </ul>
+
+    <h2>Experience</h2>
+    <ul>
+      <li>UX Quality Manager (Software R&amp;D) @ Epic Systems</li>
+      <li>UX &amp; Visual Designer @ Ronik Design Agency</li>
+      <li>Product Designer &amp; Researcher @ Snyk Cybersecurity</li>
+      <li>UX Designer @ SearchNEU</li>
+      <li>UX Designer @ Sandbox Software Consultancy</li>
+      <li>Game UX/UI Design Intern @ Tanbii</li>
+      <li>Graphic &amp; UI Design Intern @ Waquoit Bay National Research Reserve</li>
+      <li>BFA in UX Design @ Northeastern University</li>
+    </ul>
+
+    <h2>Client work</h2>
+    <p>Client work spanning UX/UI, research, and visual design for organizations including Reuters Plus, JFK Airport, NBCUniversal, Ogilvy, Ecolab, PGIM, Leading Edge, and Flo. Marketing.</p>
+
+    <h2>Design archive</h2>
+    <ul>
+      <li><a href="/#/design/flo-marketing">Flo. Marketing</a> — Brand identity redesign for a tech-forward B2B marketing agency.</li>
+      <li><a href="/#/design/boba-book">The Boba Book</a> — A 50+ page book designed with typographic and layout systems.</li>
+      <li><a href="/#/design/lovers-club">Lovers' Club Magazine</a> — Exploring different fandoms using storytelling and experimental typography.</li>
+      <li><a href="/#/design/typography-poster">Typography Guide Poster</a> — 50+ typographic terms explained and illustrated.</li>
+      <li><a href="/#/design/media-harmony">Media Harmony</a> — WordPress plugin for managing website files.</li>
+      <li><a href="/#/design/nasa-worldview">NASA Worldview</a> — A redesigned tool for visualizing NASA's satellite imagery and data.</li>
+      <li><a href="/#/design/leading-edge">Leading Edge</a> — Redesigned web page for a non-profit.</li>
+      <li><a href="/#/design/cant-decide">Can't Decide?</a> — Brand identity for a mystery flavored drink brand.</li>
+      <li><a href="/#/design/neu-dragon">NEU Dragon and Lion Dance Troupe</a> — Revamped brand identity and online presence.</li>
+    </ul>
+
+    <h2>More</h2>
+    <ul>
+      <li><a href="/#/about">About</a> — background, experience, and design journey</li>
+      <li><a href="/#/archive">Archive</a> — design, photography, and other projects</li>
+      <li>Contact: <a href="mailto:serena.ng.contact@gmail.com">serena.ng.contact@gmail.com</a></li>
+    </ul>
+  </main>
+</div>
 
 <!-- React + Babel -->
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
