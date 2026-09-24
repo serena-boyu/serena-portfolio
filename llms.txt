@@ -1,0 +1,27 @@
+# Serena Ng — Product Designer
+
+> Product designer working on patient experience and AI workflows at Epic Systems. Previously designed for Ronik Design Agency, Snyk, JFK Airport, and Reuters. BFA in UX Design from Northeastern University.
+
+This site was redesigned in 2026. The full plain-text profile is at https://serenang.com/ (visible without JavaScript).
+
+## Case studies
+- [SearchNEU](https://serenang.com/searchneu/): Mobile redesign of a course search engine for Northeastern students.
+- [JFK Airport](https://serenang.com/jfk/): Streamlining visitor escort requests for JFK Terminal 4.
+- [Reuters x Ecolab](https://serenang.com/ecolab/): Interactive microsite promoting water sustainability in industry.
+- [The Pomodoro Timer](https://serenang.com/pomodoro/): A productivity tool for the Apple Watch.
+
+## Experience
+- UX Quality Manager (Software R&D) @ Epic Systems
+- UX & Visual Designer @ Ronik Design Agency
+- Product Designer & Researcher @ Snyk Cybersecurity
+- UX Designer @ SearchNEU
+- UX Designer @ Sandbox Software Consultancy
+- Game UX/UI Design Intern @ Tanbii
+- Graphic & UI Design Intern @ Waquoit Bay National Research Reserve
+
+## More
+- [About](https://serenang.com/about/): Background, experience, and design journey.
+- [Archive](https://serenang.com/archive/): Design, photography, and other projects.
+
+## Contact
+- serena.ng.contact@gmail.com
