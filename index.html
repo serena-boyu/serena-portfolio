@@ -56,6 +56,7 @@ window.__onThemePilot = function () { return true; };
   window.addEventListener("hashchange", sendView);
 })();
 </script>
+<script>document.documentElement.classList.add("js");</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Serena Ng — Product Designer</title>
 <meta name="description" content="Serena Ng is a product-obsessed designer working on patient experience and AI workflows at Epic Health Systems. Previously Ronik, Snyk, JFK Airport, and Reuters." />
@@ -1262,7 +1263,10 @@ window.__onThemePilot = function () { return true; };
     .page-enter.is-entering { animation: none; }
   }
 
-  /* Plain-text fallback shown only until React mounts. */
+  /* Plain-text fallback for crawlers and AI tools that don't run JavaScript.
+     Browsers that do run it never see this (html.js is set before first paint),
+     so there's no flash on reload. */
+  html.js .static-profile { display: none; }
   .static-profile { max-width: 680px; margin: 0 auto; padding: 72px 24px 80px; font-family: "Inter", -apple-system, system-ui, sans-serif; color: var(--ink); line-height: 1.6; font-size: 15px; }
   .static-profile h1 { font-size: 28px; letter-spacing: -0.03em; margin: 0 0 16px; }
   .static-profile h2 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 36px 0 10px; }
