@@ -234,7 +234,9 @@ window.__onThemePilot = function () { return true; };
      the old one fades beneath it. */
   ::view-transition-old(root),
   ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-  ::view-transition-old(root) { animation: themeOldFade 1.1s ease-out both; z-index: 1; }
+  /* Old theme stays fully opaque. Fading it let the NEW theme's canvas color
+     show through behind it, so dark→light washed out before the circle arrived. */
+  ::view-transition-old(root) { z-index: 1; }
   ::view-transition-new(root) { z-index: 2; }
   /* The knob slides live before the reveal starts (see ThemeToggle), so the
      icons crossfade alongside it rather than popping in afterwards. */
