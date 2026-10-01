@@ -284,6 +284,10 @@ window.__onThemePilot = function () { return true; };
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
   @media (prefers-reduced-motion: reduce) { .theme-hint { animation: none; } }
+  /* Dark mode lightens --accent for text, which washes out white-on-accent.
+     Pin the bubble to the deeper brand purple so the text keeps its contrast. */
+  html[data-theme="dark"] .theme-hint,
+  html[data-theme="dark"] .theme-hint::before { background: #575EDB; }
   @media (max-width: 720px) {
     /* Toggle is a 38px circle here. */
     .theme-hint::before { right: 13px; }
