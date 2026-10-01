@@ -626,10 +626,33 @@ window.Lightbox = Lightbox;
 // Shared top nav used on EVERY page — "Serena Ng" left, links right.
 // Sticky; collapses to a compact translucent bar once the page is scrolled.
 // `overlay` makes it float over the fixed Home split-screen (which doesn't scroll).
+// The theme hint only greets visitors whose first page is the home page.
+const isHomeRoute = () => (location.hash || "").replace(/^#\/?/, "") === "";
+const LANDED_ON_HOME = isHomeRoute();
+
 // Light/dark toggle. Remembers a manual choice; with no choice saved, the
 // site follows the device setting. (Dark mode is piloting on About only.)
 function ThemeToggle() {
   const [dark, setDark] = useStateAb(() => document.documentElement.dataset.theme === "dark");
+  // One-time hint pointing at the toggle. Remembered once dismissed (or once
+  // the toggle has been used), so it never nags returning visitors.
+  const HINT_KEY = "themeHintSeen";
+  const [hint, setHint] = useStateAb(false);
+  useEffectAb(() => {
+    let seen = false;
+    try {seen = localStorage.getItem(HINT_KEY) === "1";} catch (e) {}
+    // Only on the home page, and only when that's where the visit started.
+    if (seen || !LANDED_ON_HOME || !isHomeRoute()) return;
+    const t = setTimeout(() => {if (isHomeRoute()) setHint(true);}, 1600);
+    // Leaving home hides it for good — it was a first-landing nudge.
+    const onRoute = () => {if (!isHomeRoute()) dismissHint();};
+    window.addEventListener("hashchange", onRoute);
+    return () => {clearTimeout(t);window.removeEventListener("hashchange", onRoute);};
+  }, []);
+  const dismissHint = () => {
+    setHint(false);
+    try {localStorage.setItem(HINT_KEY, "1");} catch (e) {}
+  };
   useEffectAb(() => {
     const sync = () => setDark(document.documentElement.dataset.theme === "dark");
     window.addEventListener("themechange", sync);
@@ -666,11 +689,12 @@ function ThemeToggle() {
     }).catch(() => {});
   };
   return (
+    <span className="theme-toggle-wrap">
     <button
       className={"theme-toggle" + (dark ? " is-dark" : "")}
       role="switch"
       aria-checked={dark}
-      onClick={(e) => {const b = e.currentTarget;b.blur();flip(b);}}
+      onClick={(e) => {const b = e.currentTarget;b.blur();dismissHint();flip(b);}}
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       title={dark ? "Light mode" : "Dark mode"}>
       {/* Two-state switch: sun and moon both visible, the knob sits on the
@@ -683,7 +707,21 @@ function ThemeToggle() {
       <svg className="theme-ic theme-ic-moon" width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
       </svg>
-    </button>);
+    </button>
+    {hint &&
+      <span className="theme-hint" role="status">
+        <span className="theme-hint-text">Toggle between light and dark mode here</span>
+        <button
+          className="theme-hint-close"
+          onClick={dismissHint}
+          aria-label="Dismiss hint">
+          <svg width="10" height="10" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+        </button>
+      </span>
+      }
+    </span>);
 
 }
 
@@ -1560,7 +1598,7 @@ function About({ onNavigate }) {
         <div className="about-two-col" style={{ marginTop: 56, display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 48 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Experience</div>
-            <MetaItem role="UX Quality Manager (Software R&D)" org="Epic Systems" orgShort="Epic" href="https://www.epic.com/" />
+            <MetaItem role="UX Design Quality Manager" org="Epic Systems" orgShort="Epic" href="https://www.epic.com/" />
             <MetaItem role="UX & Visual Designer" org="Ronik Design Agency" href="https://www.ronikdesign.com/" />
             <MetaItem role="Product Designer & Researcher" org="Snyk Cybersecurity" orgShort="Snyk" href="https://snyk.io/" />
             <MetaItem role="UX Designer" org="SearchNEU" href="https://searchneu.com/" />

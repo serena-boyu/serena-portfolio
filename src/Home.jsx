@@ -226,6 +226,24 @@ function CompanyLink({ href, children }) {
 }
 
 function EmojiCloud({ visible, hoveredId, onHover, onNavigate }) {
+  // Hint that the emojis are interactive: every few seconds one of them gives
+  // a small wiggle. Paused while the user is hovering one.
+  const [wiggle, setWiggle] = useState({ idx: -1, n: 0 });
+  useEffect(() => {
+    if (!visible || hoveredId !== null) return;
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+    const count = (window.EMOJIS || []).length;
+    if (!count) return;
+    const tick = () => setWiggle((w) => {
+      let next = Math.floor(Math.random() * count);
+      if (count > 1 && next === w.idx) next = (next + 1) % count;
+      return { idx: next, n: w.n + 1 };
+    });
+    const first = setTimeout(tick, 1400);
+    const id = setInterval(tick, 3600);
+    return () => { clearTimeout(first); clearInterval(id); };
+  }, [visible, hoveredId]);
   // Warm the browser cache for every hover photo once, on mount — so the first
   // hover paints instantly instead of waiting on a network fetch.
   useEffect(() => {
@@ -314,8 +332,15 @@ function EmojiCloud({ visible, hoveredId, onHover, onNavigate }) {
                 padding: 0,
                 animation: visible ? `emojiFloat${i % 3} ${6 + i * 0.4}s ease-in-out infinite` : "none"
               }}>
-            
-            {e.char}
+            <span
+              key={wiggle.idx === i ? "w" + wiggle.n : "s"}
+              style={{
+                display: "inline-block",
+                transformOrigin: "50% 80%",
+                animation: wiggle.idx === i && hoveredId === null ? "emojiWiggle .9s ease-in-out" : "none"
+              }}>
+              {e.char}
+            </span>
           </button>);
 
         })}
@@ -325,6 +350,14 @@ function EmojiCloud({ visible, hoveredId, onHover, onNavigate }) {
         @keyframes emojiFloat0 { 0%,100%{translate:0 0} 50%{translate:0 -6px} }
         @keyframes emojiFloat1 { 0%,100%{translate:0 0} 50%{translate:0 -10px} }
         @keyframes emojiFloat2 { 0%,100%{translate:0 0} 50%{translate:0 -4px} }
+        @keyframes emojiWiggle {
+          0%, 100% { transform: rotate(0deg) scale(1); }
+          15% { transform: rotate(-14deg) scale(1.08); }
+          30% { transform: rotate(12deg) scale(1.08); }
+          45% { transform: rotate(-9deg) scale(1.05); }
+          60% { transform: rotate(6deg) scale(1.03); }
+          75% { transform: rotate(-3deg) scale(1); }
+        }
       `}</style>
       </div>
     </div>);
@@ -911,8 +944,9 @@ function HomeDesktop({ onOpen, onNavigate }) {
         {/* Idle hint — appears with the emojis */}
         <div style={{
           position: "absolute",
-          left: 40,
+          right: 40,
           bottom: 30,
+          textAlign: "right",
           fontSize: 13,
           color: "rgb(var(--ink-rgb) / var(--hint-alpha, 0.45))",
           letterSpacing: "-0.01em",

@@ -252,6 +252,43 @@ window.__onThemePilot = function () { return true; };
     transition: border-color .2s ease, background .2s ease;
   }
   .theme-toggle:hover { border-color: var(--accent); }
+  /* One-time hint bubble pointing up at the toggle. */
+  .theme-toggle-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
+  .theme-hint {
+    position: absolute; top: calc(100% + 12px); right: 0; z-index: 60;
+    display: flex; align-items: flex-start; gap: 8px;
+    width: max-content; max-width: 220px;
+    padding: 10px 10px 10px 14px; border-radius: 12px;
+    background: var(--accent); color: #fff;
+    font-size: 12.5px; line-height: 17px; font-weight: 500; letter-spacing: -0.01em;
+    white-space: normal; text-align: left;
+    box-shadow: 0 8px 24px var(--accent-shadow), 0 2px 6px rgba(0,0,0,0.12);
+    animation: themeHintIn .45s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  /* Arrow points at the toggle's centre (track is 62px wide). */
+  .theme-hint::before {
+    content: ""; position: absolute; top: -5px; right: 25px;
+    width: 12px; height: 12px; background: var(--accent);
+    transform: rotate(45deg); border-radius: 2px;
+  }
+  .theme-hint-text { position: relative; }
+  .theme-hint-close {
+    position: relative; flex-shrink: 0; width: 18px; height: 18px; margin-top: -1px;
+    display: grid; place-items: center; border: none; border-radius: 50%;
+    background: rgba(255,255,255,0.18); color: #fff; cursor: pointer; padding: 0;
+    transition: background .2s ease;
+  }
+  .theme-hint-close:hover { background: rgba(255,255,255,0.32); }
+  @keyframes themeHintIn {
+    from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) { .theme-hint { animation: none; } }
+  @media (max-width: 720px) {
+    /* Toggle is a 38px circle here. */
+    .theme-hint::before { right: 13px; }
+    .theme-hint { max-width: 190px; }
+  }
   .theme-knob {
     position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 50%;
     background: var(--paper); box-shadow: 0 1px 3px rgba(0,0,0,0.22);
