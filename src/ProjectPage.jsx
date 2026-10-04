@@ -1460,16 +1460,23 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
               {data.subtitle}
             </p>
 
-            {/* Tags */}
-            {data.tags &&
-            <div style={{ marginTop: 18, display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {data.tags.map((t) =>
+            {/* Tags — the live-status pill leads the row when a project shipped. */}
+            {(data.tags || data.live) &&
+            <div style={{ marginTop: 18, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+              {data.live &&
+              <span className="live-pill">
+                  <span className="live-dot" aria-hidden="true" />
+                  {data.live.label}
+                </span>
+              }
+              {(data.tags || []).map((t) =>
               <span key={t} style={{
                 fontSize: 12,
                 letterSpacing: "-0.01em",
-                color: "var(--accent)",
-                background: "color-mix(in oklch, var(--accent) 8%, transparent)",
-                border: "1px solid color-mix(in oklch, var(--accent) 26%, transparent)",
+                // Neutral: these are descriptive labels, not controls.
+                color: "rgb(var(--ink-rgb) / 0.62)",
+                background: "rgb(var(--ink-rgb) / 0.035)",
+                border: "1px solid var(--hair)",
                 borderRadius: 999,
                 padding: "4px 11px"
               }}>{t}</span>

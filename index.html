@@ -252,6 +252,49 @@ window.__onThemePilot = function () { return true; };
     transition: border-color .2s ease, background .2s ease;
   }
   .theme-toggle:hover { border-color: var(--accent); }
+  /* Case study hero: "Live since" status pill + live-site link. */
+  .live-row { margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  /* Tighten the gap to the project tags that follow. */
+  .live-row + div { margin-top: 10px !important; }
+  .live-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 4px 11px 4px 9px; border-radius: 999px;
+    font-size: 12px; font-weight: 500; letter-spacing: -0.01em;
+    color: rgb(22,128,74);
+    background: rgba(34,170,96,0.1);
+    border: 1px solid rgba(34,170,96,0.28);
+  }
+  .live-dot {
+    position: relative; width: 7px; height: 7px; border-radius: 50%;
+    background: rgb(34,170,96);
+  }
+  /* Soft pulse so it reads as "on" without being distracting. */
+  .live-dot::after {
+    content: ""; position: absolute; inset: -3px; border-radius: 50%;
+    background: rgb(34,170,96); opacity: 0.35;
+    animation: livePulse 2.4s ease-out infinite;
+  }
+  @keyframes livePulse {
+    0% { transform: scale(0.6); opacity: 0.45; }
+    80%, 100% { transform: scale(1.9); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .live-dot::after { animation: none; opacity: 0; } }
+  .live-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 13px; font-weight: 500; letter-spacing: -0.01em;
+    color: var(--accent); text-decoration: none;
+    transition: opacity .2s ease;
+  }
+  .live-link:hover { opacity: 0.75; }
+  .live-link svg { transition: transform .2s ease; }
+  .live-link:hover svg { transform: translate(1px, -1px); }
+  html[data-theme="dark"] .live-pill {
+    color: rgb(110,214,152);
+    background: rgba(52,199,110,0.12);
+    border-color: rgba(52,199,110,0.32);
+  }
+  html[data-theme="dark"] .live-dot,
+  html[data-theme="dark"] .live-dot::after { background: rgb(74,214,128); }
   /* One-time hint bubble pointing up at the toggle. */
   .theme-toggle-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
   .theme-hint {
@@ -396,7 +439,7 @@ window.__onThemePilot = function () { return true; };
      pure black; hue-rotate keeps any colour close to its original hue. */
   html[data-theme="dark"] video.invert-dark { filter: invert(0.93) hue-rotate(180deg); }
   /* "@" between role and company: dimmer than the role text so it reads as a divider. */
-  .at-sep { color: rgb(var(--ink-rgb) / 0.38); font-weight: 400; }
+  .at-sep { color: rgb(var(--ink-rgb) / 0.55); font-weight: 400; }
 
   * { box-sizing: border-box; }
 
@@ -1451,12 +1494,12 @@ window.__onThemePilot = function () { return true; };
 
 <!-- ?v= cache-buster: BUMP THIS NUMBER on every deploy so browsers re-fetch
      the JSX instead of serving a stale cached copy. -->
-<script type="text/babel" src="tweaks-panel.jsx?v=70"></script>
-<script type="text/babel" src="src/data.jsx?v=70"></script>
-<script type="text/babel" src="src/Home.jsx?v=70"></script>
-<script type="text/babel" src="src/ProjectPage.jsx?v=70"></script>
-<script type="text/babel" src="src/About.jsx?v=70"></script>
-<script type="text/babel" src="src/PlaygroundSimple.jsx?v=70"></script>
-<script type="text/babel" src="src/App.jsx?v=70"></script>
+<script type="text/babel" src="tweaks-panel.jsx?v=71"></script>
+<script type="text/babel" src="src/data.jsx?v=71"></script>
+<script type="text/babel" src="src/Home.jsx?v=71"></script>
+<script type="text/babel" src="src/ProjectPage.jsx?v=71"></script>
+<script type="text/babel" src="src/About.jsx?v=71"></script>
+<script type="text/babel" src="src/PlaygroundSimple.jsx?v=71"></script>
+<script type="text/babel" src="src/App.jsx?v=71"></script>
 </body>
 </html>

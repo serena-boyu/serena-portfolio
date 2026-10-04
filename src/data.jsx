@@ -159,6 +159,8 @@ const PROJECT_PAGE = {
   searchneu: {
     title: "SearchNEU",
     subtitle: "Redesigning the mobile experience for a course search engine.",
+    // Live-status pill in the hero, with a link to the real product.
+    live: { label: "Live since 2025", href: "https://searchneu.com/", linkLabel: "View live site" },
     cover: "image",
     // Cover image at the top of the page — swap this path to change it.
     coverSrc: "assets/web/searchneu/cover-angled-screens-w.webp",
@@ -167,7 +169,7 @@ const PROJECT_PAGE = {
     meta: [
       { label: "Role", value: "UX Design Lead", sub: "Interaction Design, Visual Design,\nUser Flows, Prototyping, UX Research" },
       { label: "Team", value: "1 UX Design Lead\n1 UX Designer\n4 Developers\n1 Project Manager" },
-      { label: "Timeline & Status", value: "4 Months\nLaunched in 2025" },
+      { label: "Timeline", value: "4 Months" },
     ],
     sections: [
       {
@@ -483,14 +485,16 @@ const PROJECT_PAGE = {
   jfk: {
     title: "JFK Airport",
     subtitle: "Streamlining visitor escort requests for the largest terminal at JFK International Airport.",
+    // Internal tool, so no public link.
+    live: { label: "Live since 2025" },
     cover: "image",
     coverSrc: "assets/jfk/web/hero-dashboard-v3.jpg",
     eyebrowDate: "2024-2025",
-    tags: ["Dashboard", "Desktop & Mobile", "UX Design", "Client Work"],
+    tags: ["Client Work", "Dashboard", "Desktop & Mobile", "UX Design"],
     meta: [
       { label: "Role", value: "UX Designer", sub: "Interaction Design, Visual Design,\nUser Flows, Prototyping" },
       { label: "Team", value: "2 UX Designers", sub: "1 Senior Web Developer\n1 Project Manager\n1 Creative Director" },
-      { label: "Timeline & Status", value: "3 Months", sub: "Launched in January 2025" },
+      { label: "Timeline", value: "3 Months" },
     ],
     sections: [
       {
@@ -881,10 +885,11 @@ const PROJECT_PAGE = {
     cover: "image",
     coverSrc: "assets/web/ecolab/web/hero-desktop-mobile.webp",
     eyebrowDate: "2024",
-    tags: ["Web Design", "Graphic Design", "Desktop & Mobile", "Client Work"],
+    live: { label: "Live since 2024" },
+    tags: ["Client Work", "Web Design", "Graphic Design", "Desktop & Mobile"],
     meta: [
-      { label: "Role", value: "Designer & Developer (Lead)", sub: "Editorial Design, Data Visualization,\nMotion Design" },
-      { label: "Team", value: "1 Designer/Developer (Lead)", sub: "1 Designer\n1 Creative Director/3D Animator" },
+      { label: "Role", value: "Designer & Developer Lead", sub: "Editorial Design, Data Visualization,\nMotion Design" },
+      { label: "Team", value: "1 Designer/Developer Lead", sub: "1 Designer\n1 Creative Director/3D Animator" },
       { label: "Client", value: "Reuters Plus (Content Partner)\nEcolab (Client)" },
     ],
     sections: [
@@ -964,7 +969,7 @@ const PROJECT_PAGE = {
           "**Easy to share** — a link anyone can send, plus a PDF version for when a document suits better",
         ],
         figures: [
-          { videoSrc: "assets/ecolab/desktop-scroll.mp4", frame: "plus.reuters.com", caption: "The published microsite on desktop." },
+          { videoSrc: "assets/ecolab/desktop-scroll.mp4", videoStart: 3.5, frame: "plus.reuters.com", caption: "The published microsite on desktop." },
         ],
         subsections: [
           {
@@ -1038,7 +1043,7 @@ const PROJECT_PAGE = {
         title: "Final Design Gallery",
         body: [],
         figures: [
-          { videoSrc: "assets/ecolab/desktop-scroll.mp4", frame: "plus.reuters.com", caption: "The full walkthrough on desktop." },
+          { videoSrc: "assets/ecolab/desktop-scroll.mp4", videoStart: 3.5, frame: "plus.reuters.com", caption: "The full walkthrough on desktop." },
           { videoSrc: "assets/ecolab/mobile-scroll.mp4", phoneFrame: "plus.reuters.com", caption: "The full walkthrough on mobile." },
         ],
       },

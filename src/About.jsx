@@ -1177,9 +1177,9 @@ window.SiteFooter = SiteFooter;
 // Back-compat alias — older call sites used <SubpageNav/>.
 function SubpageNav(props) {return <SiteNav {...props} />;}
 
-function MetaItem({ label, value, link, role, org, href, roleShort, orgShort }) {
+function MetaItem({ label, value, link, role, org, href, roleShort, orgShort, desc }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 12 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 18 }}>
       {label &&
       <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.85)" }}>{label}</div>
       }
@@ -1187,14 +1187,17 @@ function MetaItem({ label, value, link, role, org, href, roleShort, orgShort }) 
         {org ?
         <>
             {/* Long / short variants swap by CSS so the row fits on a phone. */}
+            {/* Role in full ink so each row's start is easy to pick out. */}
+            <span className="meta-role" style={{ color: "rgb(var(--ink-rgb) / 0.92)", fontWeight: 400 }}>
             {roleShort ?
           <>
                 <span className="meta-long">{role}</span>
                 <span className="meta-short">{roleShort}</span>
               </> :
           role
-          } <span className="at-sep">@</span>{" "}
-            <a className="org-link" href={href} target="_blank" rel="noreferrer noopener">
+          }
+            </span> <span className="at-sep">@</span>{" "}
+            <a className="org-link" href={href} target="_blank" rel="noreferrer noopener" style={{ fontWeight: 400 }}>
               {orgShort ?
             <>
                   <span className="meta-long">{org}</span>
@@ -1207,6 +1210,9 @@ function MetaItem({ label, value, link, role, org, href, roleShort, orgShort }) 
         value
         }
       </div>
+      {desc &&
+      <div className="meta-desc" style={{ fontSize: 13, fontWeight: 300, lineHeight: "19px", letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.62)", textWrap: "pretty" }}>{desc}</div>
+      }
     </div>);
 
 }
@@ -1520,7 +1526,7 @@ function About({ onNavigate }) {
    body: "I got into design in high school through a graphic design class. My teacher helped me get Adobe Creative Cloud over the summer, and I spent it working through every YouTube tutorial I could find.",
   src: "assets/web/funPics/journey/highschool.webp", image: "high school", imgTitle: "First designs", imgCaption: "A summer spent inside Photoshop and Illustrator." },
   { year: "High School / College", title: "Exploring UX design",
-   body: "I picked up Adobe XD next, just to try it. Watching my static designs become interactive sparked my interest, and I fell in love with the whole UX process, from research to iteration.",
+   body: "I picked up Adobe XD next, just to try it. Watching my static designs become interactive sparked my interest, and I fell in love with the whole UX process, from research to iteration.\n\nI went on to earn my BFA in UX Design at Northeastern University.",
   src: "assets/web/funPics/journey/firstux.webp", image: "UX", imgTitle: "My first ever UX project", imgCaption: "The first time I made a static design interactive." },
   { year: "Ronik Design", title: "Working at an agency",
    body: "My time at Ronik Design taught me to wear a lot of hats: graphic design, UX/UI, animation, often across several client projects at once. Constant feedback, revisions, and pitches made the work exciting and incredibly rewarding.",
@@ -1597,15 +1603,11 @@ function About({ onNavigate }) {
             squeezing Experience. */}
         <div className="about-two-col" style={{ marginTop: 56, display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 48 }}>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Experience</div>
-            <MetaItem role="UX Design Quality Manager" org="Epic Systems" orgShort="Epic" href="https://www.epic.com/" />
-            <MetaItem role="UX & Visual Designer" org="Ronik Design Agency" href="https://www.ronikdesign.com/" />
-            <MetaItem role="Product Designer & Researcher" org="Snyk Cybersecurity" orgShort="Snyk" href="https://snyk.io/" />
-            <MetaItem role="UX Designer" org="SearchNEU" href="https://searchneu.com/" />
-            <MetaItem role="UX Designer" org="Sandbox Software Consultancy" href="https://www.sandboxnu.com/" />
-            <MetaItem role="Game UX/UI Design Intern" org="Tanbii" href="https://www.tanbii.com/" />
-            <MetaItem role="Graphic & UI Design Intern" roleShort="Design Intern" org="Waquoit Bay National Research" href="https://waquoitbayreserve.org/" />
-            <MetaItem role="BFA in UX Design" org="Northeastern University" href="https://www.northeastern.edu/" />
+            <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Selected Experience</div>
+            <MetaItem role="UX Design Quality Manager" org="Epic Systems" orgShort="Epic" href="https://www.epic.com/" desc="Patient experience + AI workflows for MyChart and Emergency/Urgent Care" />
+            <MetaItem role="UX & Visual Designer" org="Ronik Design Agency" href="https://www.ronikdesign.com/" desc="UX/UI, branding, and motion design across client projects" />
+            <MetaItem role="Product Designer & UX Researcher" org="Snyk Cybersecurity" orgShort="Snyk" href="https://snyk.io/" desc="R&D for SBOM features and Snyk's ASPM product launch" />
+            <MetaItem role="UX Designer" org="SearchNEU" href="https://searchneu.com/" desc="Mobile redesign of a course search tool used by 38,000+ students" />
           </div>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Client Work</div>
