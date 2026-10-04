@@ -888,17 +888,35 @@ function SecretPrompt({ onYes, onNo }) {
           width: "100%", maxWidth: 420,
           border: "1px solid var(--dialog-border, transparent)",
           boxShadow: "var(--dialog-shadow, 0 24px 60px rgba(0,0,0,0.22))",
-          textAlign: "center"
+          textAlign: "center",
+          position: "relative"
         }}>
+        <button
+          onClick={onNo}
+          aria-label="Close"
+          style={{
+            position: "absolute", top: 12, right: 12,
+            width: 32, height: 32, borderRadius: "50%",
+            display: "grid", placeItems: "center",
+            border: "none", background: "transparent", cursor: "pointer",
+            color: "rgb(var(--ink-rgb) / 0.5)", padding: 0,
+            transition: "background .2s ease, color .2s ease"
+          }}
+          onMouseEnter={(e) => {e.currentTarget.style.background = "rgb(var(--ink-rgb) / 0.07)";e.currentTarget.style.color = "var(--ink)";}}
+          onMouseLeave={(e) => {e.currentTarget.style.background = "transparent";e.currentTarget.style.color = "rgb(var(--ink-rgb) / 0.5)";}}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+        </button>
         <div style={{ fontWeight: 700, fontSize: 20, letterSpacing: "-0.03em", color: "var(--ink)" }}>
           Activate attention enhancer tool?
         </div>
-        <div style={{ marginTop: 8, fontSize: 13, fontWeight: 300, letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.5)" }}>
+        <div style={{ marginTop: 8, fontSize: 13, fontWeight: 300, letterSpacing: "-0.01em", color: "rgb(var(--ink-rgb) / 0.62)" }}>
           (Btw this was my brother's idea)
         </div>
         <div style={{ marginTop: 22, display: "flex", gap: 9, justifyContent: "center", flexWrap: "wrap" }}>
           <button className="pill-btn ghost" onClick={onNo} style={{ justifyContent: "center" }}>
-            Oh god no...
+            No thanks
           </button>
           <button className="pill-btn" onClick={onYes} style={{ justifyContent: "center" }}>
             YESSSSS!!!
@@ -1604,7 +1622,7 @@ function About({ onNavigate }) {
         <div className="about-two-col" style={{ marginTop: 56, display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 48 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 16 }}>Selected Experience</div>
-            <MetaItem role="UX Design Quality Manager" org="Epic Systems" orgShort="Epic" href="https://www.epic.com/" desc="Patient experience + AI workflows for MyChart and Emergency/Urgent Care" />
+            <MetaItem role="UX Design Quality Manager" org="Epic Systems" orgShort="Epic" href="https://www.epic.com/" desc="Patient experience + AI workflows for MyChart, Emergency, and Urgent Care" />
             <MetaItem role="UX & Visual Designer" org="Ronik Design Agency" href="https://www.ronikdesign.com/" desc="UX/UI, branding, and motion design across client projects" />
             <MetaItem role="Product Designer & UX Researcher" org="Snyk Cybersecurity" orgShort="Snyk" href="https://snyk.io/" desc="R&D for SBOM features and Snyk's ASPM product launch" />
             <MetaItem role="UX Designer" org="SearchNEU" href="https://searchneu.com/" desc="Mobile redesign of a course search tool used by 38,000+ students" />
