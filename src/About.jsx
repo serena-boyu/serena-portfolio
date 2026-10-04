@@ -1678,7 +1678,7 @@ function About({ onNavigate }) {
         </div>
 
         {/* My Journey — animated timeline */}
-        <div style={{ marginTop: 64 }}>
+        <div className="about-journey-wrap" style={{ marginTop: 64 }}>
           <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 24 }}>My Journey</div>
           <Journey items={journey} />
         </div>

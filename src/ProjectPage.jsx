@@ -1152,7 +1152,7 @@ function Section({ section, registerRef, projectId }) {
 }
 
 // Projects requiring a password before their case study is shown.
-const PROTECTED_PROJECTS = { epic: "pixels" };
+const PROTECTED_PROJECTS = {};
 
 // Intermediary password screen shown before a protected case study.
 function PasswordGate({ project, onUnlock, onNavigate }) {
