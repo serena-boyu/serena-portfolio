@@ -425,8 +425,8 @@ function CompactSidebar({ sections, activeId, onJump, onTop, onHome }) {
                       width: "100%",
                       cursor: "pointer",
                       fontFamily: "inherit",
-                      fontSize: 11.5,
-                      lineHeight: "16px",
+                      fontSize: 12.5,
+                      lineHeight: "17px",
                       letterSpacing: "-0.01em",
                       color: subActive ? "var(--accent)" : "rgb(var(--ink-rgb) / var(--label-alpha, 0.42))",
                       fontWeight: subActive ? 600 : 400,
@@ -1421,6 +1421,10 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
         display: "flex",
         gap: isMobile ? 0 : 68,
         maxWidth: 1180,
+        // Fill the available width even when a page has little media —
+        // otherwise a text-only case study shrinks narrower than the others.
+        width: "100%",
+        boxSizing: "border-box",
         margin: "0 auto",
         padding: isMobile ? "16px 20px 60px" : "84px 40px 80px"
       }}>
@@ -1492,8 +1496,13 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
               gap: isMobile ? 18 : 40,
               justifyContent: "start"
             }}>
-              {data.meta.map((m) =>
-              <div key={m.label}>
+              {data.meta.map((m, mi) =>
+              <div key={m.label} style={Object.assign(
+                m.label === "Role" ? { maxWidth: 300 } : {},
+                // Phones use 2 columns; a lone last item gets the full width so
+                // longer values (e.g. "Reuters Plus (Content Partner)") don't wrap.
+                isMobile && data.meta.length % 2 === 1 && mi === data.meta.length - 1 ? { gridColumn: "1 / -1" } : {}
+              )}>
                   <div style={{
                   fontSize: 10,
                   letterSpacing: "0.08em",
@@ -1507,22 +1516,15 @@ function ProjectCaseStudy({ projectId, onBack, onOpen, onNavigate, isMobile }) {
                   fontWeight: 400,
                   lineHeight: "21px",
                   whiteSpace: "pre-line"
-                }}>{typeof m.value === "string" && m.value.includes("(") ?
-                  // Parenthesised qualifiers read as secondary — gray them out.
-                  m.value.split(/(\([^)]*\))/g).map((part, pi) =>
-                  part.startsWith("(") && part.endsWith(")") ?
-                  <span key={pi} style={{ color: "rgb(var(--ink-rgb) / 0.5)", fontWeight: 300 }}>{part}</span> :
-                  <React.Fragment key={pi}>{part}</React.Fragment>
-                  ) :
-                  m.value}</div>
+                }}>{m.value}</div>
                   {m.sub &&
-                <div style={{
+                <div className="meta-sub" style={{
                   fontSize: 13,
                   letterSpacing: "0.005em",
                   fontWeight: 300,
                   lineHeight: "21px",
                   color: "rgb(var(--ink-rgb) / 0.5)",
-                  whiteSpace: "pre-line"
+                  whiteSpace: "normal"
                 }}>{m.sub}</div>
                 }
                 </div>

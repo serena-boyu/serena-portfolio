@@ -168,7 +168,7 @@ const PROJECT_PAGE = {
     tags: ["Redesign", "Mobile", "UX Design", "UX Research"],
     meta: [
       { label: "Role", value: "UX Design Lead", sub: "Interaction Design, Visual Design,\nUser Flows, Prototyping, UX Research" },
-      { label: "Team", value: "1 UX Design Lead\n1 UX Designer\n4 Developers\n1 Project Manager" },
+      { label: "Team", value: "2 UX Designers\n4 Developers\n1 Project Manager" },
       { label: "Timeline", value: "4 Months" },
     ],
     sections: [
@@ -493,7 +493,7 @@ const PROJECT_PAGE = {
     tags: ["Client Work", "Dashboard", "Desktop & Mobile", "UX Design"],
     meta: [
       { label: "Role", value: "UX Designer", sub: "Interaction Design, Visual Design,\nUser Flows, Prototyping" },
-      { label: "Team", value: "2 UX Designers", sub: "1 Senior Web Developer\n1 Project Manager\n1 Creative Director" },
+      { label: "Team", value: "2 UX Designers\n1 Senior Web Developer\n1 Project Manager\n1 Creative Director" },
       { label: "Timeline", value: "3 Months" },
     ],
     sections: [
@@ -889,7 +889,7 @@ const PROJECT_PAGE = {
     tags: ["Client Work", "Web Design", "Graphic Design", "Desktop & Mobile"],
     meta: [
       { label: "Role", value: "Designer & Developer Lead", sub: "Editorial Design, Data Visualization,\nMotion Design" },
-      { label: "Team", value: "1 Designer/Developer Lead", sub: "1 Designer\n1 Creative Director/3D Animator" },
+      { label: "Team", value: "1 Designer/Developer Lead\n1 Designer\n1 Creative Director" },
       { label: "Client", value: "Reuters Plus (Content Partner)\nEcolab (Client)" },
     ],
     sections: [
